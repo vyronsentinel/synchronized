@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SYNCHRONIZED | iDate</title>
 
     <!-- SEO & Link Preview Tags -->
@@ -11,18 +11,27 @@
     <!-- Open Graph (Discord, Facebook, Messenger, Viber, etc.) -->
     <meta property="og:title" content="SYNCHRONIZED | iDate">
     <meta property="og:description" content="SYNCHRONIZED is iDate Clan's official hub — roster, events, and more.">
-    <meta property="og:image" content="https://synchronized.surge.sh/sync-logo.png">
-    <meta property="og:url" content="https://synchronized.surge.sh">
+    <meta property="og:image" content="https://synchronized.site/sync-logo.png">
+    <meta property="og:url" content="https://synchronized.site">
     <meta property="og:type" content="website">
 
     <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="SYNCHRONIZED | iDate">
     <meta name="twitter:description" content="SYNCHRONIZED is iDate Clan's official hub — roster, events, and more.">
-    <meta name="twitter:image" content="https://synchronized.surge.sh/sync-logo.png">
+    <meta name="twitter:image" content="https://synchronized.site/sync-logo.png">
+
+    <!-- Canonical & theme color -->
+    <link rel="canonical" href="https://synchronized.site/">
+    <meta name="theme-color" content="#ff2d78">
+    <meta property="og:site_name" content="SYNCHRONIZED">
+    <meta property="og:locale" content="en_US">
 
     <link rel="icon" type="image/png" href="sync-logo.png">
     
+    <!-- Preconnect for faster font loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
 <style>
@@ -779,9 +788,8 @@
 
   .footer-logo {
     font-family: 'Orbitron', sans-serif;
-    font-weight: 700;
-    font-size: 1.4rem;
     font-weight: 400;
+    font-size: 1.4rem;
     color: var(--cyan);
     letter-spacing: 0.15em;
     margin-bottom: 0.5rem;
@@ -1080,18 +1088,22 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(5,5,16,0.95);
-    z-index: 99999;
+    background: rgba(5,5,16,0.97);
+    z-index: 999999;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     gap: 1rem;
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    isolation: isolate;
   }
   #lightbox.open { display: flex; }
+  /* Suppress scanline and other pseudo overlays when lightbox is open */
+  body.lightbox-open::before { z-index: -1 !important; }
   #lightbox img {
     max-width: 92vw;
-    max-height: 88vh;
+    max-height: 82vh;
     width: auto;
     height: auto;
     object-fit: contain;
@@ -1100,6 +1112,8 @@
     box-shadow: 0 0 60px rgba(255,45,120,0.3), 0 0 100px rgba(0,240,255,0.2);
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
+    position: relative;
+    z-index: 1000001;
   }
   #lightbox-close {
     font-family: 'Orbitron', sans-serif;
@@ -1112,6 +1126,8 @@
     padding: 6px 18px;
     border-radius: 2px;
     transition: color 0.2s, border-color 0.2s;
+    position: relative;
+    z-index: 1000001;
   }
   #lightbox-close:hover { color: var(--hot-pink); border-color: var(--hot-pink); }
 
@@ -1906,10 +1922,19 @@
 <nav>
   <a class="nav-logo" href="#hero">
     <img src="sync-logo.png" alt="SYNCHRONIZED" style="display:block; height: 50px; width: auto; animation: logoFloat 3.5s ease-in-out infinite, logoPulse 3.5s ease-in-out infinite;">
-</a>
+  </a>
+
+  <!-- ANNOUNCEMENT BUTTON — CENTER -->
+  <button id="ann-nav-btn" onclick="toggleAnnPopup()" title="Announcements" aria-label="Announcements">
+    <span class="ann-nav-exclaim">!</span>
+    <span class="ann-nav-label">ANNOUNCEMENTS</span>
+    <div id="ann-badge"></div>
+  </button>
+
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
-    <li><a href="#members">Members</a></li>
+    <li><a href="#members">Founders</a></li>
+    <li><a href="#" onclick="openRosterModal();return false;">Roster</a></li>
     <li><a href="#join">Join Us</a></li>
     <li><a href="#apply">Apply</a></li>
     <li><a href="https://discord.gg/XW7nY97d" target="_blank" class="nav-discord">Discord ↗</a></li>
@@ -1923,6 +1948,8 @@
 <div class="mobile-menu" id="mobileMenu">
   <a href="#about" onclick="toggleMenu()">About</a>
   <a href="#members" onclick="toggleMenu()">Members</a>
+  <a href="#" onclick="toggleMenu();openRosterModal();return false;">Roster</a>
+  <a href="#announcements" onclick="toggleMenu()">News</a>
   <a href="#join" onclick="toggleMenu()">Join Us</a>
   <a href="#apply" onclick="toggleMenu()">Apply</a>
   <a href="https://discord.gg/XW7nY97d" target="_blank" class="mob-discord">Discord ↗</a>
@@ -2073,7 +2100,7 @@
 
         <!-- Gallery count tag -->
         <div style="text-align:right; margin-top:0.25rem;">
-          <span style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:0.2em; color:var(--muted);">[ 4 PHOTOS · SYNCHRONIZED ARCHIVE ]</span>
+          <span id="gallery-count-tag" style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:0.2em; color:var(--muted);">[ 4 PHOTOS · SYNCHRONIZED ARCHIVE ]</span>
         </div>
 
       </div>
@@ -2125,12 +2152,32 @@
         <div class="tier-connector"></div>
         <div class="tier-cards tier-cards--center">
           <div class="member-card hcard--master">
-            <div class="member-card-corner" style="border-top-color: rgba(255,215,0,0.6);"></div>
-            <div class="member-avatar" style="background:none;padding:0;overflow:hidden;width:90px;height:90px;border:3px solid #FFD700;box-shadow:0 0 25px rgba(255,215,0,0.8), 0 0 45px rgba(255,215,0,0.4);">
-              <img src="lujj.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+            <!-- Gold dust particles -->
+            <div class="master-dust">
+              <span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span>
             </div>
-            <div class="member-name" style="font-size: 1.15rem; text-shadow: 0 0 12px rgba(255,215,0,0.6);">[SYNC]-Lujuria-</div>
-            <div class="member-role clan-master">Clan Master</div>
+
+            <!-- Animated crown -->
+            <span class="master-crown">👑</span>
+
+            <!-- Avatar with dual spinning rings -->
+            <div class="master-avatar-wrap">
+              <div class="master-avatar-ring-2"></div>
+              <div class="master-avatar-ring"></div>
+              <div class="member-avatar" style="background:none;padding:0;overflow:hidden;width:100px;height:100px;border:3px solid #FFD700;position:relative;z-index:2;">
+                <img src="lujj.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+              </div>
+            </div>
+
+            <!-- Shimmer name -->
+            <div class="master-name">[SYNC]-Lujuria-</div>
+
+            <!-- Role -->
+            <div class="member-role clan-master" style="margin-top:0.3rem;">Clan Master</div>
+
+            <!-- Commander badge -->
+            <div class="master-badge">⚔ Commander ⚔</div>
           </div>
         </div>
       </div>
@@ -2180,9 +2227,9 @@
           <div class="member-card hcard--council">
             <div class="member-card-corner"></div>
             <div class="member-avatar" style="background:none;padding:0;overflow:hidden;border:2px solid #E8B48A;box-shadow:0 0 14px rgba(232,180,138,0.4);">
-              <img src="errs.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+              <img src="shin.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
             </div>
-            <div class="member-name">[SYNC]-Errs-</div>
+            <div class="member-name">[SYNC]-Sh1n-</div>
             <div class="member-role high-council">High Council</div>
           </div>
           <div class="member-card hcard--council">
@@ -2193,67 +2240,113 @@
             <div class="member-name">[SYNC]-KYO-</div>
             <div class="member-role high-council">High Council</div>
           </div>
+          <div class="member-card hcard--council">
+            <div class="member-card-corner"></div>
+            <div class="member-avatar" style="background:none;padding:0;overflow:hidden;border:2px solid #E8B48A;box-shadow:0 0 14px rgba(232,180,138,0.4);">
+              <img src="mari.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+            </div>
+            <div class="member-name" style="font-size:0.82rem;letter-spacing:0.06em;">[SYNC]-Minwonuna-</div>
+            <div class="member-role high-council">High Council</div>
+          </div>
         </div>
       </div>
 
       <div class="tier-branch-line"></div>
 
-      <!-- ── TIER 3: MOD ── -->
+      <!-- ── TIER 3: MOD + EXAMINER + RECRUITER (triangle layout) ── -->
       <div class="hierarchy-tier">
-        <div class="tier-label tier-label--mod" style="animation: modLabelPulse 2s ease-in-out infinite;">
-          <span class="tier-icon">⬡</span> Moderator
+        <div class="tier-label-row-triangle">
+          <div class="tier-label tier-label--recruiter" style="animation: examinerLabelPulse 2.5s ease-in-out infinite;">
+            <span class="tier-icon">◎</span> Examiner
+          </div>
+          <div class="tier-label tier-label--mod" style="animation: modLabelPulse 2s ease-in-out infinite;">
+            <span class="tier-icon">⬡</span> Moderator
+          </div>
+          <div class="tier-label tier-label--recruiter-new" style="animation: recruiterLabelPulse 2.2s ease-in-out infinite;">
+            <span class="tier-icon">✦</span> Recruiter
+          </div>
         </div>
         <div class="tier-connector" style="background:linear-gradient(180deg,rgba(176,127,255,0.8),rgba(255,45,120,0.5));"></div>
-        <div class="tier-cards">
 
-          <!-- SPECIAL MOD CARD: WEBSITE DESIGNER -->
-          <div class="member-card hcard--mod hcard--mod-special" id="mod-pinoo">
-            <!-- Rotating border ring -->
-            <div class="mod-ring mod-ring-1"></div>
-            <div class="mod-ring mod-ring-2"></div>
-            <!-- Particle sparks -->
-            <div class="mod-sparks">
-              <span></span><span></span><span></span><span></span>
-              <span></span><span></span><span></span><span></span>
-            </div>
-            <!-- Corner accents -->
-            <div class="member-card-corner" style="border-top-color:rgba(176,127,255,0.9);"></div>
-            <div class="mod-corner-bl"></div>
-            <!-- Designer badge -->
-            <div class="mod-badge">✦ Forum Moderator ✦</div>
-            <!-- Avatar with spinning halo -->
-            <div class="mod-avatar-wrap">
-              <div class="mod-avatar-halo"></div>
-              <div class="member-avatar mod-avatar-inner" style="background:none;padding:0;overflow:hidden;width:96px;height:96px;border:3px solid #b07fff;box-shadow:0 0 30px rgba(176,127,255,1), 0 0 60px rgba(176,127,255,0.5), 0 0 90px rgba(255,45,120,0.3);">
-                <img src="pinoo.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;filter:saturate(1.4) brightness(1.1);">
+        <!-- Triangle layout: examiner left, mod center (higher), recruiter right -->
+        <div class="triangle-tier-cards">
+
+          <!-- LEFT: EXAMINER -->
+          <div class="triangle-side triangle-left">
+            <div class="member-card hcard--recruiter hcard--examiner-special">
+              <div class="member-card-corner" style="border-top-color:rgba(0,191,255,0.9);"></div>
+              <div class="examiner-sparks">
+                <span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
               </div>
+              <div class="examiner-corner-bl"></div>
+              <div class="examiner-badge">✦ Examiner ✦</div>
+              <div class="examiner-avatar-wrap">
+                <div class="examiner-avatar-halo"></div>
+                <div class="member-avatar examiner-avatar-inner" style="background:none;padding:0;overflow:hidden;width:90px;height:90px;border:2px solid #00BFFF;box-shadow:0 0 25px rgba(0,191,255,0.9), 0 0 50px rgba(0,191,255,0.4), 0 0 80px rgba(0,240,255,0.2);">
+                  <img src="errs.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;filter:saturate(1.3) brightness(1.1);" onerror="this.parentElement.innerHTML='?'">
+                </div>
+              </div>
+              <div class="examiner-ring examiner-ring-1"></div>
+              <div class="examiner-ring examiner-ring-2"></div>
+              <div class="member-name examiner-name">[SYNC]-Errs-</div>
+              <div class="member-role recruiter" style="font-size:0.8rem;letter-spacing:0.2em;">Examiner</div>
             </div>
-            <div class="member-name mod-name">[SYNC]-pinoo*-</div>
-            <div class="member-role mod" style="font-size:0.8rem;letter-spacing:0.2em;">Moderator</div>
-            <!-- Code tag decoration -->
-            <div class="mod-code-tag">&lt;dev /&gt;</div>
           </div>
 
-        </div>
-      </div>
-
-      <div class="tier-branch-line"></div>
-
-      <!-- ── TIER 4: RECRUITER ── -->
-      <div class="hierarchy-tier">
-        <div class="tier-label tier-label--recruiter">
-          <span class="tier-icon">◎</span> Recruiter
-        </div>
-        <div class="tier-connector"></div>
-        <div class="tier-cards">
-          <div class="member-card hcard--recruiter">
-            <div class="member-card-corner"></div>
-            <div class="member-avatar" style="background:none;padding:0;overflow:hidden;border:2px solid #00BFFF;box-shadow:0 0 14px rgba(0,191,255,0.4);">
-              <img src="kael.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.innerHTML='?'">
+          <!-- CENTER: MODERATOR (elevated) -->
+          <div class="triangle-center">
+            <div class="member-card hcard--mod hcard--mod-special" id="mod-pinoo">
+              <div class="mod-ring mod-ring-1"></div>
+              <div class="mod-ring mod-ring-2"></div>
+              <div class="mod-sparks">
+                <span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
+              </div>
+              <div class="member-card-corner" style="border-top-color:rgba(176,127,255,0.9);"></div>
+              <div class="mod-corner-bl"></div>
+              <div class="mod-badge">✦ Forum Moderator ✦</div>
+              <div class="mod-avatar-wrap">
+                <div class="mod-avatar-halo"></div>
+                <div class="member-avatar mod-avatar-inner" style="background:none;padding:0;overflow:hidden;width:96px;height:96px;border:3px solid #b07fff;box-shadow:0 0 30px rgba(176,127,255,1), 0 0 60px rgba(176,127,255,0.5), 0 0 90px rgba(255,45,120,0.3);">
+                  <img src="pinoo.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;filter:saturate(1.4) brightness(1.1);">
+                </div>
+              </div>
+              <div class="member-name mod-name">[SYNC]-pinoo*-</div>
+              <div class="member-role mod" style="font-size:0.8rem;letter-spacing:0.2em;">Moderator</div>
+              <div class="mod-code-tag">&lt;dev /&gt;</div>
             </div>
-            <div class="member-name">[SYNC]-Kael-</div>
-            <div class="member-role recruiter">Recruiter</div>
           </div>
+
+          <!-- RIGHT: RECRUITER -->
+          <div class="triangle-side triangle-right">
+            <div class="member-card hcard--recruiter-new" id="card-recruiter">
+              <!-- Neon scan line sweep -->
+              <div class="recruiter-scan"></div>
+              <!-- Corner accents -->
+              <div class="member-card-corner" style="border-top-color:rgba(0,255,180,0.9);"></div>
+              <div class="recruiter-corner-bl"></div>
+              <!-- Orbiting dots -->
+              <div class="recruiter-orbit">
+                <span class="ro ro-1"></span>
+                <span class="ro ro-2"></span>
+                <span class="ro ro-3"></span>
+              </div>
+              <!-- Badge -->
+              <div class="recruiter-badge">✦ Recruiter ✦</div>
+              <!-- Avatar -->
+              <div class="recruiter-avatar-wrap">
+                <div class="recruiter-avatar-ring-1"></div>
+                <div class="recruiter-avatar-ring-2"></div>
+                <div class="member-avatar recruiter-avatar-inner" style="background:none;padding:0;overflow:hidden;width:90px;height:90px;border:2px solid #00ffb4;box-shadow:0 0 25px rgba(0,255,180,0.9), 0 0 50px rgba(0,255,180,0.4), 0 0 80px rgba(0,240,255,0.2);">
+                  <img src="kael.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;filter:saturate(1.3) brightness(1.1);" onerror="this.parentElement.style.background='linear-gradient(135deg,#00ffb4,#00BFFF)';this.parentElement.innerHTML='<span style=\'font-family:Orbitron,sans-serif;font-size:1.8rem;color:#fff;\'>R</span>'">
+                </div>
+              </div>
+              <div class="member-name recruiter-name-text">[SYNC]-Kael-</div>
+              <div class="member-role" style="color:#00ffb4;text-shadow:0 0 8px rgba(0,255,180,0.8);font-size:0.8rem;letter-spacing:0.2em;">Recruiter</div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -2261,6 +2354,985 @@
     </div><!-- /hierarchy-tree -->
   </div>
 </section>
+
+<!-- ══════════════════════════════════════════
+     ANNOUNCEMENTS — Auto-synced from Discord
+══════════════════════════════════════════ -->
+
+<style>
+  /* ── ANNOUNCEMENTS SECTION ── */
+  #announcements {
+    background: var(--dark2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #announcements::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  }
+
+  .ann-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .ann-card {
+    background: var(--dark3);
+    border: 1px solid rgba(0,240,255,0.1);
+    border-radius: 2px;
+    padding: 1.5rem;
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    animation: annFadeIn 0.5s ease both;
+  }
+
+  .ann-card:hover {
+    border-color: rgba(0,240,255,0.35);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0,240,255,0.08);
+  }
+
+  .ann-card-corner {
+    position: absolute;
+    top: 0; right: 0;
+    width: 0; height: 0;
+    border-left: 14px solid transparent;
+    border-top: 14px solid rgba(0,240,255,0.15);
+  }
+
+  .ann-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .ann-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--hot-pink), var(--cyan));
+    border: 1.5px solid rgba(0,240,255,0.3);
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    color: #fff;
+  }
+
+  .ann-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .ann-meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ann-author {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ann-time {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: rgba(136,136,170,0.6);
+    margin-top: 1px;
+  }
+
+  .ann-discord-icon {
+    width: 16px;
+    height: 16px;
+    fill: #5865F2;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  .ann-body {
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: #aaaacc;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .ann-body a {
+    color: var(--cyan);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0,240,255,0.3);
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .ann-body a:hover {
+    color: #fff;
+    border-color: var(--cyan);
+  }
+
+  .ann-image {
+    margin-top: 1rem;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid rgba(0,240,255,0.12);
+  }
+
+  .ann-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 280px;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+
+  .ann-image:hover img { transform: scale(1.02); }
+
+  /* Loading skeleton */
+  .ann-skeleton {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .ann-skel-card {
+    background: var(--dark3);
+    border: 1px solid rgba(0,240,255,0.06);
+    border-radius: 2px;
+    padding: 1.5rem;
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  }
+
+  .skel-line {
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    animation: skelPulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes skelPulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+  }
+
+  @keyframes annFadeIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Empty state */
+  .ann-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 1rem;
+    border: 1px dashed rgba(0,240,255,0.15);
+    border-radius: 2px;
+  }
+
+  .ann-empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.4;
+  }
+
+  .ann-empty p {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: rgba(136,136,170,0.5);
+    text-transform: uppercase;
+  }
+
+  /* Live badge */
+  .ann-live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--hot-pink);
+    background: rgba(255,45,120,0.08);
+    border: 1px solid rgba(255,45,120,0.2);
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin-left: auto;
+  }
+
+  .ann-live-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--hot-pink);
+    animation: pulse 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  .ann-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .ann-header-row .section-title { margin-bottom: 0; }
+
+  @media (max-width: 600px) {
+    .ann-grid { grid-template-columns: 1fr; }
+    .ann-skeleton { grid-template-columns: 1fr; }
+  }
+</style>
+
+<!-- FLOATING ANNOUNCEMENT BUTTON + POPUP -->
+<style>
+  /* ── NAV ANNOUNCEMENT BUTTON (CENTERED) ── */
+  #ann-nav-btn {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(255,45,120,0.18) 0%, rgba(155,39,175,0.12) 100%);
+    border: 1.5px solid rgba(255,45,120,0.7);
+    border-radius: 3px;
+    padding: 7px 18px 7px 14px;
+    cursor: pointer;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+    animation: annCenterPulse 2.2s ease-in-out infinite;
+    transition: background 0.2s, box-shadow 0.2s, border-color 0.2s;
+    z-index: 10;
+    white-space: nowrap;
+  }
+  #ann-nav-btn:hover {
+    background: linear-gradient(135deg, rgba(255,45,120,0.35) 0%, rgba(155,39,175,0.25) 100%);
+    border-color: var(--hot-pink);
+    box-shadow: 0 0 30px rgba(255,45,120,0.55), 0 0 60px rgba(255,45,120,0.2);
+    animation: none;
+  }
+  @keyframes annCenterPulse {
+    0%,100% {
+      box-shadow: 0 0 10px rgba(255,45,120,0.35), 0 0 25px rgba(255,45,120,0.12);
+      border-color: rgba(255,45,120,0.7);
+    }
+    50% {
+      box-shadow: 0 0 22px rgba(255,45,120,0.7), 0 0 50px rgba(255,45,120,0.25), 0 0 80px rgba(255,45,120,0.1);
+      border-color: var(--hot-pink);
+    }
+  }
+
+  .ann-nav-exclaim {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+    background: var(--hot-pink);
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 10px rgba(255,45,120,0.9);
+    animation: exclaimBounce 2.2s ease-in-out infinite;
+  }
+  @keyframes exclaimBounce {
+    0%,100%{ transform: scale(1); }
+    50%{ transform: scale(1.18); box-shadow: 0 0 18px rgba(255,45,120,1); }
+  }
+
+  .ann-nav-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: #fff;
+    text-transform: uppercase;
+    text-shadow: 0 0 12px rgba(255,45,120,0.7);
+  }
+
+  /* Unread badge */
+  #ann-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--cyan);
+    color: #000;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.48rem;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 3px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #050510;
+    box-shadow: 0 0 8px rgba(0,240,255,0.8);
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity 0.3s, transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  #ann-badge.show { opacity: 1; transform: scale(1); }
+
+  @media (max-width: 768px) {
+    .ann-nav-label { display: none; }
+    #ann-nav-btn { padding: 7px 12px; gap: 0; }
+  }
+
+  /* ── POPUP PANEL ── */
+  #ann-popup {
+    position: fixed;
+    top: 74px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.85) translateY(-8px);
+    z-index: 9997;
+    width: 400px;
+    max-width: calc(100vw - 24px);
+    max-height: 540px;
+    background: #0d0d28;
+    border: 1px solid rgba(0,240,255,0.2);
+    box-shadow: 0 0 0 1px rgba(255,45,120,0.1), 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(0,240,255,0.08);
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+    display: flex;
+    flex-direction: column;
+    transform-origin: top center;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+  }
+  #ann-popup.open {
+    transform: translateX(-50%) scale(1) translateY(0);
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* Header */
+  .ann-popup-header {
+    padding: 1rem 1.1rem 0.8rem;
+    border-bottom: 1px solid rgba(0,240,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .ann-popup-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .ann-popup-title-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #fff;
+    text-transform: uppercase;
+  }
+  .ann-popup-title-text span { color: var(--cyan); }
+  .ann-live-dot-fab {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #00f0ff;
+    box-shadow: 0 0 8px #00f0ff;
+    animation: liveBlink 1.4s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes liveBlink {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+  #ann-popup-close {
+    background: none;
+    border: none;
+    color: rgba(0,240,255,0.4);
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    padding: 3px 7px;
+    transition: color 0.2s;
+    line-height: 1;
+  }
+  #ann-popup-close:hover { color: #ff2d78; }
+
+  /* Posts list */
+  #ann-popup-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+  #ann-popup-body::-webkit-scrollbar { width: 3px; }
+  #ann-popup-body::-webkit-scrollbar-track { background: transparent; }
+  #ann-popup-body::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.2); border-radius: 2px; }
+
+  /* Individual post card */
+  .ann-popup-card {
+    background: rgba(18,18,48,0.95);
+    border: 1px solid rgba(0,240,255,0.12);
+    border-radius: 3px;
+    padding: 0.85rem 0.95rem;
+    animation: popCardIn 0.35s ease both;
+  }
+  @keyframes popCardIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .ann-popup-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.55rem;
+  }
+  .ann-popup-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff2d78, #7b2fff);
+    border: 1px solid rgba(0,240,255,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .ann-popup-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .ann-popup-author {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.05em;
+    color: #fff;
+    line-height: 1.1;
+  }
+  .ann-popup-time {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.57rem;
+    letter-spacing: 0.08em;
+    color: rgba(0,240,255,0.45);
+    text-transform: uppercase;
+  }
+  .ann-popup-content {
+    font-size: 0.86rem;
+    line-height: 1.7;
+    color: #e8e8f8;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: 'Exo 2', sans-serif;
+  }
+  .ann-popup-content a {
+    color: var(--cyan);
+    text-decoration: none;
+  }
+  .ann-popup-content a:hover { text-decoration: underline; }
+  .ann-popup-img {
+    margin-top: 0.6rem;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid rgba(0,240,255,0.12);
+  }
+  .ann-popup-img img {
+    width: 100%;
+    display: block;
+    max-height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s;
+    cursor: pointer;
+  }
+  .ann-popup-img img:hover { transform: scale(1.02); }
+
+  /* Loading / empty states */
+  .ann-popup-loading {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.25rem;
+  }
+  .ann-popup-skel {
+    background: rgba(255,255,255,0.04);
+    border-radius: 3px;
+    padding: 0.75rem;
+  }
+  .ann-popup-skel-line {
+    height: 8px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.06) 75%);
+    background-size: 200% 100%;
+    border-radius: 2px;
+    margin-bottom: 7px;
+    animation: shimmer 1.5s infinite;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .ann-popup-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: rgba(136,136,170,0.5);
+    text-transform: uppercase;
+  }
+  .ann-popup-empty-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+
+  /* Footer */
+  .ann-popup-footer {
+    padding: 0.6rem 0.85rem;
+    border-top: 1px solid rgba(0,240,255,0.08);
+    display: flex;
+    justify-content: flex-end;
+    flex-shrink: 0;
+  }
+  .ann-popup-footer a {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #5865F2;
+    text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+  }
+  .ann-popup-footer a:hover { opacity: 1; }
+
+  /* Hidden section anchor for nav link */
+  #announcements { position: absolute; pointer-events: none; height: 0; }
+</style>
+
+<!-- Anchor for nav "News" link -->
+<div id="announcements"></div>
+
+<!-- Announcement Popup -->
+<div id="ann-popup">
+  <div class="ann-popup-header">
+    <div class="ann-popup-title">
+      <div class="ann-live-dot-fab"></div>
+      <div class="ann-popup-title-text">Clan <span>Announcements</span></div>
+    </div>
+    <button id="ann-popup-close" onclick="toggleAnnPopup()">✕</button>
+  </div>
+  <div id="ann-popup-body">
+    <div class="ann-popup-loading" id="ann-popup-skeleton">
+      <div class="ann-popup-skel">
+        <div class="ann-popup-skel-line" style="width:50%;"></div>
+        <div class="ann-popup-skel-line" style="width:100%;"></div>
+        <div class="ann-popup-skel-line" style="width:80%;margin-bottom:0;"></div>
+      </div>
+      <div class="ann-popup-skel">
+        <div class="ann-popup-skel-line" style="width:40%;"></div>
+        <div class="ann-popup-skel-line" style="width:100%;"></div>
+        <div class="ann-popup-skel-line" style="width:65%;margin-bottom:0;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="ann-popup-footer">
+    <a href="https://discord.gg/XW7nY97d" target="_blank">View in Discord ↗</a>
+  </div>
+</div>
+
+<script>
+(function() {
+  const WORKER_URL = 'https://sync-worker.lastresort962.workers.dev';
+  let popupOpen = false;
+  let postsLoaded = false;
+
+  function timeAgo(iso) {
+    const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+    if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
+    return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  }
+
+  function cleanContent(text) {
+    if (!text) return '';
+    // Strip Discord custom emojis BEFORE HTML-escaping
+    let t = text.replace(/<a?:[a-zA-Z0-9_]+:[0-9]+>/g, '');
+    t = t.replace(/\\n/g, '\n');
+    t = t.replace(/\n{3,}/g, '\n\n');
+    // HTML-escape
+    t = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    // Mentions
+    t = t.replace(/@everyone/g, '<strong style="color:#00f0ff;">@everyone</strong>');
+    t = t.replace(/@here/g,     '<strong style="color:#00f0ff;">@here</strong>');
+    t = t.replace(/@(\w+)/g,    '<strong style="color:#00f0ff;">@$1</strong>');
+    t = t.replace(/#(\w+)/g,    '<strong style="color:#ffd700;">#$1</strong>');
+    // Markdown
+    t = t.replace(/\*\*(.*?)\*\*/gs, '<strong>$1</strong>');
+    t = t.replace(/__(.*?)__/gs,     '<u>$1</u>');
+    t = t.replace(/\*(.*?)\*/gs,     '<em>$1</em>');
+    t = t.replace(/_([^_]+)_/gs,     '<em>$1</em>');
+    return t.trim();
+  }
+
+  function linkify(text) {
+    return cleanContent(text)
+      .replace(/(https?:\/\/[^\s<"]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
+      .replace(/\n/g, '<br>');
+  }
+
+  window.loadAnnouncements = async function() {
+    const body     = document.getElementById('ann-popup-body');
+    const skeleton = document.getElementById('ann-popup-skeleton');
+    try {
+      const res   = await fetch(WORKER_URL + '/announcements', { cache: 'no-store' });
+      const posts = await res.json();
+      if (skeleton) skeleton.remove();
+      body.innerHTML = '';
+      if (!posts || posts.length === 0) {
+        body.innerHTML = `<div class="ann-popup-empty"><div class="ann-popup-empty-icon">📡</div>No announcements yet — check back soon</div>`;
+        return;
+      }
+      // badge
+      const badge = document.getElementById('ann-badge');
+      badge.textContent = posts.length > 9 ? '9+' : posts.length;
+      badge.classList.add('show');
+
+      posts.forEach((post, i) => {
+        const card = document.createElement('div');
+        card.className = 'ann-popup-card';
+        card.style.animationDelay = (i * 0.07) + 's';
+        const avatarHtml = post.avatar
+          ? `<img src="${post.avatar}" alt="${(post.author||'S').charAt(0)}" onerror="this.parentElement.textContent='${(post.author||'S').charAt(0).toUpperCase()}'">`
+          : (post.author||'S').charAt(0).toUpperCase();
+        const rawMedia = [].concat(post.images || [], post.attachments || []);
+        const imageHtml = rawMedia
+          .filter(a => typeof a === 'string' ? a.length > 0 : (a && a.url))
+          .map(a => {
+            const url = typeof a === 'string' ? a : a.url;
+            return url ? `<div class="ann-popup-img"><img src="${url}" alt="image" loading="lazy" referrerpolicy="no-referrer" style="min-height: 100px; background: rgba(0,240,255,0.05);"></div>` : '';
+          })
+          .join('');
+        card.innerHTML = `
+          <div class="ann-popup-card-header">
+            <div class="ann-popup-avatar">${avatarHtml}</div>
+            <div>
+              <div class="ann-popup-author">${(post.author||'SYNCHRONIZED').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+              <div class="ann-popup-time">${timeAgo(post.timestamp)}</div>
+            </div>
+          </div>
+          <div class="ann-popup-content">${linkify(post.content||'')}</div>
+          ${imageHtml}`;
+        body.appendChild(card);
+      });
+      postsLoaded = true;
+    } catch {
+      if (skeleton) skeleton.remove();
+      body.innerHTML = `<div class="ann-popup-empty"><div class="ann-popup-empty-icon">📡</div>Could not load — check back soon</div>`;
+    }
+  };
+
+  window.toggleAnnPopup = function() {
+    const popup = document.getElementById('ann-popup');
+    popupOpen = !popupOpen;
+    popup.classList.toggle('open', popupOpen);
+    if (popupOpen && !postsLoaded) loadAnnouncements();
+  };
+
+  // Close on outside click
+  document.addEventListener('click', function(e) {
+    const popup  = document.getElementById('ann-popup');
+    const navBtn = document.getElementById('ann-nav-btn');
+    if (popupOpen && !popup.contains(e.target) && !navBtn.contains(e.target)) {
+      popupOpen = false;
+      popup.classList.remove('open');
+    }
+  });
+
+  // Nav "News" link also opens popup
+  document.querySelectorAll('a[href="#announcements"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (!popupOpen) { popupOpen = true; document.getElementById('ann-popup').classList.add('open'); if (!postsLoaded) loadAnnouncements(); }
+    });
+  });
+
+  // Auto-load badge on page ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadAnnouncements);
+  } else {
+    loadAnnouncements();
+  }
+  setInterval(loadAnnouncements, 60000);
+})();
+</script>
+
+
+
+<!-- ══════════════════════════════════════════
+     ROSTER CTA — links to roster.html
+══════════════════════════════════════════ -->
+<section id="roster">
+  <div class="section-wrapper" style="text-align:center;">
+    <div class="section-label">Full Lineup</div>
+    <h2 class="section-title">Clan <span class="cyan">Roster</span></h2>
+    <div class="section-divider" style="margin:0 auto 2rem;background:linear-gradient(90deg,transparent,var(--hot-pink),transparent);width:120px;"></div>
+
+    <p style="color:#aaaacc;font-size:1.05rem;line-height:1.8;max-width:540px;margin:0 auto 2.5rem;">
+      View the complete lineup of all <strong style="color:#fff;">25 active members</strong> — names, ranks, and roles — on the full roster page.
+    </p>
+
+    <!-- Quick role legend -->
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.6rem;margin-bottom:2.5rem;">
+      <span style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;letter-spacing:0.18em;padding:4px 12px;border-radius:2px;color:#FFD700;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.3);">♛ Clan Master</span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;letter-spacing:0.18em;padding:4px 12px;border-radius:2px;color:#ff5555;background:rgba(255,51,51,0.08);border:1px solid rgba(255,51,51,0.3);">♜ Vice</span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;letter-spacing:0.18em;padding:4px 12px;border-radius:2px;color:#E8B48A;background:rgba(232,180,138,0.08);border:1px solid rgba(232,180,138,0.3);">◈ High Council</span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;letter-spacing:0.18em;padding:4px 12px;border-radius:2px;color:#b07fff;background:rgba(176,127,255,0.08);border:1px solid rgba(176,127,255,0.3);">⬡ Moderator</span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;letter-spacing:0.18em;padding:4px 12px;border-radius:2px;color:#00BFFF;background:rgba(0,191,255,0.08);border:1px solid rgba(0,191,255,0.3);">◎ Examiner</span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;letter-spacing:0.18em;padding:4px 12px;border-radius:2px;color:#00BFFF;background:rgba(0,191,255,0.06);border:1px solid rgba(0,191,255,0.22);">✦ Recruiter</span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;letter-spacing:0.18em;padding:4px 12px;border-radius:2px;color:#FF69B4;background:rgba(255,105,180,0.06);border:1px solid rgba(255,105,180,0.25);">◆ Member</span>
+    </div>
+
+    <a href="#" onclick="openRosterModal();return false;" style="display:inline-flex;align-items:center;gap:10px;background:var(--hot-pink);color:#fff;font-family:'Orbitron',sans-serif;font-size:0.85rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:14px 32px;border-radius:2px;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));transition:all 0.2s;" onmouseover="this.style.background='#ff5599';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 30px rgba(255,45,120,0.5)'" onmouseout="this.style.background='var(--hot-pink)';this.style.transform='';this.style.boxShadow=''">
+      View Full Roster &nbsp;→
+    </a>
+  </div>
+</section>
+
+<style>
+  /* ══ ROSTER SECTION ══ */
+  #roster { background: rgba(0,0,0,0.2); }
+
+  /* ── TABS ── */
+  .roster-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid rgba(0,240,255,0.12);
+    padding-bottom: 1rem;
+  }
+
+  .roster-tab {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 2px;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: all 0.22s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .roster-tab:hover {
+    color: var(--cyan);
+    border-color: rgba(0,240,255,0.3);
+    background: rgba(0,240,255,0.05);
+  }
+
+  .roster-tab.active {
+    color: #fff;
+    background: var(--hot-pink);
+    border-color: var(--hot-pink);
+    box-shadow: 0 0 16px rgba(255,45,120,0.4);
+  }
+
+  .tab-count {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    background: rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 1px 7px;
+  }
+  .roster-tab.active .tab-count { background: rgba(255,255,255,0.25); }
+
+  /* ── ROSTER GRID ── */
+  .roster-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  /* ── ROSTER CARD ── */
+  .roster-card {
+    background: rgba(10,10,30,0.7);
+    border: 1px solid rgba(0,240,255,0.1);
+    border-radius: 4px;
+    padding: 1.2rem 0.9rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: center;
+    transition: transform 0.22s, border-color 0.22s, box-shadow 0.22s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .roster-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--hot-pink), var(--cyan));
+    opacity: 0.5;
+  }
+
+  .roster-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0,240,255,0.35);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4), 0 0 20px rgba(0,240,255,0.12);
+  }
+
+  .roster-card.hidden {
+    display: none;
+  }
+
+  /* Fade-in animation */
+  @keyframes rcFadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .roster-card.visible {
+    animation: rcFadeIn 0.3s ease forwards;
+  }
+
+  /* ── BADGE ── */
+  .rc-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.52rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 2px 9px;
+    border-radius: 2px;
+    margin-bottom: 0.3rem;
+    white-space: nowrap;
+  }
+  .rc-badge--master   { color: #FFD700; background: rgba(255,215,0,0.1);    border: 1px solid rgba(255,215,0,0.3); }
+  .rc-badge--vice     { color: #ff3333; background: rgba(255,51,51,0.1);    border: 1px solid rgba(255,51,51,0.35); }
+  .rc-badge--council  { color: #E8B48A; background: rgba(232,180,138,0.08); border: 1px solid rgba(232,180,138,0.3); }
+  .rc-badge--mod      { color: #b07fff; background: rgba(176,127,255,0.08); border: 1px solid rgba(176,127,255,0.3); }
+  .rc-badge--examiner { color: #00BFFF; background: rgba(0,191,255,0.08);   border: 1px solid rgba(0,191,255,0.3); }
+  .rc-badge--recruiter{ color: #00BFFF; background: rgba(0,191,255,0.06);   border: 1px solid rgba(0,191,255,0.25); }
+  .rc-badge--member   { color: #FF69B4; background: rgba(255,105,180,0.06); border: 1px solid rgba(255,105,180,0.25); }
+
+  /* ── AVATAR ── */
+  .rc-avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 2px solid rgba(0,240,255,0.3);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--dark3);
+    flex-shrink: 0;
+  }
+  .rc-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  .rc-initials {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--cyan);
+  }
+
+  /* ── NAME & ROLE ── */
+  .rc-name {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    color: #fff;
+    line-height: 1.2;
+    word-break: break-all;
+  }
+  .rc-role {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  @media (max-width: 600px) {
+    .roster-tabs { gap: 0.4rem; }
+    .roster-tab  { font-size: 0.7rem; padding: 6px 10px; }
+    .roster-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.75rem; }
+    .rc-avatar   { width: 58px; height: 58px; }
+  }
+</style>
+
+<script>
+(function() {
+  const tabs  = document.querySelectorAll('.roster-tab');
+  const cards = document.querySelectorAll('.roster-card');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Activate tab
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      const filter = tab.dataset.filter;
+
+      cards.forEach((card, i) => {
+        const role = card.dataset.role;
+        const show = filter === 'all' || role === filter;
+        card.classList.remove('hidden', 'visible');
+        if (show) {
+          // Staggered fade-in
+          setTimeout(() => {
+            card.classList.remove('hidden');
+            card.classList.add('visible');
+          }, i * 18);
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    });
+  });
+
+  // Init: show all with stagger
+  cards.forEach((card, i) => {
+    setTimeout(() => card.classList.add('visible'), i * 18);
+  });
+})();
+</script>
 
 <style>
   /* ── HIERARCHY TREE ── */
@@ -2339,16 +3411,6 @@
   }
 
   /* Tier-specific card accent overrides */
-  @keyframes masterPulse {
-    0%, 100% { box-shadow: 0 0 15px rgba(255,215,0,0.15), inset 0 0 10px rgba(255,215,0,0.05); transform: translateY(0) scale(1); }
-    50% { box-shadow: 0 0 40px rgba(255,215,0,0.5), inset 0 0 20px rgba(255,215,0,0.15); transform: translateY(-4px) scale(1.02); border-color: rgba(255,215,0,0.8) !important; }
-  }
-
-  .hcard--master {
-    animation: masterPulse 4s ease-in-out infinite;
-    border-color: rgba(255,215,0,0.4) !important;
-    z-index: 10;
-  }
   .hcard--vice    { border-color: rgba(255,68,68,0.35) !important; }
   .hcard--vice:hover    { border-color: rgba(255,68,68,0.7) !important; }
   .hcard--council { border-color: rgba(232,180,138,0.3) !important; }
@@ -2356,10 +3418,179 @@
   .hcard--recruiter { border-color: rgba(0,191,255,0.3) !important; }
   .hcard--recruiter:hover { border-color: rgba(0,191,255,0.65) !important; }
 
-  /* Clan master card slightly larger */
+  /* ══════════════════════════════════════════
+     CLAN MASTER — ROYAL CARD
+  ══════════════════════════════════════════ */
+  @keyframes masterFloat {
+    0%,100% { transform: translateY(0) scale(1); }
+    50%     { transform: translateY(-8px) scale(1.015); }
+  }
+  @keyframes masterBorder {
+    0%,100% {
+      box-shadow:
+        0 0 0 2px rgba(255,215,0,0.55),
+        0 0 30px rgba(255,215,0,0.35),
+        0 0 70px rgba(255,215,0,0.15),
+        inset 0 0 30px rgba(255,215,0,0.06);
+      border-color: rgba(255,215,0,0.7) !important;
+    }
+    50% {
+      box-shadow:
+        0 0 0 2px rgba(255,215,0,0.9),
+        0 0 60px rgba(255,215,0,0.65),
+        0 0 120px rgba(255,180,0,0.3),
+        inset 0 0 50px rgba(255,215,0,0.12);
+      border-color: #FFD700 !important;
+    }
+  }
+  @keyframes masterRingRotate    { from { transform: rotate(0deg); }   to { transform: rotate(360deg); } }
+  @keyframes masterRingRotateCCW { from { transform: rotate(0deg); }   to { transform: rotate(-360deg); } }
+  @keyframes masterNameShimmer   { 0% { background-position:0% center; } 100% { background-position:300% center; } }
+  @keyframes masterCrownBob {
+    0%,100% { transform: translateY(0) scale(1);     filter: drop-shadow(0 0 6px rgba(255,215,0,0.8)); }
+    50%     { transform: translateY(-5px) scale(1.15); filter: drop-shadow(0 0 16px rgba(255,215,0,1)); }
+  }
+  @keyframes masterGoldDust {
+    0%   { top: 110%; opacity: 0; transform: translateX(0) rotate(0deg); }
+    15%  { opacity: 1; }
+    85%  { opacity: 0.7; }
+    100% { top: -10%;  opacity: 0; transform: translateX(var(--drift)) rotate(360deg); }
+  }
+  @keyframes masterAvatarHalo {
+    0%,100% { opacity: 0.5; transform: scale(1); }
+    50%     { opacity: 1;   transform: scale(1.18); }
+  }
+  @keyframes masterAvatarRing {
+    0%,100% { box-shadow: 0 0 22px rgba(255,215,0,0.7), 0 0 50px rgba(255,215,0,0.35); border-color: #FFD700; }
+    50%     { box-shadow: 0 0 45px rgba(255,215,0,1),   0 0 90px rgba(255,200,0,0.55);  border-color: #fff8a0; }
+  }
+  @keyframes masterBadgePulse {
+    0%,100% { box-shadow: 0 0 8px rgba(255,215,0,0.4);  color: #FFD700; }
+    50%     { box-shadow: 0 0 20px rgba(255,215,0,0.85); color: #fff8a0; }
+  }
+
+  .hcard--master {
+    animation: masterFloat 4s ease-in-out infinite, masterBorder 4s ease-in-out infinite;
+    border: 2px solid rgba(255,215,0,0.7) !important;
+    border-radius: 4px !important;
+    background: linear-gradient(160deg,
+      rgba(60,40,0,0.55) 0%,
+      rgba(20,15,0,0.75) 40%,
+      rgba(10,10,20,0.9) 100%
+    ) !important;
+    padding: 2rem 1.6rem 1.8rem !important;
+    min-width: 220px !important;
+    position: relative;
+    overflow: visible !important;
+    z-index: 10;
+  }
+
+  /* Glowing ambient backdrop */
+  .hcard--master::before {
+    content: '';
+    position: absolute;
+    inset: -30px;
+    background: radial-gradient(ellipse at 50% 50%,
+      rgba(255,215,0,0.18) 0%,
+      rgba(255,160,0,0.08) 40%,
+      transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
+    animation: masterAvatarHalo 4s ease-in-out infinite;
+  }
+
+  /* Outer rotating dashed frame */
+  .hcard--master::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border-radius: 6px;
+    border: 1px dashed rgba(255,215,0,0.22);
+    pointer-events: none;
+    animation: masterRingRotate 14s linear infinite;
+  }
+
+  /* Avatar bigger */
   .hcard--master .member-avatar {
-    width: 80px !important;
-    height: 80px !important;
+    width: 100px !important;
+    height: 100px !important;
+    animation: masterAvatarRing 3s ease-in-out infinite !important;
+  }
+
+  /* Gold dust particles */
+  .master-dust { position:absolute; inset:0; pointer-events:none; overflow:hidden; border-radius:4px; z-index:0; }
+  .master-dust span {
+    position: absolute;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #FFD700, #ff9900);
+    bottom: -10%;
+    animation: masterGoldDust linear infinite;
+    opacity: 0;
+  }
+  .master-dust span:nth-child(1) { left:8%;  animation-duration:3.2s; animation-delay:0s;   --drift: 12px;  width:3px; height:3px; }
+  .master-dust span:nth-child(2) { left:20%; animation-duration:4.1s; animation-delay:0.6s; --drift:-8px;  width:4px; height:4px; }
+  .master-dust span:nth-child(3) { left:35%; animation-duration:3.6s; animation-delay:1.2s; --drift: 15px;  width:2px; height:2px; }
+  .master-dust span:nth-child(4) { left:50%; animation-duration:2.8s; animation-delay:0.3s; --drift:-12px; width:5px; height:5px; }
+  .master-dust span:nth-child(5) { left:65%; animation-duration:4.4s; animation-delay:1.8s; --drift: 10px;  width:3px; height:3px; }
+  .master-dust span:nth-child(6) { left:78%; animation-duration:3.0s; animation-delay:0.9s; --drift:-6px;  width:4px; height:4px; }
+  .master-dust span:nth-child(7) { left:88%; animation-duration:3.8s; animation-delay:2.1s; --drift: 8px;   width:2px; height:2px; }
+  .master-dust span:nth-child(8) { left:92%; animation-duration:2.5s; animation-delay:1.5s; --drift:-14px; width:3px; height:3px; }
+
+  /* Crown */
+  .master-crown { font-size:1.8rem; line-height:1; margin-bottom:0.6rem; display:block; animation:masterCrownBob 2.5s ease-in-out infinite; position:relative; z-index:2; }
+
+  /* Shimmer gold name */
+  .master-name {
+    background: linear-gradient(90deg, #FFD700, #fff8a0, #ffb300, #FFD700, #fff8a0);
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: masterNameShimmer 3.5s linear infinite;
+    font-size: 1.15rem !important;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    position: relative; z-index: 2;
+  }
+
+  /* "COMMANDER" badge */
+  .master-badge {
+    margin-top: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #FFD700;
+    border: 1px solid rgba(255,215,0,0.5);
+    background: rgba(255,215,0,0.07);
+    padding: 3px 10px;
+    border-radius: 2px;
+    animation: masterBadgePulse 3s ease-in-out infinite;
+    position: relative; z-index: 2;
+  }
+
+  /* Avatar wrap + dual spinning rings */
+  .master-avatar-wrap { position:relative; margin-bottom:1rem; display:flex; align-items:center; justify-content:center; z-index:2; }
+  .master-avatar-ring {
+    position:absolute; width:124px; height:124px; border-radius:50%;
+    border:1px solid transparent;
+    border-top-color:rgba(255,215,0,0.75); border-right-color:rgba(255,215,0,0.3);
+    border-bottom-color:transparent; border-left-color:rgba(255,215,0,0.5);
+    animation: masterRingRotate 3s linear infinite;
+  }
+  .master-avatar-ring-2 {
+    position:absolute; width:138px; height:138px; border-radius:50%;
+    border:1px solid transparent;
+    border-top-color:transparent; border-right-color:rgba(255,200,0,0.45);
+    border-bottom-color:rgba(255,215,0,0.65); border-left-color:transparent;
+    animation: masterRingRotateCCW 5s linear infinite;
   }
 
   /* Empty slot */
@@ -2393,6 +3624,391 @@
     .tier-cards { gap: 0.8rem; }
     .empty-slot { padding: 12px 18px; }
     .empty-slot-text { font-size: 0.62rem; }
+  }
+
+  /* ══════════════════════════════════════════
+     TRIANGLE LAYOUT — MOD / EXAMINER / RECRUITER
+  ══════════════════════════════════════════ */
+  .tier-label-row-triangle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .triangle-tier-cards {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 1.5rem;
+    width: 100%;
+    padding: 0 1rem;
+    position: relative;
+  }
+
+  /* Sides sit lower, center sits higher */
+  .triangle-center {
+    order: 2;
+    margin-bottom: 0;
+    position: relative;
+    z-index: 2;
+  }
+  .triangle-left  { order: 1; margin-bottom: -32px; }
+  .triangle-right { order: 3; margin-bottom: -32px; }
+
+  @media (max-width: 700px) {
+    .triangle-tier-cards { flex-direction: column; align-items: center; }
+    .triangle-left, .triangle-right, .triangle-center { order: unset; margin-bottom: 0; }
+    .tier-label-row-triangle { gap: 0.6rem; }
+  }
+
+  /* ── RECRUITER LABEL ── */
+  .tier-label--recruiter-new {
+    color: #00ffb4;
+    border: 1px solid rgba(0,255,180,0.4);
+    background: rgba(0,255,180,0.07);
+    text-shadow: 0 0 8px rgba(0,255,180,0.6);
+  }
+  @keyframes recruiterLabelPulse {
+    0%,100% { box-shadow: 0 0 6px rgba(0,255,180,0.2); color: #00ffb4; }
+    50%      { box-shadow: 0 0 18px rgba(0,255,180,0.6); color: #afffdf; }
+  }
+
+  /* ══════════════════════════════════════════
+     RECRUITER CARD — EMERALD PULSE
+  ══════════════════════════════════════════ */
+  @keyframes recruiterFloat {
+    0%,100% { transform: translateY(0) scale(1); box-shadow: 0 0 18px rgba(0,255,180,0.3), 0 0 40px rgba(0,255,180,0.1), inset 0 0 12px rgba(0,255,180,0.04); border-color: rgba(0,255,180,0.45) !important; }
+    50%      { transform: translateY(-8px) scale(1.02); box-shadow: 0 0 50px rgba(0,255,180,0.7), 0 0 90px rgba(0,240,255,0.25), inset 0 0 28px rgba(0,255,180,0.1); border-color: rgba(0,255,180,0.95) !important; }
+  }
+  @keyframes recruiterScan {
+    0%   { top: -10%; opacity: 0; }
+    5%   { opacity: 0.6; }
+    95%  { opacity: 0.4; }
+    100% { top: 110%; opacity: 0; }
+  }
+  @keyframes recruiterOrbit {
+    from { transform: rotate(0deg) translateX(48px) rotate(0deg); }
+    to   { transform: rotate(360deg) translateX(48px) rotate(-360deg); }
+  }
+  @keyframes recruiterOrbitCCW {
+    from { transform: rotate(0deg) translateX(58px) rotate(0deg); }
+    to   { transform: rotate(-360deg) translateX(58px) rotate(360deg); }
+  }
+  @keyframes recruiterAvatarRing {
+    0%,100% { transform: rotate(0deg);   box-shadow: 0 0 12px rgba(0,255,180,0.5); }
+    50%     { transform: rotate(180deg); box-shadow: 0 0 28px rgba(0,255,180,1); }
+  }
+  @keyframes recruiterAvatarRingCCW {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(-360deg); }
+  }
+  @keyframes recruiterNameShimmer {
+    0%   { background-position: 0% center; }
+    100% { background-position: 300% center; }
+  }
+  @keyframes recruiterBadgePulse {
+    0%,100% { box-shadow: 0 0 6px rgba(0,255,180,0.3); color: #00ffb4; border-color: rgba(0,255,180,0.4); }
+    50%      { box-shadow: 0 0 18px rgba(0,255,180,0.8); color: #afffdf; border-color: rgba(0,255,180,0.9); }
+  }
+
+  .hcard--recruiter-new {
+    animation: recruiterFloat 4s ease-in-out infinite;
+    border: 2px solid rgba(0,255,180,0.45) !important;
+    background: linear-gradient(155deg, rgba(0,40,25,0.65) 0%, rgba(0,20,15,0.8) 40%, rgba(10,10,20,0.9) 100%) !important;
+    position: relative;
+    overflow: hidden !important;
+    z-index: 2;
+  }
+
+  /* Ambient glow backdrop */
+  .hcard--recruiter-new::before {
+    content: '';
+    position: absolute;
+    inset: -20px;
+    background: radial-gradient(ellipse at 50% 50%, rgba(0,255,180,0.12) 0%, rgba(0,240,255,0.06) 40%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Dashed rotating outer frame */
+  .hcard--recruiter-new::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 6px;
+    border: 1px dashed rgba(0,255,180,0.25);
+    pointer-events: none;
+    animation: recruiterAvatarRing 6s linear infinite;
+  }
+
+  /* Scan line sweep */
+  .recruiter-scan {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0,255,180,0.7), rgba(0,240,255,0.5), transparent);
+    top: 0;
+    pointer-events: none;
+    z-index: 3;
+    animation: recruiterScan 3.5s ease-in-out infinite;
+  }
+
+  /* Orbiting dots */
+  .recruiter-orbit {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .ro {
+    position: absolute;
+    border-radius: 50%;
+    background: #00ffb4;
+    box-shadow: 0 0 6px rgba(0,255,180,0.9);
+  }
+  .ro-1 { width: 5px; height: 5px; animation: recruiterOrbit 3s linear infinite; margin: -2.5px; }
+  .ro-2 { width: 3px; height: 3px; animation: recruiterOrbit 5s linear infinite reverse; margin: -1.5px; background: #00f0ff; box-shadow: 0 0 6px rgba(0,240,255,0.9); }
+  .ro-3 { width: 4px; height: 4px; animation: recruiterOrbitCCW 4s linear infinite; margin: -2px; background: #7bffcf; }
+
+  /* Badge */
+  .recruiter-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #00ffb4;
+    border: 1px solid rgba(0,255,180,0.4);
+    background: rgba(0,255,180,0.07);
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin-bottom: 0.75rem;
+    animation: recruiterBadgePulse 2.5s ease-in-out infinite;
+    position: relative; z-index: 2;
+  }
+
+  /* Corner accent bl */
+  .recruiter-corner-bl {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 14px; height: 14px;
+    border-bottom: 2px solid rgba(0,255,180,0.6);
+    border-left: 2px solid rgba(0,255,180,0.6);
+    pointer-events: none;
+  }
+
+  /* Avatar wrap */
+  .recruiter-avatar-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    z-index: 2;
+  }
+  .recruiter-avatar-ring-1 {
+    position: absolute;
+    width: 108px; height: 108px;
+    border-radius: 50%;
+    border: 1.5px solid transparent;
+    border-top-color: rgba(0,255,180,0.8);
+    border-right-color: rgba(0,255,180,0.3);
+    animation: recruiterAvatarRing 2.8s linear infinite;
+  }
+  .recruiter-avatar-ring-2 {
+    position: absolute;
+    width: 122px; height: 122px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    border-bottom-color: rgba(0,240,255,0.65);
+    border-left-color: rgba(0,240,255,0.3);
+    animation: recruiterAvatarRingCCW 4.5s linear infinite;
+  }
+  .recruiter-avatar-inner {
+    position: relative; z-index: 2;
+  }
+
+  /* Shimmer name */
+  .recruiter-name-text {
+    background: linear-gradient(90deg, #00ffb4, #afffdf, #00f0ff, #00ffb4, #afffdf);
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: recruiterNameShimmer 3s linear infinite;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem !important;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    position: relative; z-index: 2;
+  }
+
+  /* ── HIGH COUNCIL ANIMATED GLOW ── */
+  @keyframes councilPulse {
+    0%,100% {
+      box-shadow: 0 0 12px rgba(232,180,138,0.2), inset 0 0 8px rgba(232,180,138,0.04);
+      transform: translateY(0) scale(1);
+      border-color: rgba(232,180,138,0.3) !important;
+    }
+    50% {
+      box-shadow: 0 0 35px rgba(232,180,138,0.6), 0 0 65px rgba(255,180,80,0.2), inset 0 0 18px rgba(232,180,138,0.12);
+      transform: translateY(-5px) scale(1.02);
+      border-color: rgba(232,180,138,0.85) !important;
+    }
+  }
+  .hcard--council {
+    animation: councilPulse 4.5s ease-in-out infinite;
+    border-color: rgba(232,180,138,0.3) !important;
+    background: linear-gradient(155deg, rgba(40,25,10,0.6) 0%, var(--dark3) 60%) !important;
+  }
+  .hcard--council:nth-child(2) { animation-delay: 1.5s; }
+  .hcard--council:nth-child(3) { animation-delay: 3s; }
+  /* Council avatar glow pulse */
+  .hcard--council .member-avatar {
+    animation: councilAvatarGlow 4.5s ease-in-out infinite;
+  }
+  @keyframes councilAvatarGlow {
+    0%,100% { box-shadow: 0 0 14px rgba(232,180,138,0.4); border-color:#E8B48A; }
+    50%      { box-shadow: 0 0 30px rgba(232,180,138,0.9), 0 0 55px rgba(255,200,100,0.35); border-color:#ffcf80; }
+  }
+
+  /* ── EXAMINER / RECRUITER SPECIAL CARD ── */
+  @keyframes examinerCardFloat {
+    0%,100% {
+      transform: translateY(0) scale(1);
+      box-shadow: 0 0 25px rgba(0,191,255,0.3), 0 0 50px rgba(0,191,255,0.12), inset 0 0 15px rgba(0,191,255,0.04);
+      border-color: rgba(0,191,255,0.5) !important;
+    }
+    33% {
+      transform: translateY(-7px) scale(1.02);
+      box-shadow: 0 0 55px rgba(0,191,255,0.7), 0 0 100px rgba(0,240,255,0.2), inset 0 0 28px rgba(0,191,255,0.1);
+      border-color: rgba(0,240,255,0.95) !important;
+    }
+    66% {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 0 40px rgba(0,240,255,0.45), 0 0 80px rgba(0,191,255,0.2), inset 0 0 22px rgba(0,240,255,0.07);
+      border-color: rgba(0,210,255,0.7) !important;
+    }
+  }
+  .hcard--examiner-special {
+    position: relative;
+    overflow: visible !important;
+    padding: 2.2rem 1.5rem 1.5rem !important;
+    background: linear-gradient(145deg, rgba(0,20,40,0.95) 0%, rgba(5,10,25,0.98) 100%) !important;
+    border-color: rgba(0,191,255,0.6) !important;
+    animation: examinerCardFloat 4s ease-in-out infinite !important;
+    z-index: 20;
+    min-width: 200px;
+  }
+  /* Examiner label pulse */
+  @keyframes examinerLabelPulse {
+    0%,100% { box-shadow:none; }
+    50% { box-shadow: 0 0 16px rgba(0,191,255,0.6), 0 0 30px rgba(0,191,255,0.25); color:#7adfff; }
+  }
+  /* Rotating rings */
+  .examiner-ring {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .examiner-ring-1 {
+    width: 130px; height: 130px;
+    top: 50%; left: 50%; transform: translate(-50%, -70%);
+    border: 1px solid transparent;
+    border-top-color: rgba(0,191,255,0.8);
+    border-right-color: rgba(0,191,255,0.3);
+    animation: examinerRing1 3.2s linear infinite;
+  }
+  .examiner-ring-2 {
+    width: 158px; height: 158px;
+    top: 50%; left: 50%; transform: translate(-50%, -63%);
+    border: 1px dashed rgba(0,240,255,0.3);
+    border-bottom-color: rgba(0,240,255,0.75);
+    animation: examinerRing2 5.5s linear infinite;
+  }
+  @keyframes examinerRing1 { from { transform:translate(-50%,-70%) rotate(0deg); } to { transform:translate(-50%,-70%) rotate(360deg); } }
+  @keyframes examinerRing2 { from { transform:translate(-50%,-63%) rotate(0deg); } to { transform:translate(-50%,-63%) rotate(-360deg); } }
+  /* Sparks */
+  .examiner-sparks { position:absolute; inset:0; pointer-events:none; overflow:hidden; border-radius:2px; }
+  .examiner-sparks span {
+    position:absolute;
+    width:2px;
+    border-radius:2px;
+    background:linear-gradient(180deg,rgba(0,191,255,0.95),transparent);
+    animation:examinerSparkRise 2.5s ease-in-out infinite;
+  }
+  .examiner-sparks span:nth-child(1){ left:8%;  height:20px; animation-delay:0s;    animation-duration:2.1s; background:linear-gradient(180deg,rgba(0,191,255,0.9),transparent); }
+  .examiner-sparks span:nth-child(2){ left:20%; height:14px; animation-delay:0.4s;  animation-duration:3.0s; background:linear-gradient(180deg,rgba(0,240,255,0.9),transparent); }
+  .examiner-sparks span:nth-child(3){ left:32%; height:22px; animation-delay:0.9s;  animation-duration:2.4s; }
+  .examiner-sparks span:nth-child(4){ left:48%; height:16px; animation-delay:0.2s;  animation-duration:3.3s; background:linear-gradient(180deg,rgba(0,210,255,0.9),transparent); }
+  .examiner-sparks span:nth-child(5){ left:62%; height:24px; animation-delay:1.3s;  animation-duration:2.7s; }
+  .examiner-sparks span:nth-child(6){ left:75%; height:12px; animation-delay:0.6s;  animation-duration:3.6s; background:linear-gradient(180deg,rgba(0,240,255,0.8),transparent); }
+  .examiner-sparks span:nth-child(7){ left:85%; height:18px; animation-delay:1.7s;  animation-duration:2.3s; }
+  .examiner-sparks span:nth-child(8){ left:94%; height:15px; animation-delay:0.1s;  animation-duration:2.9s; background:linear-gradient(180deg,rgba(0,191,255,0.9),transparent); }
+  @keyframes examinerSparkRise {
+    0%   { bottom:-5px; opacity:0; }
+    15%  { opacity:1; }
+    85%  { opacity:0.5; }
+    100% { bottom:105%; opacity:0; }
+  }
+  /* Corner accent */
+  .examiner-corner-bl {
+    position:absolute; bottom:0; left:0;
+    width:18px; height:18px;
+    border-bottom:2px solid rgba(0,191,255,0.7);
+    border-left:2px solid rgba(0,191,255,0.7);
+    pointer-events:none;
+  }
+  /* Badge */
+  .examiner-badge {
+    font-family:'Share Tech Mono',monospace;
+    font-size:0.52rem;
+    letter-spacing:0.22em;
+    color:#00bfff;
+    background:rgba(0,191,255,0.1);
+    border:1px solid rgba(0,191,255,0.35);
+    padding:3px 10px;
+    text-transform:uppercase;
+    margin-bottom:0.9rem;
+    animation:examinerBadgeGlow 3s ease-in-out infinite;
+    white-space:nowrap;
+  }
+  @keyframes examinerBadgeGlow {
+    0%,100% { box-shadow:none; color:#00bfff; }
+    50% { box-shadow:0 0 12px rgba(0,191,255,0.55); color:#7adfff; border-color:rgba(0,191,255,0.8); }
+  }
+  /* Avatar halo */
+  .examiner-avatar-wrap { position:relative; margin-bottom:0.9rem; display:flex; align-items:center; justify-content:center; }
+  .examiner-avatar-halo {
+    position:absolute;
+    width:118px; height:118px;
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(0,191,255,0.28) 0%,rgba(0,240,255,0.12) 50%,transparent 70%);
+    animation:examinerHaloBreath 3s ease-in-out infinite;
+  }
+  @keyframes examinerHaloBreath {
+    0%,100% { transform:scale(1);    opacity:0.7; }
+    50%     { transform:scale(1.18); opacity:1; }
+  }
+  .examiner-avatar-inner { position:relative; z-index:2; }
+  /* Name shimmer */
+  .examiner-name {
+    font-size:1.05rem !important;
+    background:linear-gradient(90deg,#00bfff,#00f0ff,#7adfff,#00bfff);
+    background-size:300% auto;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+    animation:examinerNameShimmer 4s linear infinite !important;
+  }
+  @keyframes examinerNameShimmer {
+    0%   { background-position:0% center; }
+    100% { background-position:300% center; }
   }
 
   /* ── VICE CLAN MASTER SPECIAL ── */
@@ -2622,9 +4238,23 @@
 </section>
 
 <!-- APPLICATION FORM -->
-<section id="apply" style="background: var(--dark3);">
-  <div class="section-wrapper" style="display:flex;justify-content:center;">
-    <div style="width:100%;max-width:680px;">
+<section id="apply" style="background: var(--dark3); position: relative; overflow: hidden;">
+  <!-- blurred glow backdrop -->
+  <div style="
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse at 50% 30%, rgba(255,45,120,0.07) 0%, rgba(0,240,255,0.04) 50%, transparent 80%);
+  "></div>
+  <div class="section-wrapper" style="display:flex;justify-content:center; position:relative; z-index:1;">
+    <div style="
+      width:100%; max-width:680px;
+      background: rgba(10,10,30,0.55);
+      border: 1px solid rgba(0,240,255,0.12);
+      border-radius: 4px;
+      padding: 2.5rem 2rem;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 0 40px rgba(0,240,255,0.06), 0 8px 40px rgba(0,0,0,0.5);
+    ">
       <div class="section-label">Clan Application</div>
       <h2 class="section-title">Apply to <span class="cyan">SYNCHRONIZED</span></h2>
       <div class="section-divider"></div>
@@ -2775,13 +4405,17 @@
 <script>
 function calcAge() {
   const bday = document.getElementById('f-birthday').value;
-  if (!bday) return;
+  const ageField = document.getElementById('f-age');
+  if (!bday) {
+    ageField.value = '';          // revert to empty/placeholder when cleared
+    return;
+  }
   const today = new Date();
   const birth = new Date(bday);
   let age = today.getFullYear() - birth.getFullYear();
   const m = today.getMonth() - birth.getMonth();
   if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
-  document.getElementById('f-age').value = age;
+  ageField.value = age;
 }
 
 async function submitApplication() {
@@ -2835,7 +4469,7 @@ async function submitApplication() {
 
   const payload = {
     username: 'SYNCHRONIZED Recruiter',
-    avatar_url: 'https://synchronized.surge.sh/sync-logo.png',
+    avatar_url: 'https://synchronized.site/sync-logo.png',
     embeds: [{
       title: 'New Clan Application',
       color: 0xff2d78,
@@ -2897,7 +4531,7 @@ async function submitApplication() {
 </footer>
 
 <!-- BACKGROUND MUSIC -->
-<audio id="bgMusic" loop preload="auto" autoplay></audio>
+<audio id="bgMusic" loop preload="none"></audio>
 
 <!-- Music Player Widget -->
 <div id="music-player" style="
@@ -3210,16 +4844,19 @@ async function submitApplication() {
     }
   }
 
+  // ── Visibility flag — pauses hero work when scrolled away ──
+  let heroVisible = true;
+
   // ── Random idle lightning (not tied to lunge) ──
   function idleLightning() {
-    triggerLightning();
+    if (heroVisible) triggerLightning();   // skip when off-screen
     setTimeout(idleLightning, 1800 + Math.random() * 3200);
   }
   setTimeout(idleLightning, 1200);
 
   // ── Glitch effect on logo ──
   function doGlitch() {
-    if (logoImg) {
+    if (heroVisible && logoImg) {          // skip when off-screen
       logoImg.classList.add('glitching');
       const rx = (Math.random()-0.5)*8, ry = (Math.random()-0.5)*5;
       logoImg.style.transform = `translate(${rx}px,${ry}px)`;
@@ -3235,9 +4872,13 @@ async function submitApplication() {
   setTimeout(doGlitch, 800);
 
   // ── Main RAF loop ──
+  let heroRaf = null;
   function loop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     updateMovement();
+
+    // Cap bolt array to prevent unbounded growth
+    if (activeBolts.length > 40) activeBolts = activeBolts.slice(-40);
 
     // Draw active bolts
     activeBolts = activeBolts.filter(b => b.alpha > 0.02);
@@ -3265,9 +4906,23 @@ async function submitApplication() {
       s.size *= 0.97;
     }
 
-    requestAnimationFrame(loop);
+    heroRaf = requestAnimationFrame(loop);
   }
-  loop();
+
+  // ── Pause RAF when hero is off-screen ──
+  const heroObserver = new IntersectionObserver(entries => {
+    heroVisible = entries[0].isIntersecting;
+    if (heroVisible) {
+      if (!heroRaf) loop();
+    } else {
+      cancelAnimationFrame(heroRaf);
+      heroRaf = null;
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // clear canvas when hidden
+      activeBolts = [];  // discard stale bolts
+      sparks = [];       // discard stale sparks
+    }
+  }, { threshold: 0.05 });
+  heroObserver.observe(hero);
 })();
 </script>
 
@@ -3302,6 +4957,7 @@ async function submitApplication() {
 
     // ── PLAYLIST — edit your songs here ──
     const playlist = [
+      { src: 'allstar.mp3', label: 'All Star - Smash Mouth' },
       { src: 'celepretty.mp3', label: 'Celepretty - Park Boram' },
       { src: 'paradise.mp3', label: 'Paradise - T-MAX' },
       { src: 'swd.mp3',   label: 'She Was Dead - SR-17' },
@@ -3572,7 +5228,7 @@ async function submitApplication() {
   if (membersSection) observer.observe(membersSection);
 
   init();
-  new ResizeObserver(() => { resize(); nodes = Array.from({ length: NODE_COUNT }, makeNode); }).observe(membersSection);
+  new ResizeObserver(() => { resize(); }).observe(membersSection);
 })();
 </script>
 
@@ -3607,6 +5263,7 @@ async function submitApplication() {
     'clan master':        'clan-master',
     'high council':       'high-council',
     'moderator':          'mod',
+    'examiner':           'recruiter',
     'recruiter':          'recruiter',
     'member':             'member',
     'leader':             'leader',
@@ -3628,20 +5285,1300 @@ async function submitApplication() {
   });
 </script>
 
+<!-- ══════════════════════════════════════════
+     FIX 1 — CLAN CONFIG (edit stats here)
+══════════════════════════════════════════ -->
+<script>
+  // ── EASY EDIT: update these whenever things change ──
+  const CLAN_CONFIG = {
+    memberCount:  24,          // total members
+    eventsHeld:   8,           // events held so far
+    founded:      '2025',      // founding year
+    photoCount:   4,           // number of photos in gallery
+    discordLink:  'https://discord.gg/XW7nY97d',
+  };
+
+  // Auto-wire stats to any element with data-stat attribute
+  document.querySelectorAll('[data-stat]').forEach(el => {
+    const key = el.dataset.stat;
+    if (CLAN_CONFIG[key] !== undefined) el.textContent = CLAN_CONFIG[key];
+  });
+
+  // Fix 3: dynamic photo count tag
+  const gcTag = document.getElementById('gallery-count-tag');
+  if (gcTag) gcTag.textContent = `[ ${CLAN_CONFIG.photoCount} PHOTOS · SYNCHRONIZED ARCHIVE ]`;
+</script>
+
+<!-- ══════════════════════════════════════════
+     FIX 2 — SCROLL REVEAL
+══════════════════════════════════════════ -->
+<style>
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1);
+  }
+  .reveal.reveal--left  { transform: translateX(-40px); }
+  .reveal.reveal--right { transform: translateX(40px); }
+  .reveal.reveal--scale { transform: scale(0.94); }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+  /* stagger children inside a group */
+  .reveal-group > * {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1);
+  }
+  .reveal-group.visible > *:nth-child(1) { transition-delay: 0.05s; opacity:1; transform:none; }
+  .reveal-group.visible > *:nth-child(2) { transition-delay: 0.13s; opacity:1; transform:none; }
+  .reveal-group.visible > *:nth-child(3) { transition-delay: 0.21s; opacity:1; transform:none; }
+  .reveal-group.visible > *:nth-child(4) { transition-delay: 0.29s; opacity:1; transform:none; }
+  .reveal-group.visible > *:nth-child(5) { transition-delay: 0.37s; opacity:1; transform:none; }
+  .reveal-group.visible > *:nth-child(6) { transition-delay: 0.45s; opacity:1; transform:none; }
+  .reveal-group.visible > *:nth-child(n+7) { transition-delay: 0.5s; opacity:1; transform:none; }
+
+  /* form error highlight */
+  .form-input.input-error {
+    border-color: rgba(255,45,120,0.8) !important;
+    box-shadow: 0 0 0 3px rgba(255,45,120,0.12), 0 0 10px rgba(255,45,120,0.2) !important;
+    animation: inputShake 0.35s ease;
+  }
+  @keyframes inputShake {
+    0%,100% { transform: translateX(0); }
+    20%     { transform: translateX(-5px); }
+    40%     { transform: translateX(5px); }
+    60%     { transform: translateX(-3px); }
+    80%     { transform: translateX(3px); }
+  }
+  .form-input.input-error::placeholder { color: rgba(255,45,120,0.6); }
+  .input-error-msg {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    color: var(--hot-pink);
+    margin-top: 4px;
+    display: block;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .input-error-msg.show { opacity: 1; transform: translateY(0); }
+</style>
+
+<script>
+  // ── FIX 2: Scroll Reveal ──
+  (function() {
+    // Tag sections and key elements for reveal
+    const revealSelectors = [
+      { sel: '#about .about-text',   cls: 'reveal reveal--left'  },
+      { sel: '#about .about-visual', cls: 'reveal reveal--right' },
+      { sel: '.section-label',       cls: 'reveal'               },
+      { sel: '.section-title',       cls: 'reveal'               },
+      { sel: '.section-divider',     cls: 'reveal'               },
+      { sel: '.badge',               cls: 'reveal reveal--scale' },
+      { sel: '.join-box',            cls: 'reveal reveal--scale' },
+      { sel: '.marquee-bar',         cls: 'reveal'               },
+      { sel: '.info-ticker',         cls: 'reveal'               },
+      { sel: '.hierarchy-tier',      cls: 'reveal'               },
+      { sel: '.tier-branch-line',    cls: 'reveal'               },
+      { sel: '#apply .section-label',cls: 'reveal'               },
+      { sel: '#apply .section-title',cls: 'reveal'               },
+    ];
+
+    // Add classes without overwriting existing ones
+    revealSelectors.forEach(({ sel, cls }) => {
+      document.querySelectorAll(sel).forEach(el => {
+        // Don't double-add or touch hero elements
+        if (el.closest('#hero') || el.closest('#ls')) return;
+        cls.split(' ').forEach(c => el.classList.add(c));
+      });
+    });
+
+    // Tag member cards as a stagger group per tier
+    document.querySelectorAll('.tier-cards').forEach(tc => {
+      tc.classList.add('reveal-group');
+    });
+
+    // Also tag form fields group
+    const formFields = document.querySelector('#apply .section-wrapper > div > div[style*="flex-direction:column"]');
+    if (formFields) formFields.classList.add('reveal-group');
+
+    // Observer
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          io.unobserve(e.target); // fire once
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal, .reveal-group').forEach(el => io.observe(el));
+  })();
+
+  // ── FIX 4: Enhanced form validation with per-field highlighting ──
+  (function() {
+    // Required field definitions: [id, label]
+    const REQUIRED = [
+      ['f-name',     'Name'],
+      ['f-ign',      'IGN'],
+      ['f-discord',  'Discord Username'],
+      ['f-level',    'Level'],
+      ['f-birthday', 'Birthday'],
+      ['f-fbemail',  'Facebook Email'],
+      ['f-examiner', 'Examiner'],
+      ['f-r1',       'Reason 1'],
+      ['f-r2',       'Reason 2'],
+      ['f-r3',       'Reason 3'],
+    ];
+
+    // Inject error msg spans after each required input
+    REQUIRED.forEach(([id]) => {
+      const input = document.getElementById(id);
+      if (!input) return;
+      const msg = document.createElement('span');
+      msg.className = 'input-error-msg';
+      msg.id = id + '-err';
+      input.parentNode.appendChild(msg);
+
+      // Clear error on fix
+      input.addEventListener('input', () => {
+        input.classList.remove('input-error');
+        msg.classList.remove('show');
+      });
+    });
+
+    // Patch submitApplication to do per-field validation first
+    const _origSubmit = window.submitApplication;
+    window.submitApplication = async function() {
+      // Clear all errors first
+      REQUIRED.forEach(([id]) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('input-error');
+        const msg = document.getElementById(id + '-err');
+        if (msg) msg.classList.remove('show');
+      });
+
+      let firstError = null;
+      const errors = [];
+
+      REQUIRED.forEach(([id, label]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const val = el.value.trim();
+        if (!val) {
+          el.classList.add('input-error');
+          const msg = document.getElementById(id + '-err');
+          if (msg) {
+            msg.textContent = `${label} is required.`;
+            msg.classList.add('show');
+          }
+          errors.push(id);
+          if (!firstError) firstError = el;
+        }
+      });
+
+      // Email format check
+      const emailEl = document.getElementById('f-fbemail');
+      if (emailEl && emailEl.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim())) {
+        emailEl.classList.add('input-error');
+        const msg = document.getElementById('f-fbemail-err');
+        if (msg) { msg.textContent = 'Enter a valid email address.'; msg.classList.add('show'); }
+        if (!firstError) firstError = emailEl;
+      }
+
+      // Age check
+      const ageVal = parseInt(document.getElementById('f-age')?.value || '0');
+      const bdayEl = document.getElementById('f-birthday');
+      if (bdayEl && bdayEl.value && ageVal < 21) {
+        bdayEl.classList.add('input-error');
+        const msg = document.getElementById('f-birthday-err');
+        if (msg) { msg.textContent = 'Must be 21 years or older.'; msg.classList.add('show'); }
+        if (!firstError) firstError = bdayEl;
+      }
+
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstError.focus();
+        return;
+      }
+
+      // All good — call original
+      await _origSubmit();
+    };
+  })();
+</script>
+
 <script>
   // ── LIGHTBOX ──
   function openLightbox(src) {
     document.getElementById('lightbox-img').src = src;
     document.getElementById('lightbox').classList.add('open');
+    document.body.classList.add('lightbox-open');
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
   }
   function closeLightbox() {
     document.getElementById('lightbox').classList.remove('open');
+    document.body.classList.remove('lightbox-open');
     document.body.style.overflow = '';
     document.documentElement.style.overflow = '';
   }
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+</script>
+
+<!-- ══════════════════════════════════════════
+     ADMIN MODAL — triple-click nav logo to open
+══════════════════════════════════════════ -->
+<style>
+  /* Overlay */
+  #admin-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5,5,16,0.92);
+    backdrop-filter: blur(10px);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  #admin-overlay.open { display: flex; }
+
+  /* Panel */
+  #admin-panel {
+    position: relative;
+    width: 100%;
+    max-width: 580px;
+    background: #0d0d28;
+    border: 1px solid rgba(0,240,255,0.18);
+    padding: 2.5rem 2rem;
+    clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  #admin-panel::-webkit-scrollbar { width: 4px; }
+  #admin-panel::-webkit-scrollbar-track { background: transparent; }
+  #admin-panel::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.2); border-radius: 2px; }
+
+  #admin-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    color: rgba(0,240,255,0.4);
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    padding: 4px 8px;
+    transition: color 0.2s;
+  }
+  #admin-close:hover { color: #ff2d78; }
+
+  .adm-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.4em;
+    color: #ff2d78;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+  .adm-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: 0.08em;
+    color: #fff;
+    margin-bottom: 0.2rem;
+  }
+  .adm-title span { color: #00f0ff; }
+  .adm-divider {
+    width: 50px; height: 2px;
+    background: linear-gradient(90deg, #ff2d78, transparent);
+    margin-bottom: 1.75rem;
+    margin-top: 0.6rem;
+  }
+
+  /* Fields */
+  .adm-field { margin-bottom: 1.1rem; }
+  .adm-field label {
+    display: block;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #dae7e6;
+    margin-bottom: 0.4rem;
+  }
+  .adm-field input, .adm-field textarea {
+    width: 100%;
+    background: #0f0f2a;
+    border: 1px solid rgba(0,240,255,0.15);
+    color: #e8e8f8;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.65rem 0.9rem;
+    border-radius: 2px;
+    outline: none;
+    resize: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .adm-field input:focus, .adm-field textarea:focus {
+    border-color: rgba(0,240,255,0.4);
+    box-shadow: 0 0 0 3px rgba(0,240,255,0.07);
+  }
+  .adm-field input[type="password"] { letter-spacing: 0.2em; }
+  .adm-field textarea { min-height: 110px; line-height: 1.6; }
+
+  /* Char count */
+  .adm-char {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    color: rgba(136,136,170,0.5);
+    text-align: right;
+    margin-top: 3px;
+  }
+  .adm-char.warn { color: #ffd700; }
+  .adm-char.over { color: #ff2d78; }
+
+  /* Buttons */
+  .adm-btn {
+    width: 100%;
+    background: #ff2d78;
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 13px 24px;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  }
+  .adm-btn:hover { background: #ff5599; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,45,120,0.4); }
+  .adm-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+  .adm-btn-out {
+    width: 100%;
+    background: transparent;
+    color: #00f0ff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 9px 24px;
+    border: 1px solid rgba(0,240,255,0.3);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 0.65rem;
+  }
+  .adm-btn-out:hover { background: rgba(0,240,255,0.06); }
+
+  /* Messages */
+  .adm-msg {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    padding: 9px 12px;
+    border-radius: 2px;
+    margin-bottom: 1.1rem;
+    text-transform: uppercase;
+    display: none;
+  }
+  .adm-msg.error  { color: #ff2d78; background: rgba(255,45,120,0.08); border: 1px solid rgba(255,45,120,0.25); display: block; }
+  .adm-msg.success{ color: #00f0ff; background: rgba(0,240,255,0.08); border: 1px solid rgba(0,240,255,0.25); display: block; }
+
+  /* Post list */
+  .adm-posts { margin-top: 1.75rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.25rem; }
+  .adm-posts-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.28em;
+    color: #dae7e6;
+    text-transform: uppercase;
+    margin-bottom: 0.85rem;
+  }
+  .adm-post-item {
+    background: #0f0f2a;
+    border: 1px solid rgba(0,240,255,0.08);
+    border-radius: 2px;
+    padding: 0.65rem 0.9rem;
+    margin-bottom: 0.6rem;
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+  .adm-post-content { font-size: 0.82rem; color: #c8c8e8; line-height: 1.6; margin-bottom: 0.3rem; word-break: break-word; padding-right: 1.5rem; }
+  .adm-post-meta   { font-family: 'Share Tech Mono', monospace; font-size: 0.55rem; letter-spacing: 0.08em; color: rgba(136,136,170,0.45); text-transform: uppercase; }
+  .adm-post-del {
+    position: absolute; top: 0.45rem; right: 0.45rem;
+    background: none; border: none; color: rgba(255,45,120,0.35);
+    cursor: pointer; font-size: 0.75rem; padding: 2px 5px;
+    transition: color 0.2s; font-family: 'Share Tech Mono', monospace;
+  }
+  .adm-post-del:hover { color: #ff2d78; }
+
+  /* Tool buttons (emoji/image) */
+  .adm-tool-btn {
+    background: rgba(0,240,255,0.05);
+    border: 1px solid rgba(0,240,255,0.2);
+    color: #dae7e6;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .adm-tool-btn:hover { background: rgba(0,240,255,0.12); border-color: rgba(0,240,255,0.45); color: #00f0ff; }
+
+  /* Triple-click hint flash */
+  @keyframes logoHint {
+    0%,100% { filter: brightness(1); }
+    50%      { filter: brightness(1.6) drop-shadow(0 0 8px #00f0ff); }
+  }
+  .logo-hint { animation: logoHint 0.3s ease; }
+</style>
+
+<!-- Admin Modal HTML -->
+<div id="admin-overlay">
+  <div id="admin-panel">
+    <button id="admin-close" onclick="admClose()">✕</button>
+
+    <!-- LOGIN VIEW -->
+    <div id="adm-login-view">
+      <div class="adm-label">Officers Only</div>
+      <div class="adm-title">Admin <span>Login</span></div>
+      <div class="adm-divider"></div>
+      <div class="adm-msg" id="adm-login-msg"></div>
+      <div class="adm-field">
+        <label>Password</label>
+        <input type="password" id="adm-pw" placeholder="Enter admin password" autocomplete="current-password">
+      </div>
+      <button class="adm-btn" onclick="admLogin()">▶ &nbsp; Enter</button>
+    </div>
+
+    <!-- PANEL VIEW -->
+    <div id="adm-panel-view" style="display:none;">
+      <div class="adm-label">Announcement Panel</div>
+      <div class="adm-title">Post <span>Announcement</span></div>
+      <div class="adm-divider"></div>
+      <div class="adm-msg" id="adm-post-msg"></div>
+      <div class="adm-field">
+        <label>Author Name</label>
+        <input type="text" id="adm-author" placeholder="e.g. [SYNC]-Lujuria-" value="SYNCHRONIZED">
+      </div>
+      <div class="adm-field">
+        <label>Announcement</label>
+        <!-- Emoji + image toolbar -->
+        <div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap;">
+          <button type="button" class="adm-tool-btn" onclick="admToggleEmoji()" title="Insert emoji">😊 Emoji</button>
+          <label class="adm-tool-btn" title="Attach image(s)" style="cursor:pointer;margin:0;">
+            🖼 Image
+            <input type="file" id="adm-img-input" accept="image/*" multiple style="display:none;" onchange="admHandleImages(this)">
+          </label>
+        </div>
+        <!-- Emoji grid -->
+        <div id="adm-emoji-grid" style="display:none;background:#0b0b20;border:1px solid rgba(0,240,255,0.15);border-radius:4px;padding:8px;margin-bottom:8px;max-height:148px;overflow-y:auto;">
+          <div style="display:flex;flex-wrap:wrap;gap:2px;" id="adm-emoji-list"></div>
+        </div>
+        <!-- Image previews -->
+        <div id="adm-img-previews" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
+        <textarea id="adm-content" placeholder="Type your announcement here… supports long text, emojis 🎉, and URLs" style="min-height:130px;"></textarea>
+        <div class="adm-char" id="adm-char">0 chars</div>
+      </div>
+      <button class="adm-btn" id="adm-post-btn" onclick="admPost()">▶ &nbsp; Post Announcement</button>
+      <button class="adm-btn-out" onclick="admLogout()">← Logout</button>
+      <div class="adm-posts">
+        <div class="adm-posts-label">📡 &nbsp; Current Announcements</div>
+        <div id="adm-posts-list">Loading...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  // ── CONFIG (must match your worker) ──
+  const WORKER_URL = 'https://sync-worker.lastresort962.workers.dev';
+  const SECRET     = 'sync123';
+  const PASSWORD   = 'sync@admin2026';
+
+  // ── Triple-click on nav logo ──
+  const navLogo = document.querySelector('nav .nav-logo');
+  let clickCount = 0, clickTimer = null;
+  if (navLogo) {
+    navLogo.addEventListener('click', function(e) {
+      e.preventDefault();
+      clickCount++;
+      // Brief glow hint on each click
+      this.classList.remove('logo-hint');
+      void this.offsetWidth;
+      this.classList.add('logo-hint');
+      if (clickTimer) clearTimeout(clickTimer);
+      if (clickCount >= 3) {
+        clickCount = 0;
+        admOpen();
+      } else {
+        clickTimer = setTimeout(() => { clickCount = 0; }, 800);
+      }
+    });
+  }
+
+  // ── Open / Close ──
+  window.admOpen = function() {
+    document.getElementById('admin-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => document.getElementById('adm-pw').focus(), 100);
+  };
+  window.admClose = function() {
+    document.getElementById('admin-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  // Close on overlay click (outside panel)
+  document.getElementById('admin-overlay').addEventListener('click', function(e) {
+    if (e.target === this) admClose();
+  });
+
+  // Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('admin-overlay').classList.contains('open')) admClose();
+  });
+
+  // ── Login ──
+  window.admLogin = function() {
+    const pw  = document.getElementById('adm-pw').value;
+    const msg = document.getElementById('adm-login-msg');
+    if (pw === PASSWORD) {
+      document.getElementById('adm-login-view').style.display = 'none';
+      document.getElementById('adm-panel-view').style.display  = 'block';
+      admLoadPosts();
+    } else {
+      msg.textContent = '✕ Incorrect password — try again';
+      msg.className = 'adm-msg error';
+      document.getElementById('adm-pw').value = '';
+      document.getElementById('adm-pw').focus();
+    }
+  };
+  document.getElementById('adm-pw').addEventListener('keydown', e => { if (e.key === 'Enter') admLogin(); });
+
+  // ── Logout ──
+  window.admLogout = function() {
+    document.getElementById('adm-login-view').style.display = 'block';
+    document.getElementById('adm-panel-view').style.display  = 'none';
+    document.getElementById('adm-pw').value = '';
+    document.getElementById('adm-login-msg').className = 'adm-msg';
+  };
+
+  // ── Char count (no limit) ──
+  document.getElementById('adm-content').addEventListener('input', function() {
+    const len = this.value.length;
+    const el  = document.getElementById('adm-char');
+    el.textContent = len + ' chars';
+    el.className = 'adm-char';
+  });
+  document.getElementById('adm-content').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) admPost();
+  });
+
+  // ── Emoji picker ──
+  const EMOJIS = ['😀','😂','🥰','😍','😎','🤩','🥳','😤','😡','💀','👀','🔥','💯','✨','🎉','🎮','🏆','👑','⚡','💥','🌟','🎯','🛡️','⚔️','🤝','💪','👊','🙌','❤️','💙','💜','🩷','💚','🖤','🤍','❌','✅','📢','📡','🔔','🗓️','📸','🎵','🕹️','👾','🤖','🧠','😴','😭','🫡','💬','👋'];
+  const emojiList = document.getElementById('adm-emoji-list');
+  EMOJIS.forEach(em => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = em;
+    btn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:1.15rem;padding:3px 5px;border-radius:3px;transition:background 0.15s;';
+    btn.addEventListener('mouseover', () => btn.style.background = 'rgba(0,240,255,0.1)');
+    btn.addEventListener('mouseout', () => btn.style.background = 'none');
+    btn.addEventListener('click', () => {
+      const ta = document.getElementById('adm-content');
+      const pos = ta.selectionStart;
+      ta.value = ta.value.slice(0, pos) + em + ta.value.slice(pos);
+      ta.selectionStart = ta.selectionEnd = pos + em.length;
+      ta.focus();
+      document.getElementById('adm-char').textContent = ta.value.length + ' chars';
+    });
+    emojiList.appendChild(btn);
+  });
+
+  window.admToggleEmoji = function() {
+    const grid = document.getElementById('adm-emoji-grid');
+    grid.style.display = grid.style.display === 'none' ? 'block' : 'none';
+  };
+
+  // ── Image handler ──
+  let admImages = []; // base64 strings
+  window.admHandleImages = function(input) {
+    const files = Array.from(input.files);
+    const previews = document.getElementById('adm-img-previews');
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64 = e.target.result;
+        admImages.push(base64);
+        // preview
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'position:relative;width:80px;height:80px;';
+        const img = document.createElement('img');
+        img.src = base64;
+        img.style.cssText = 'width:80px;height:80px;object-fit:cover;border-radius:3px;border:1px solid rgba(0,240,255,0.2);';
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.textContent = '✕';
+        del.style.cssText = 'position:absolute;top:-5px;right:-5px;background:#ff2d78;border:none;color:#fff;border-radius:50%;width:18px;height:18px;font-size:0.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;';
+        const idx = admImages.length - 1;
+        del.addEventListener('click', () => {
+          admImages.splice(idx, 1);
+          previews.removeChild(wrap);
+          if (admImages.length === 0) previews.style.display = 'none';
+        });
+        wrap.appendChild(img);
+        wrap.appendChild(del);
+        previews.style.display = 'flex';
+        previews.appendChild(wrap);
+      };
+      reader.readAsDataURL(file);
+    });
+    input.value = ''; // reset so same file can be re-added
+  };
+
+  // ── Post ──
+  window.admPost = async function() {
+    const content = document.getElementById('adm-content').value.trim();
+    const author  = document.getElementById('adm-author').value.trim() || 'SYNCHRONIZED';
+    const msg     = document.getElementById('adm-post-msg');
+    const btn     = document.getElementById('adm-post-btn');
+    if (!content && admImages.length === 0) { msg.textContent = '✕ Please write an announcement or attach an image'; msg.className = 'adm-msg error'; return; }
+    btn.disabled = true; btn.textContent = 'Posting...'; msg.className = 'adm-msg';
+    try {
+      const payload = { content: content || '', author, images: admImages };
+      const res = await fetch(`${WORKER_URL}/post?secret=${SECRET}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        msg.textContent = '✓ Announcement posted!';
+        msg.className = 'adm-msg success';
+        document.getElementById('adm-content').value = '';
+        document.getElementById('adm-char').textContent = '0 chars';
+        admImages = [];
+        document.getElementById('adm-img-previews').innerHTML = '';
+        document.getElementById('adm-img-previews').style.display = 'none';
+        document.getElementById('adm-emoji-grid').style.display = 'none';
+        admLoadPosts();
+        if (typeof loadAnnouncements === 'function') loadAnnouncements();
+      } else {
+        msg.textContent = '✕ Failed — check your connection';
+        msg.className = 'adm-msg error';
+      }
+    } catch { msg.textContent = '✕ Network error — try again'; msg.className = 'adm-msg error'; }
+    btn.disabled = false; btn.textContent = '▶   Post Announcement';
+  };
+
+  // ── Load posts ──
+  // ── Load posts ──
+  window.admLoadPosts = async function() {
+    const list = document.getElementById('adm-posts-list');
+    try {
+      const res   = await fetch(`${WORKER_URL}/announcements`, { cache: 'no-store' });
+      const posts = await res.json();
+      if (!posts || posts.length === 0) {
+        list.innerHTML = '<div style="font-family:Share Tech Mono,monospace;font-size:0.62rem;color:rgba(136,136,170,0.4);letter-spacing:0.15em;text-transform:uppercase;">No announcements yet</div>';
+        return;
+      }
+      list.innerHTML = posts.map((p, i) => {
+        // FIXED: Removed the 'linkify' function that was causing the crash
+        const escapedContent = (p.content||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+        const rawMedia = [].concat(p.images || [], p.attachments || []);
+        const imagesHtml = rawMedia.map(a => {
+            const url = typeof a === 'string' ? a : a.url;
+            return url ? `<img src="${url}" style="max-width:100%;max-height:120px;object-fit:cover;border-radius:3px;margin-top:4px;border:1px solid rgba(0,240,255,0.15);" loading="lazy" referrerpolicy="no-referrer">` : '';
+        }).join('');
+        return `
+        <div class="adm-post-item">
+          <button class="adm-post-del" onclick="admDeletePost(${i})" title="Delete">✕</button>
+          <div class="adm-post-content">${escapedContent}</div>
+          ${imagesHtml}
+          <div class="adm-post-meta">${(p.author||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')} · ${admTimeAgo(p.timestamp)}</div>
+        </div>`;
+      }).join('');
+    } catch {
+      list.innerHTML = '<div style="color:rgba(255,45,120,0.6);font-size:0.75rem;">Could not load posts</div>';
+    }
+  };
+
+  // ── Delete post ──
+  window.admDeletePost = async function(index) {
+    if (!confirm('Delete this announcement?')) return;
+    try {
+      const res   = await fetch(`${WORKER_URL}/announcements`);
+      const posts = await res.json();
+      posts.splice(index, 1);
+      await fetch(`${WORKER_URL}/save?secret=${SECRET}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(posts),
+      });
+      admLoadPosts();
+      if (typeof loadAnnouncements === 'function') loadAnnouncements();
+    } catch { alert('Could not delete post'); }
+  };
+
+  // ── Helpers ──
+  function admTimeAgo(iso) {
+    const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+    return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  }
+})();
+</script>
+
+<!-- ══════════════════════════════════════════
+     ROSTER MODAL
+══════════════════════════════════════════ -->
+<style>
+/* ── MODAL OVERLAY ── */
+#roster-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(5,5,16,0.88);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+#roster-modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ── MODAL PANEL ── */
+#roster-modal-panel {
+  position: relative;
+  background: #07071a;
+  border: 1px solid rgba(0,240,255,0.2);
+  box-shadow:
+    0 0 0 1px rgba(255,45,120,0.1),
+    0 0 60px rgba(0,240,255,0.12),
+    0 30px 80px rgba(0,0,0,0.7);
+  width: 100%;
+  max-width: 820px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 2px;
+  transform: translateY(32px) scale(0.97);
+  transition: transform 0.38s cubic-bezier(0.22,1,0.36,1), opacity 0.35s ease;
+  opacity: 0;
+  overflow: hidden;
+}
+#roster-modal-overlay.open #roster-modal-panel {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+/* Corner accents */
+#roster-modal-panel::before,
+#roster-modal-panel::after {
+  content: '';
+  position: absolute;
+  width: 24px; height: 24px;
+  pointer-events: none;
+  z-index: 2;
+}
+#roster-modal-panel::before {
+  top: 0; left: 0;
+  border-top: 2px solid var(--cyan);
+  border-left: 2px solid var(--cyan);
+}
+#roster-modal-panel::after {
+  bottom: 0; right: 0;
+  border-bottom: 2px solid var(--hot-pink);
+  border-right: 2px solid var(--hot-pink);
+}
+
+/* ── MODAL HEADER ── */
+.roster-modal-header {
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 1px solid rgba(0,240,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 1rem;
+}
+.roster-modal-title-block {}
+.roster-modal-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.35em;
+  color: var(--hot-pink);
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+.roster-modal-title {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.2rem, 4vw, 1.7rem);
+  letter-spacing: 0.08em;
+  color: #fff;
+  line-height: 1;
+}
+.roster-modal-title .cyan { color: var(--cyan); }
+
+.roster-modal-close {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--muted);
+  width: 36px; height: 36px;
+  border-radius: 2px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  font-family: monospace;
+}
+.roster-modal-close:hover {
+  background: rgba(255,45,120,0.15);
+  border-color: var(--hot-pink);
+  color: var(--hot-pink);
+  transform: rotate(90deg);
+}
+
+/* ── FILTER BAR (inside modal) ── */
+.roster-modal-filters {
+  padding: 0.85rem 1.5rem;
+  border-bottom: 1px solid rgba(0,240,255,0.08);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+.rm-filter-btn {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700; font-size: 0.74rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 2px;
+  padding: 5px 11px; cursor: pointer; transition: all 0.18s;
+  white-space: nowrap;
+}
+.rm-filter-btn:hover { color: var(--cyan); border-color: rgba(0,240,255,0.3); background: rgba(0,240,255,0.05); }
+.rm-filter-btn.active { color: #fff; background: var(--hot-pink); border-color: var(--hot-pink); box-shadow: 0 0 12px rgba(255,45,120,0.4); }
+.rm-filter-count {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.58rem;
+  background: rgba(255,255,255,0.12); border-radius: 20px; padding: 1px 5px; margin-left: 3px;
+}
+.rm-filter-btn.active .rm-filter-count { background: rgba(255,255,255,0.25); }
+
+/* ── TABLE SCROLL AREA ── */
+.roster-modal-body {
+  overflow-y: auto;
+  flex: 1;
+  padding: 0 0 1.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,240,255,0.2) transparent;
+}
+.roster-modal-body::-webkit-scrollbar { width: 4px; }
+.roster-modal-body::-webkit-scrollbar-track { background: transparent; }
+.roster-modal-body::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.2); border-radius: 4px; }
+
+/* ── TABLE ── */
+.rm-table { width: 100%; border-collapse: collapse; }
+.rm-table thead tr { border-bottom: 1px solid rgba(0,240,255,0.18); position: sticky; top: 0; background: #07071a; z-index: 2; }
+.rm-table thead th {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--cyan); padding: 0.75rem 1rem 0.75rem; text-align: left; font-weight: 400;
+}
+.rm-table thead th:first-child { padding-left: 1.5rem; }
+
+.rm-row {
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.15s;
+}
+.rm-row:hover { background: rgba(0,240,255,0.04); }
+.rm-row td { padding: 0.8rem 1rem; vertical-align: middle; }
+.rm-row td:first-child { padding-left: 1.5rem; }
+.rm-row.rm-hidden { display: none; }
+
+@keyframes rmRowIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: none; }
+}
+.rm-row.rm-visible { animation: rmRowIn 0.22s ease forwards; }
+
+.rm-col-num {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.62rem;
+  color: rgba(255,255,255,0.2); width: 36px; letter-spacing: 0.05em;
+}
+
+/* Role pills */
+.rm-role-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 2px; white-space: nowrap;
+}
+.rm-pill--clan-master  { color: #FFD700; background: rgba(255,215,0,0.08); border: 1px solid rgba(255,215,0,0.3); }
+.rm-pill--vice         { color: #ff5555; background: rgba(255,51,51,0.08); border: 1px solid rgba(255,51,51,0.3); }
+.rm-pill--high-council { color: #E8B48A; background: rgba(232,180,138,0.08); border: 1px solid rgba(232,180,138,0.3); }
+.rm-pill--mod          { color: #c89fff; background: rgba(176,127,255,0.08); border: 1px solid rgba(176,127,255,0.3); }
+.rm-pill--examiner     { color: #00BFFF; background: rgba(0,191,255,0.08); border: 1px solid rgba(0,191,255,0.3); }
+.rm-pill--recruiter    { color: #40e0ff; background: rgba(0,191,255,0.06); border: 1px solid rgba(0,191,255,0.22); }
+.rm-pill--member       { color: #ff9ec8; background: rgba(255,105,180,0.06); border: 1px solid rgba(255,105,180,0.25); }
+
+/* Left border accents on rows */
+.rm-row[data-role="clan-master"]  td:first-child { border-left: 3px solid #FFD700; padding-left: calc(1.5rem - 3px); }
+.rm-row[data-role="vice"]         td:first-child { border-left: 3px solid #ff5555; padding-left: calc(1.5rem - 3px); }
+.rm-row[data-role="high-council"] td:first-child { border-left: 3px solid #E8B48A; padding-left: calc(1.5rem - 3px); }
+.rm-row[data-role="mod"]          td:first-child { border-left: 3px solid #b07fff; padding-left: calc(1.5rem - 3px); }
+.rm-row[data-role="examiner"]     td:first-child { border-left: 3px solid #00BFFF; padding-left: calc(1.5rem - 3px); }
+.rm-row[data-role="recruiter"]    td:first-child { border-left: 3px solid #40e0ff; padding-left: calc(1.5rem - 3px); }
+.rm-row[data-role="member"]       td:first-child { border-left: 3px solid rgba(255,105,180,0.4); padding-left: calc(1.5rem - 3px); }
+
+/* Row background tints */
+.rm-row[data-role="clan-master"]  { background: rgba(255,215,0,0.02); }
+.rm-row[data-role="vice"]         { background: rgba(255,50,50,0.02); }
+.rm-row[data-role="high-council"] { background: rgba(232,180,138,0.015); }
+.rm-row[data-role="mod"]          { background: rgba(176,127,255,0.015); }
+
+/* ── NAME STYLES (same as roster.html) ── */
+.rm-name { font-family: 'Exo 2', sans-serif; font-weight: 700; font-size: 0.93rem; letter-spacing: 0.04em; display: inline-block; }
+.rm-name--clan-master  { color: #FFD700; text-shadow: 0 0 8px rgba(255,215,0,0.9), 0 0 20px rgba(255,215,0,0.6); animation: crownPulse 2s ease-in-out infinite; font-family: 'Orbitron', sans-serif; font-weight: 900; letter-spacing: 0.08em; }
+.rm-name--clan-master::before { content: '♛ '; font-size: 0.85em; display: inline-block; animation: crownSpin 3s ease-in-out infinite; }
+.rm-name--vice         { color: #ff5555; text-shadow: 0 0 6px rgba(255,60,60,0.9), 0 0 18px rgba(255,0,0,0.5); animation: vicePulseR 1.5s ease-in-out infinite; font-family: 'Orbitron', sans-serif; font-weight: 800; }
+.rm-name--vice::before { content: '♜ '; font-size: 0.85em; display: inline-block; animation: viceBeatR 1.5s ease-in-out infinite; }
+.rm-name--high-council { color: #E8B48A; text-shadow: 0 0 6px rgba(232,180,138,0.8), 0 0 15px rgba(232,140,60,0.4); animation: emberGlowR 3s ease-in-out infinite; font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1rem; }
+.rm-name--high-council::before { content: '◈ '; font-size: 0.8em; display: inline-block; animation: emberSpinR 4s linear infinite; }
+.rm-name--mod          { color: #c89fff; text-shadow: 0 0 6px rgba(176,127,255,0.9), 0 0 18px rgba(150,80,255,0.5); animation: electricGlowR 2.5s ease-in-out infinite; font-family: 'Orbitron', sans-serif; font-weight: 700; }
+.rm-name--mod::before  { content: '⬡ '; font-size: 0.85em; display: inline-block; animation: hexSpinR 3s ease-in-out infinite; }
+.rm-name--examiner     { color: #00BFFF; text-shadow: 0 0 6px rgba(0,191,255,0.9), 0 0 16px rgba(0,150,255,0.5); animation: scanGlowR 3s linear infinite; font-family: 'Share Tech Mono', monospace; letter-spacing: 0.1em; }
+.rm-name--examiner::before { content: '◎ '; font-size: 0.85em; display: inline-block; animation: scanPingR 3s linear infinite; }
+.rm-name--recruiter    { color: #40e0ff; text-shadow: 0 0 5px rgba(0,220,255,0.8), 0 0 14px rgba(0,200,255,0.4); animation: recruitGlowR 3.5s ease-in-out infinite; font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 1rem; }
+.rm-name--recruiter::before { content: '✦ '; font-size: 0.8em; display: inline-block; animation: starTwinkleR 2s ease-in-out infinite; }
+.rm-name--member       { color: #ff9ec8; text-shadow: 0 0 4px rgba(255,105,180,0.6), 0 0 10px rgba(255,80,150,0.3); animation: memberGlowR 4s ease-in-out infinite; }
+
+/* Reuse the same keyframes but with unique names to avoid conflicts */
+@keyframes crownPulse    { 0%,100% { text-shadow: 0 0 8px rgba(255,215,0,0.9), 0 0 20px rgba(255,215,0,0.6), 0 0 40px rgba(255,180,0,0.4); } 50% { text-shadow: 0 0 14px rgba(255,215,0,1), 0 0 35px rgba(255,215,0,0.9), 0 0 70px rgba(255,180,0,0.6); } }
+@keyframes crownSpin     { 0%,80%,100% { transform:rotate(0deg) scale(1); } 90% { transform:rotate(-15deg) scale(1.3); } }
+@keyframes vicePulseR    { 0%,100% { text-shadow: 0 0 6px rgba(255,60,60,0.9), 0 0 18px rgba(255,0,0,0.5); color: #ff5555; } 50% { text-shadow: 0 0 12px rgba(255,80,80,1), 0 0 30px rgba(255,30,30,0.8); color: #ff8888; } }
+@keyframes viceBeatR     { 0%,100% { transform:scale(1); } 50% { transform:scale(1.25); } }
+@keyframes emberGlowR    { 0%,100% { text-shadow: 0 0 6px rgba(232,180,138,0.8), 0 0 15px rgba(232,140,60,0.4); } 33% { text-shadow: 0 0 10px rgba(255,200,100,1), 0 0 25px rgba(255,150,50,0.7); color: #FFD0A0; } 66% { color: #D0A070; } }
+@keyframes emberSpinR    { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+@keyframes electricGlowR { 0%,100% { text-shadow: 0 0 6px rgba(176,127,255,0.9), 0 0 18px rgba(150,80,255,0.5); } 50% { text-shadow: 0 0 12px rgba(220,180,255,1), 0 0 30px rgba(180,100,255,0.8); } }
+@keyframes hexSpinR      { 0%,100% { transform:rotate(0deg) scale(1); } 50% { transform:rotate(30deg) scale(1.2); } }
+@keyframes scanGlowR     { 0%,100% { text-shadow: 0 0 6px rgba(0,191,255,0.9), 0 0 16px rgba(0,150,255,0.5); } 50% { text-shadow: 0 0 12px rgba(0,240,255,1), 0 0 28px rgba(0,200,255,0.8); } }
+@keyframes scanPingR     { 0% { transform:scale(1); opacity:1; } 50% { transform:scale(1.5); opacity:0.3; } 100% { transform:scale(1); opacity:1; } }
+@keyframes recruitGlowR  { 0%,100% { text-shadow: 0 0 5px rgba(0,220,255,0.8), 0 0 14px rgba(0,200,255,0.4); } 50% { text-shadow: 0 0 10px rgba(0,240,255,1), 0 0 24px rgba(0,220,255,0.7); } }
+@keyframes starTwinkleR  { 0%,100% { transform:scale(1) rotate(0deg); opacity:1; } 50% { transform:scale(1.4) rotate(45deg); opacity:0.6; } }
+@keyframes memberGlowR   { 0%,100% { text-shadow: 0 0 4px rgba(255,105,180,0.6), 0 0 10px rgba(255,80,150,0.3); color: #ff9ec8; } 50% { text-shadow: 0 0 8px rgba(255,140,190,0.8), 0 0 18px rgba(255,105,180,0.5); color: #ffb8d8; } }
+
+/* Section dividers */
+.rm-section-header td {
+  padding: 1.4rem 1rem 0.4rem 1.5rem;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.35em; text-transform: uppercase;
+  color: rgba(0,240,255,0.35); border-bottom: none;
+}
+
+/* Empty state */
+.rm-empty { text-align:center; padding: 2.5rem; font-family:'Share Tech Mono',monospace; font-size:0.72rem; letter-spacing:0.2em; color:var(--muted); display:none; }
+.rm-empty.show { display:block; }
+
+/* ── MODAL FOOTER ── */
+.roster-modal-footer {
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid rgba(0,240,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 1rem;
+}
+.roster-modal-footer-text {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.2);
+  text-transform: uppercase;
+}
+.roster-modal-footer a { color: var(--hot-pink); text-decoration: none; }
+
+/* Mobile adjustments */
+@media(max-width:500px){
+  .roster-modal-filters { padding: 0.65rem 1rem; }
+  .rm-filter-btn { font-size:0.66rem; padding:4px 8px; }
+  .rm-table thead th, .rm-row td { padding-left: 0.75rem !important; padding-right: 0.75rem; }
+  .roster-modal-header { padding: 1rem; }
+}
+</style>
+
+<!-- ROSTER MODAL HTML -->
+<div id="roster-modal-overlay">
+  <div id="roster-modal-panel">
+
+    <!-- Header -->
+    <div class="roster-modal-header">
+      <div class="roster-modal-title-block">
+        <div class="roster-modal-label">iDate Clan · SYNCHRONIZED</div>
+        <div class="roster-modal-title">Clan <span class="cyan">Roster</span></div>
+      </div>
+      <button class="roster-modal-close" onclick="closeRosterModal()" aria-label="Close">✕</button>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="roster-modal-filters" id="rm-filter-bar">
+      <button class="rm-filter-btn active" data-filter="all">All <span class="rm-filter-count">25</span></button>
+      <button class="rm-filter-btn" data-filter="clan-master">♛ Clan Master <span class="rm-filter-count">1</span></button>
+      <button class="rm-filter-btn" data-filter="vice">♜ Vice <span class="rm-filter-count">1</span></button>
+      <button class="rm-filter-btn" data-filter="high-council">◈ High Council <span class="rm-filter-count">4</span></button>
+      <button class="rm-filter-btn" data-filter="mod">⬡ Mod <span class="rm-filter-count">1</span></button>
+      <button class="rm-filter-btn" data-filter="examiner">◎ Examiner <span class="rm-filter-count">1</span></button>
+      <button class="rm-filter-btn" data-filter="recruiter">✦ Recruiter <span class="rm-filter-count">1</span></button>
+      <button class="rm-filter-btn" data-filter="member">◆ Members <span class="rm-filter-count">16</span></button>
+    </div>
+
+    <!-- Scrollable table -->
+    <div class="roster-modal-body">
+      <table class="rm-table">
+        <thead>
+          <tr><th>#</th><th>Name</th><th>Role</th></tr>
+        </thead>
+        <tbody id="rm-tbody">
+
+          <tr class="rm-row rm-visible" data-role="clan-master">
+            <td class="rm-col-num">01</td>
+            <td><span class="rm-name rm-name--clan-master">[SYNC]-Lujuria-</span></td>
+            <td><span class="rm-role-pill rm-pill--clan-master">♛ Clan Master</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="vice">
+            <td class="rm-col-num">02</td>
+            <td><span class="rm-name rm-name--vice">[SYNC]-Zyx-</span></td>
+            <td><span class="rm-role-pill rm-pill--vice">♜ Vice Clan Master</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="high-council">
+            <td class="rm-col-num">03</td>
+            <td><span class="rm-name rm-name--high-council">[SYNC]-Sh1n-</span></td>
+            <td><span class="rm-role-pill rm-pill--high-council">◈ High Council</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="high-council">
+            <td class="rm-col-num">04</td>
+            <td><span class="rm-name rm-name--high-council">[SYNC]-Minwonuna-</span></td>
+            <td><span class="rm-role-pill rm-pill--high-council">◈ High Council</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="high-council">
+            <td class="rm-col-num">05</td>
+            <td><span class="rm-name rm-name--high-council">[SYNC]-Jxiam-</span></td>
+            <td><span class="rm-role-pill rm-pill--high-council">◈ High Council</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="high-council">
+            <td class="rm-col-num">06</td>
+            <td><span class="rm-name rm-name--high-council">[SYNC]-KYO-</span></td>
+            <td><span class="rm-role-pill rm-pill--high-council">◈ High Council</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="mod">
+            <td class="rm-col-num">07</td>
+            <td><span class="rm-name rm-name--mod">[SYNC]-pinoo*-</span></td>
+            <td><span class="rm-role-pill rm-pill--mod">⬡ Moderator</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="examiner">
+            <td class="rm-col-num">08</td>
+            <td><span class="rm-name rm-name--examiner">[SYNC]-Errs-</span></td>
+            <td><span class="rm-role-pill rm-pill--examiner">◎ Examiner</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="recruiter">
+            <td class="rm-col-num">09</td>
+            <td><span class="rm-name rm-name--recruiter">[SYNC]-Kael-</span></td>
+            <td><span class="rm-role-pill rm-pill--recruiter">✦ Recruiter</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="member">
+            <td class="rm-col-num">10</td>
+            <td><span class="rm-name rm-name--member">[SYNC]Alwin</span></td>
+            <td><span class="rm-role-pill rm-pill--member">◆ Member</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="member">
+            <td class="rm-col-num">11</td>
+            <td><span class="rm-name rm-name--member">[SYNC]-Cleo-</span></td>
+            <td><span class="rm-role-pill rm-pill--member">◆ Member</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="member">
+            <td class="rm-col-num">12</td>
+            <td><span class="rm-name rm-name--member">[SYNC]-Clck-</span></td>
+            <td><span class="rm-role-pill rm-pill--member">◆ Member</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="member">
+            <td class="rm-col-num">13</td>
+            <td><span class="rm-name rm-name--member">[SYNC]Chaeyi</span></td>
+            <td><span class="rm-role-pill rm-pill--member">◆ Member</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="member">
+            <td class="rm-col-num">14</td>
+            <td><span class="rm-name rm-name--member">[SYNC]-Chichay-</span></td>
+            <td><span class="rm-role-pill rm-pill--member">◆ Member</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="member">
+            <td class="rm-col-num">15</td>
+            <td><span class="rm-name rm-name--member">[SYNC]Haru</span></td>
+            <td><span class="rm-role-pill rm-pill--member">◆ Member</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="member">
+            <td class="rm-col-num">16</td>
+            <td><span class="rm-name rm-name--member">[SYNC]-Jai-</span></td>
+            <td><span class="rm-role-pill rm-pill--member">◆ Member</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="member">
+            <td class="rm-col-num">17</td>
+            <td><span class="rm-name rm-name--member">[SYNC]-KDiii-</span></td>
+            <td><span class="rm-role-pill rm-pill--member">◆ Member</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="member">
+            <td class="rm-col-num">18</td>
+            <td><span class="rm-name rm-name--member">[SYNC]-meguchan-</span></td>
+            <td><span class="rm-role-pill rm-pill--member">◆ Member</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="member">
+            <td class="rm-col-num">20</td>
+            <td><span class="rm-name rm-name--member">[SYNC]-Poohday-</span></td>
+            <td><span class="rm-role-pill rm-pill--member">◆ Member</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="member">
+            <td class="rm-col-num">21</td>
+            <td><span class="rm-name rm-name--member">[SYNC]-Que-</span></td>
+            <td><span class="rm-role-pill rm-pill--member">◆ Member</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="member">
+            <td class="rm-col-num">22</td>
+            <td><span class="rm-name rm-name--member">[SYNC]-Shane-</span></td>
+            <td><span class="rm-role-pill rm-pill--member">◆ Member</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="member">
+            <td class="rm-col-num">23</td>
+            <td><span class="rm-name rm-name--member">[SYNC]-Sassy-</span></td>
+            <td><span class="rm-role-pill rm-pill--member">◆ Member</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="member">
+            <td class="rm-col-num">24</td>
+            <td><span class="rm-name rm-name--member">[SYNC]-Seiymari-</span></td>
+            <td><span class="rm-role-pill rm-pill--member">◆ Member</span></td>
+          </tr>
+
+          <tr class="rm-row rm-visible" data-role="member">
+            <td class="rm-col-num">25</td>
+            <td><span class="rm-name rm-name--member">[SYNC]-ShnJhc-</span></td>
+            <td><span class="rm-role-pill rm-pill--member">◆ Member</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+      <div class="rm-empty" id="rm-empty">[ No members found for this filter ]</div>
+    </div>
+
+    <!-- Footer -->
+    <div class="roster-modal-footer">
+      <span class="roster-modal-footer-text">[ 25 Members · Active Roster ]</span>
+      <span class="roster-modal-footer-text"><a href="https://discord.gg/XW7nY97d" target="_blank">discord.gg/XW7nY97d</a></span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── ROSTER MODAL ──
+(function() {
+  const overlay = document.getElementById('roster-modal-overlay');
+
+  window.openRosterModal = function() {
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeRosterModal = function() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  // Close on backdrop click
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) closeRosterModal();
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) closeRosterModal();
+  });
+
+  // Filter logic
+  const btns  = document.querySelectorAll('.rm-filter-btn');
+  const rows  = document.querySelectorAll('.rm-row');
+  const empty = document.getElementById('rm-empty');
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      let visible = 0;
+      rows.forEach((row, i) => {
+        const role = row.dataset.role;
+        const show = filter === 'all' || role === filter;
+        row.classList.remove('rm-hidden', 'rm-visible');
+        if (show) {
+          visible++;
+          setTimeout(() => { row.classList.remove('rm-hidden'); row.classList.add('rm-visible'); }, i * 12);
+        } else {
+          row.classList.add('rm-hidden');
+        }
+      });
+      empty.classList.toggle('show', visible === 0);
+    });
+  });
+})();
 </script>
 </body>
 </html>
