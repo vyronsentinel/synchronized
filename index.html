@@ -2839,8 +2839,9 @@
   .ann-popup-avatar {
     width: 42px; height: 42px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #ff2d78, #7b2fff);
-    border: 1px solid rgba(0,240,255,0.3);
+    background: #0d0d28;
+    border: 1.5px solid rgba(255,45,120,0.5);
+    box-shadow: 0 0 10px rgba(255,45,120,0.3), 0 0 20px rgba(123,47,255,0.2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3052,8 +3053,8 @@
         card.className = 'ann-popup-card';
         card.style.animationDelay = (i * 0.07) + 's';
         const avatarHtml = post.avatar
-          ? `<img src="${post.avatar}" alt="${(post.author||'S').charAt(0)}" onerror="this.parentElement.textContent='${(post.author||'S').charAt(0).toUpperCase()}'">`
-          : (post.author||'S').charAt(0).toUpperCase();
+          ? `<img src="${post.avatar}" alt="${(post.author||'S').charAt(0)}" onerror="this.outerHTML='<img src=\\'sync-logo.png\\' alt=\\'SYNC\\' style=\\'width:100%;height:100%;object-fit:cover;border-radius:50%;\\' />'">` 
+          : `<img src="sync-logo.png" alt="SYNC" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
         const rawMedia = [].concat(post.images || [], post.attachments || []);
         const imageHtml = rawMedia
           .filter(a => typeof a === 'string' ? a.length > 0 : (a && a.url))
