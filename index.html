@@ -4531,7 +4531,7 @@ async function submitApplication() {
 </footer>
 
 <!-- BACKGROUND MUSIC -->
-<audio id="bgMusic" loop preload="none"></audio>
+<audio id="bgMusic" preload="none"></audio>
 
 <!-- Music Player Widget -->
 <div id="music-player" style="
@@ -4599,6 +4599,14 @@ async function submitApplication() {
       <div class="vbar" style="width:3px;background:var(--cyan);border-radius:1px;height:5px;"></div>
       <div class="vbar" style="width:3px;background:var(--cyan);border-radius:1px;height:14px;"></div>
       <div class="vbar" style="width:3px;background:var(--cyan);border-radius:1px;height:7px;"></div>
+    </div>
+    <!-- Duration display -->
+    <div style="display:flex;align-items:center;gap:6px;margin-top:5px;">
+      <span id="trackCurrent" style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--cyan);letter-spacing:0.05em;">0:00</span>
+      <div style="flex:1;height:2px;background:rgba(255,255,255,0.12);border-radius:2px;overflow:hidden;">
+        <div id="trackProgress" style="height:100%;width:0%;background:linear-gradient(90deg,var(--hot-pink),var(--cyan));border-radius:2px;transition:width 0.5s linear;"></div>
+      </div>
+      <span id="trackDuration" style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.05em;">0:00</span>
     </div>
   </div>
 
@@ -5034,6 +5042,22 @@ async function submitApplication() {
     // Auto-advance
     audio.addEventListener('ended', () => {
       loadTrack((currentTrack + 1) % playlist.length, true);
+    });
+
+    // Duration display helpers
+    function fmtTime(s) {
+      if (isNaN(s)) return '0:00';
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60);
+      return m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+    audio.addEventListener('timeupdate', () => {
+      document.getElementById('trackCurrent').textContent = fmtTime(audio.currentTime);
+      const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+      document.getElementById('trackProgress').style.width = pct + '%';
+    });
+    audio.addEventListener('durationchange', () => {
+      document.getElementById('trackDuration').textContent = fmtTime(audio.duration);
     });
 
     // Load first track silently
