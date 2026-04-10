@@ -6398,6 +6398,116 @@ async function submitApplication() {
   .rm-table thead th, .rm-row td { padding-left: 0.75rem !important; padding-right: 0.75rem; }
   .roster-modal-header { padding: 1rem; }
 }
+
+/* ══════════════════════════════════════════
+   NAME GLOW STYLES (ported from roster.html)
+   ══════════════════════════════════════════ */
+.rm-name { font-family:'Exo 2',sans-serif; font-weight:700; font-size:0.92rem; letter-spacing:0.04em; display:inline-block; cursor:pointer; }
+
+/* CLAN MASTER */
+.rm-name--clan-master { color:#FFD700; text-shadow:0 0 8px rgba(255,215,0,0.9),0 0 20px rgba(255,215,0,0.6),0 0 40px rgba(255,180,0,0.4); animation:crownPulse 2s ease-in-out infinite,crownShimmer 4s linear infinite; font-family:'Orbitron',sans-serif; font-weight:900; letter-spacing:0.08em; position:relative; }
+.rm-name--clan-master::before { content:'♛ '; font-size:0.85em; animation:crownSpin 3s ease-in-out infinite; display:inline-block; }
+@keyframes crownPulse { 0%,100%{text-shadow:0 0 8px rgba(255,215,0,0.9),0 0 20px rgba(255,215,0,0.6),0 0 40px rgba(255,180,0,0.4)}50%{text-shadow:0 0 14px rgba(255,215,0,1),0 0 35px rgba(255,215,0,0.9),0 0 70px rgba(255,180,0,0.6),0 0 100px rgba(255,100,0,0.3)} }
+@keyframes crownShimmer { 0%{filter:brightness(1) hue-rotate(0deg)}33%{filter:brightness(1.3) hue-rotate(10deg)}66%{filter:brightness(1.1) hue-rotate(-10deg)}100%{filter:brightness(1) hue-rotate(0deg)} }
+@keyframes crownSpin { 0%,80%,100%{transform:rotate(0deg) scale(1)}90%{transform:rotate(-15deg) scale(1.3)} }
+.rm-name--clan-master { transition:transform 0.3s cubic-bezier(.34,1.56,.64,1),letter-spacing 0.3s ease; }
+.rm-name--clan-master:hover { transform:scale(1.18) translateY(-2px); letter-spacing:0.18em; text-shadow:0 0 10px #fff,0 0 25px #ffd700,0 0 60px #ffb300,0 0 120px rgba(255,180,0,0.8)!important; animation:crownBurst 0.6s ease forwards,crownPulse 2s ease-in-out 0.6s infinite!important; }
+@keyframes crownBurst { 0%{filter:brightness(1)}30%{filter:brightness(3) saturate(2)}60%{filter:brightness(2) saturate(1.5)}100%{filter:brightness(1.3)} }
+.rm-name--clan-master:hover::before { animation:crownHoverSpin 0.5s cubic-bezier(.34,1.56,.64,1) forwards!important; }
+@keyframes crownHoverSpin { 0%{transform:scale(1) rotate(0deg)}40%{transform:scale(2.2) rotate(-30deg)}70%{transform:scale(1.6) rotate(15deg)}100%{transform:scale(1.4) rotate(0deg)} }
+
+/* VICE */
+.rm-name--vice { color:#ff5555; text-shadow:0 0 6px rgba(255,60,60,0.9),0 0 18px rgba(255,0,0,0.5),0 0 35px rgba(255,0,0,0.3); animation:vicePulse 1.5s ease-in-out infinite; font-family:'Orbitron',sans-serif; font-weight:800; letter-spacing:0.06em; }
+.rm-name--vice::before { content:'♜ '; font-size:0.85em; animation:viceBeat 1.5s ease-in-out infinite; display:inline-block; }
+@keyframes vicePulse { 0%,100%{text-shadow:0 0 6px rgba(255,60,60,0.9),0 0 18px rgba(255,0,0,0.5),0 0 35px rgba(255,0,0,0.3);color:#ff5555}50%{text-shadow:0 0 12px rgba(255,80,80,1),0 0 30px rgba(255,30,30,0.8),0 0 60px rgba(255,0,0,0.5);color:#ff8888} }
+@keyframes viceBeat { 0%,100%{transform:scale(1)}50%{transform:scale(1.25)} }
+.rm-name--vice { transition:color 0.2s; }
+.rm-name--vice:hover { animation:viceRage 0.5s ease forwards,viceShake 0.08s linear 0s infinite!important; color:#fff!important; }
+@keyframes viceRage { 0%{text-shadow:0 0 6px rgba(255,60,60,0.9);filter:brightness(1)}20%{text-shadow:0 0 20px #fff,0 0 40px #ff3333,0 0 80px #ff0000;filter:brightness(3)}50%{text-shadow:0 0 10px #ff8888,0 0 30px #ff2222,0 0 60px #cc0000;filter:brightness(2)}100%{text-shadow:0 0 8px #fff,0 0 20px #ff4444,0 0 50px #ff0000,0 0 100px rgba(255,0,0,0.5);filter:brightness(1.5)} }
+@keyframes viceShake { 0%{transform:translateX(0)}25%{transform:translateX(-3px) rotate(-1deg)}50%{transform:translateX(3px) rotate(1deg)}75%{transform:translateX(-2px)}100%{transform:translateX(0)} }
+.rm-name--vice:hover::before { animation:viceBeat 0.15s ease-in-out infinite!important; }
+
+/* HIGH COUNCIL */
+.rm-name--high-council { color:#E8B48A; text-shadow:0 0 6px rgba(232,180,138,0.8),0 0 15px rgba(232,140,60,0.4),0 0 28px rgba(200,100,20,0.2); animation:emberGlow 3s ease-in-out infinite; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1rem; letter-spacing:0.06em; }
+.rm-name--high-council::before { content:'◈ '; font-size:0.8em; animation:emberSpin 4s linear infinite; display:inline-block; }
+@keyframes emberGlow { 0%,100%{text-shadow:0 0 6px rgba(232,180,138,0.8),0 0 15px rgba(232,140,60,0.4)}33%{text-shadow:0 0 10px rgba(255,200,100,1),0 0 25px rgba(255,150,50,0.7),0 0 45px rgba(200,80,0,0.4);color:#FFD0A0}66%{text-shadow:0 0 4px rgba(180,120,80,0.6),0 0 12px rgba(200,100,30,0.3);color:#D0A070} }
+@keyframes emberSpin { 0%{transform:rotate(0deg)}100%{transform:rotate(360deg)} }
+.rm-name--high-council { transition:transform 0.4s ease,letter-spacing 0.4s ease; }
+.rm-name--high-council:hover { transform:translateY(-4px); letter-spacing:0.12em; animation:emberFloat 2s ease-in-out infinite,emberGlow 3s ease-in-out infinite!important; }
+@keyframes emberFloat { 0%,100%{transform:translateY(-4px)}33%{transform:translateY(-6px) rotate(0.5deg)}66%{transform:translateY(-3px) rotate(-0.5deg)} }
+.rm-name--high-council:hover::before { animation:emberSpin 1.2s linear infinite!important; }
+
+/* MOD */
+.rm-name--mod { color:#c89fff; text-shadow:0 0 6px rgba(176,127,255,0.9),0 0 18px rgba(150,80,255,0.5),0 0 35px rgba(120,40,255,0.3); animation:electricGlow 2.5s ease-in-out infinite,electricFlicker 0.15s linear infinite; font-family:'Orbitron',sans-serif; font-weight:700; letter-spacing:0.05em; }
+.rm-name--mod::before { content:'⬡ '; font-size:0.85em; display:inline-block; animation:hexSpin 3s ease-in-out infinite; }
+@keyframes electricGlow { 0%,100%{text-shadow:0 0 6px rgba(176,127,255,0.9),0 0 18px rgba(150,80,255,0.5),0 0 35px rgba(120,40,255,0.3)}50%{text-shadow:0 0 12px rgba(220,180,255,1),0 0 30px rgba(180,100,255,0.8),0 0 60px rgba(140,50,255,0.5)} }
+@keyframes electricFlicker { 0%,94%,100%{opacity:1}95%{opacity:0.85}97%{opacity:1}98%{opacity:0.9} }
+@keyframes hexSpin { 0%,100%{transform:rotate(0deg) scale(1)}50%{transform:rotate(30deg) scale(1.2)} }
+.rm-name--mod { transition:transform 0.2s ease; }
+.rm-name--mod:hover { transform:scale(1.08); animation:modZap 0.1s steps(1) infinite!important; }
+@keyframes modZap { 0%{text-shadow:4px 0 #ff2d78,-4px 0 #00f0ff,0 0 20px #b07fff;color:#ffffff;filter:brightness(2)}20%{text-shadow:-3px 0 #00f0ff,3px 0 #ffd700,0 0 30px #c89fff;color:#c89fff;filter:brightness(1.8)}40%{text-shadow:2px -2px #ffd700,-2px 2px #ff2d78,0 0 25px #fff;color:#ffffff;filter:brightness(2.2)}60%{text-shadow:-4px 0 #b07fff,4px 0 #00f0ff,0 0 20px #ff2d78;color:#e8d0ff;filter:brightness(1.6)}80%{text-shadow:3px 3px #ff2d78,-3px -3px #b07fff,0 0 15px #00f0ff;color:#ffffff;filter:brightness(2)}100%{text-shadow:4px 0 #ff2d78,-4px 0 #00f0ff,0 0 20px #b07fff;color:#c89fff;filter:brightness(1.8)} }
+.rm-name--mod:hover::before { animation:hexSpin 0.3s linear infinite!important; }
+
+/* EXAMINER */
+.rm-name--examiner { color:#00BFFF; text-shadow:0 0 6px rgba(0,191,255,0.9),0 0 16px rgba(0,150,255,0.5),0 0 30px rgba(0,100,220,0.3); animation:scanGlow 3s linear infinite; font-family:'Share Tech Mono',monospace; font-weight:400; letter-spacing:0.1em; }
+.rm-name--examiner::before { content:'◎ '; font-size:0.85em; display:inline-block; animation:scanPing 3s linear infinite; }
+@keyframes scanGlow { 0%,100%{text-shadow:0 0 6px rgba(0,191,255,0.9),0 0 16px rgba(0,150,255,0.5)}50%{text-shadow:0 0 12px rgba(0,240,255,1),0 0 28px rgba(0,200,255,0.8),0 0 50px rgba(0,150,255,0.5)} }
+@keyframes scanPing { 0%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:0.3}100%{transform:scale(1);opacity:1} }
+.rm-name--examiner { transition:transform 0.3s ease,letter-spacing 0.3s ease; overflow:visible; }
+.rm-name--examiner:hover { transform:scale(1.06); letter-spacing:0.18em; animation:examScan 1.2s linear infinite,scanGlow 3s linear infinite!important; }
+@keyframes examScan { 0%{filter:brightness(1)}48%{filter:brightness(1)}50%{filter:brightness(2.5) drop-shadow(0 0 8px #00f0ff)}52%{filter:brightness(1)}100%{filter:brightness(1)} }
+.rm-name--examiner:hover::before { animation:scanPing 0.8s ease-in-out infinite!important; }
+
+/* RECRUITER */
+.rm-name--recruiter { color:#40e0ff; text-shadow:0 0 5px rgba(0,220,255,0.8),0 0 14px rgba(0,200,255,0.4),0 0 25px rgba(0,180,255,0.2); animation:recruitGlow 3.5s ease-in-out infinite; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1rem; letter-spacing:0.07em; }
+.rm-name--recruiter::before { content:'✦ '; font-size:0.8em; display:inline-block; animation:starTwinkle 2s ease-in-out infinite; }
+@keyframes recruitGlow { 0%,100%{text-shadow:0 0 5px rgba(0,220,255,0.8),0 0 14px rgba(0,200,255,0.4)}50%{text-shadow:0 0 10px rgba(0,240,255,1),0 0 24px rgba(0,220,255,0.7),0 0 40px rgba(0,200,255,0.4)} }
+@keyframes starTwinkle { 0%,100%{transform:scale(1) rotate(0deg);opacity:1}50%{transform:scale(1.4) rotate(45deg);opacity:0.6} }
+.rm-name--recruiter { transition:transform 0.3s cubic-bezier(.34,1.56,.64,1),letter-spacing 0.3s ease; }
+.rm-name--recruiter:hover { transform:scale(1.1) translateY(-1px); letter-spacing:0.12em; animation:recruitBurst 0.4s ease forwards,recruitGlow 2s ease-in-out 0.4s infinite!important; }
+@keyframes recruitBurst { 0%{filter:brightness(1)}25%{filter:brightness(2.5) hue-rotate(20deg)}100%{filter:brightness(1.4)} }
+.rm-name--recruiter:hover::before { animation:starTwinkle 0.4s ease-in-out infinite!important; }
+
+/* MEMBER */
+.rm-name--member { color:#ff9ec8; text-shadow:0 0 4px rgba(255,105,180,0.6),0 0 10px rgba(255,80,150,0.3); animation:memberGlow 4s ease-in-out infinite; }
+@keyframes memberGlow { 0%,100%{text-shadow:0 0 4px rgba(255,105,180,0.6),0 0 10px rgba(255,80,150,0.3);color:#ff9ec8}50%{text-shadow:0 0 8px rgba(255,140,190,0.8),0 0 18px rgba(255,105,180,0.5);color:#ffb8d8} }
+.rm-name--member { transition:transform 0.2s ease; }
+.rm-name--member:hover { animation:memberBeat 0.5s ease-in-out infinite!important; }
+@keyframes memberBeat { 0%{transform:scale(1);text-shadow:0 0 4px rgba(255,105,180,0.6)}14%{transform:scale(1.12);text-shadow:0 0 12px rgba(255,140,190,0.9),0 0 25px rgba(255,105,180,0.6)}28%{transform:scale(1.02)}42%{transform:scale(1.08);text-shadow:0 0 10px rgba(255,140,190,0.8),0 0 20px rgba(255,105,180,0.5)}70%{transform:scale(1);text-shadow:0 0 4px rgba(255,105,180,0.6)}100%{transform:scale(1)} }
+
+/* ── KAEL TRANSFORMATION ── */
+.kael-wrap { position:relative; display:inline-block; cursor:pointer; min-width:140px; }
+.kael-original { display:inline-block; transition:none; }
+.kael-icon-layer { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(0); opacity:0; pointer-events:none; font-family:'Orbitron',sans-serif; font-weight:900; font-size:1.1rem; letter-spacing:0.22em; color:#ffd700; white-space:nowrap; text-shadow:0 0 10px #fff,0 0 25px #ffd700,0 0 50px #ffb300,0 0 90px rgba(255,160,0,0.7); transition:none; }
+.kael-wrap.kael-exiting .kael-original { animation:kaelNameOut 0.45s cubic-bezier(.55,0,.1,1) forwards; }
+@keyframes kaelNameOut { 0%{opacity:1;transform:scale(1) skewX(0deg) translateY(0);filter:blur(0)}30%{opacity:0.7;transform:scale(1.05) skewX(-8deg) translateY(-2px);filter:blur(1px) brightness(1.8)}60%{opacity:0.3;transform:scale(0.9) skewX(12deg) translateY(-8px);filter:blur(3px) brightness(2.5)}100%{opacity:0;transform:scale(0.6) skewX(-5deg) translateY(-20px);filter:blur(8px) brightness(3)} }
+.kael-wrap.kael-shown .kael-icon-layer { animation:kaelIconIn 0.6s cubic-bezier(.34,1.56,.64,1) forwards; }
+@keyframes kaelIconIn { 0%{opacity:0;transform:translate(-50%,-50%) scale(2.5) rotate(-8deg);filter:blur(12px) brightness(4);letter-spacing:0.8em}25%{opacity:0.6;transform:translate(-50%,-50%) scale(1.4) rotate(3deg);filter:blur(4px) brightness(2.5);letter-spacing:0.4em}55%{opacity:0.9;transform:translate(-50%,-50%) scale(0.92) rotate(-1deg);filter:blur(1px) brightness(1.8);letter-spacing:0.2em}75%{opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(0.5deg);filter:brightness(1.5);letter-spacing:0.23em}90%{transform:translate(-50%,-50%) scale(0.98);filter:brightness(1.2);letter-spacing:0.22em}100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0deg);filter:none;letter-spacing:0.22em} }
+.kael-wrap.kael-pulsing .kael-icon-layer { animation:kaelIconPulse 1.8s ease-in-out infinite!important; }
+@keyframes kaelIconPulse { 0%,100%{text-shadow:0 0 10px #fff,0 0 25px #ffd700,0 0 50px #ffb300,0 0 90px rgba(255,160,0,0.7);transform:translate(-50%,-50%) scale(1)}50%{text-shadow:0 0 16px #fff,0 0 40px #ffd700,0 0 80px #ff8800,0 0 140px rgba(255,140,0,0.9);transform:translate(-50%,-50%) scale(1.07)} }
+.kael-wrap.kael-icon-exiting .kael-icon-layer { animation:kaelIconOut 0.35s ease-in forwards!important; }
+@keyframes kaelIconOut { 0%{opacity:1;transform:translate(-50%,-50%) scale(1);filter:none}40%{opacity:0.5;transform:translate(-50%,-50%) scale(1.15);filter:brightness(2) blur(2px)}100%{opacity:0;transform:translate(-50%,-50%) scale(0.3);filter:brightness(4) blur(8px)} }
+.kael-wrap.kael-restoring .kael-original { animation:kaelNameIn 0.4s cubic-bezier(.34,1.56,.64,1) forwards; }
+@keyframes kaelNameIn { 0%{opacity:0;transform:scale(0.6) translateY(10px);filter:blur(6px)}60%{opacity:0.8;transform:scale(1.04) translateY(-1px);filter:blur(1px)}80%{opacity:1;transform:scale(0.98) translateY(0);filter:none}100%{opacity:1;transform:scale(1) translateY(0);filter:none} }
+.kael-wrap.kael-shown::after,.kael-wrap.kael-pulsing::after { content:''; position:absolute; inset:-8px -14px; border-radius:4px; border:1px solid rgba(255,215,0,0.5); box-shadow:0 0 18px rgba(255,215,0,0.3),inset 0 0 10px rgba(255,180,0,0.1); animation:kaelAura 0.5s ease forwards; pointer-events:none; }
+@keyframes kaelAura { 0%{opacity:0;transform:scale(1.3)}100%{opacity:1;transform:scale(1)} }
+
+/* ── BIDA TRANSFORMATION ── */
+.bida-wrap { position:relative; display:inline-block; cursor:pointer; min-width:130px; }
+.bida-original { display:inline-block; transition:none; }
+.bida-icon-layer { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(0); opacity:0; pointer-events:none; font-family:'Orbitron',sans-serif; font-weight:900; font-size:1.05rem; letter-spacing:0.28em; color:#ff2d78; white-space:nowrap; text-shadow:0 0 10px #fff,0 0 22px #ff2d78,0 0 50px #ff005e,0 0 90px rgba(255,0,80,0.7); transition:none; }
+.bida-wrap.bida-exiting .bida-original { animation:bidaNameOut 0.45s cubic-bezier(.55,0,.1,1) forwards; }
+@keyframes bidaNameOut { 0%{opacity:1;transform:scale(1) skewX(0deg) translateY(0);filter:blur(0)}30%{opacity:0.7;transform:scale(1.05) skewX(-8deg) translateY(-2px);filter:blur(1px) brightness(1.8)}60%{opacity:0.3;transform:scale(0.9) skewX(12deg) translateY(-8px);filter:blur(3px) brightness(2.5)}100%{opacity:0;transform:scale(0.6) skewX(-5deg) translateY(-20px);filter:blur(8px) brightness(3)} }
+.bida-wrap.bida-shown .bida-icon-layer { visibility:visible; animation:bidaIconIn 0.6s cubic-bezier(.34,1.56,.64,1) forwards; }
+@keyframes bidaIconIn { 0%{opacity:0;transform:translate(-50%,-50%) scale(2.5) rotate(-8deg);filter:blur(12px) brightness(4);letter-spacing:0.9em}25%{opacity:0.6;transform:translate(-50%,-50%) scale(1.4) rotate(3deg);filter:blur(4px) brightness(2.5);letter-spacing:0.5em}55%{opacity:0.9;transform:translate(-50%,-50%) scale(0.92) rotate(-1deg);filter:blur(1px) brightness(1.8);letter-spacing:0.3em}75%{opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(0.5deg);filter:brightness(1.5);letter-spacing:0.29em}90%{transform:translate(-50%,-50%) scale(0.98);filter:brightness(1.2);letter-spacing:0.28em}100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0deg);filter:none;letter-spacing:0.28em} }
+.bida-wrap.bida-pulsing .bida-icon-layer { animation:bidaIconPulse 1.8s ease-in-out infinite!important; }
+@keyframes bidaIconPulse { 0%,100%{text-shadow:0 0 10px #fff,0 0 25px #ff2d78,0 0 50px #ff005e,0 0 90px rgba(255,0,80,0.7);transform:translate(-50%,-50%) scale(1)}50%{text-shadow:0 0 16px #fff,0 0 40px #ff2d78,0 0 80px #ff0055,0 0 140px rgba(255,0,80,0.9);transform:translate(-50%,-50%) scale(1.07)} }
+.bida-wrap.bida-icon-exiting .bida-icon-layer { animation:bidaIconOut 0.35s ease-in forwards!important; }
+@keyframes bidaIconOut { 0%{opacity:1;transform:translate(-50%,-50%) scale(1);filter:none}40%{opacity:0.5;transform:translate(-50%,-50%) scale(1.15);filter:brightness(2) blur(2px)}100%{opacity:0;transform:translate(-50%,-50%) scale(0.3);filter:brightness(4) blur(8px)} }
+.bida-wrap.bida-restoring .bida-original { animation:bidaNameIn 0.4s cubic-bezier(.34,1.56,.64,1) forwards; }
+@keyframes bidaNameIn { 0%{opacity:0;transform:scale(0.6) translateY(10px);filter:blur(6px)}60%{opacity:0.8;transform:scale(1.04) translateY(-1px);filter:blur(1px)}80%{opacity:1;transform:scale(0.98) translateY(0);filter:none}100%{opacity:1;transform:scale(1) translateY(0);filter:none} }
+.bida-wrap.bida-shown::after,.bida-wrap.bida-pulsing::after { content:''; position:absolute; inset:-8px -14px; border-radius:4px; border:1px solid rgba(255,45,120,0.5); box-shadow:0 0 18px rgba(255,45,120,0.3),inset 0 0 10px rgba(255,0,80,0.1); animation:bidaAura 0.5s ease forwards; pointer-events:none; }
+@keyframes bidaAura { 0%{opacity:0;transform:scale(1.3)}100%{opacity:1;transform:scale(1)} }
 </style>
 
 <!-- ROSTER MODAL HTML -->
@@ -6436,55 +6546,70 @@ async function submitApplication() {
           <tr class="rm-row rm-visible" data-role="clan-master">
             <td class="rm-col-num">01</td>
             <td><span class="rm-name rm-name--clan-master">[SYNC]-Lujuria-</span></td>
-            <td><span class="rm-role-pill rm-pill--clan-master">♛ Clan Master</span></td>
+            <td><span class="rm-role-pill rm-pill--clan-master"><span class="role-icon">♛</span> Clan Master</span></td>
           </tr>
 
           <tr class="rm-row rm-visible" data-role="vice">
             <td class="rm-col-num">02</td>
             <td><span class="rm-name rm-name--vice">[SYNC]-Zyx-</span></td>
-            <td><span class="rm-role-pill rm-pill--vice">♜ Vice Clan Master</span></td>
+            <td><span class="rm-role-pill rm-pill--vice"><span class="role-icon">♜</span> Vice Clan Master</span></td>
           </tr>
 
           <tr class="rm-row rm-visible" data-role="high-council">
             <td class="rm-col-num">03</td>
             <td><span class="rm-name rm-name--high-council">[SYNC]-Sh1n-</span></td>
-            <td><span class="rm-role-pill rm-pill--high-council">◈ High Council</span></td>
+            <td><span class="rm-role-pill rm-pill--high-council"><span class="role-icon">◈</span> High Council</span></td>
           </tr>
 
           <tr class="rm-row rm-visible" data-role="high-council">
             <td class="rm-col-num">04</td>
             <td><span class="rm-name rm-name--high-council">[SYNC]-Minwonuna-</span></td>
-            <td><span class="rm-role-pill rm-pill--high-council">◈ High Council</span></td>
+            <td><span class="rm-role-pill rm-pill--high-council"><span class="role-icon">◈</span> High Council</span></td>
           </tr>
 
           <tr class="rm-row rm-visible" data-role="high-council">
             <td class="rm-col-num">05</td>
-            <td><span class="rm-name rm-name--high-council">[SYNC]-Jxiam-</span></td>
-            <td><span class="rm-role-pill rm-pill--high-council">◈ High Council</span></td>
+            <td>
+              <span class="rm-name rm-name--high-council bida-wrap" id="jxiamWrap">
+                <span class="bida-original" id="jxiamOriginal">[SYNC]-Jxiam-</span>
+                <span class="bida-icon-layer" id="jxiamIcon">✦ BIDA ✦</span>
+              </span>
+            </td>
+            <td><span class="rm-role-pill rm-pill--high-council"><span class="role-icon">◈</span> High Council</span></td>
           </tr>
 
           <tr class="rm-row rm-visible" data-role="high-council">
             <td class="rm-col-num">06</td>
             <td><span class="rm-name rm-name--high-council">[SYNC]-KYO-</span></td>
-            <td><span class="rm-role-pill rm-pill--high-council">◈ High Council</span></td>
+            <td><span class="rm-role-pill rm-pill--high-council"><span class="role-icon">◈</span> High Council</span></td>
           </tr>
 
           <tr class="rm-row rm-visible" data-role="mod">
             <td class="rm-col-num">07</td>
             <td><span class="rm-name rm-name--mod">[SYNC]-pinoo*-</span></td>
-            <td><span class="rm-role-pill rm-pill--mod">⬡ Moderator</span></td>
+            <td><span class="rm-role-pill rm-pill--mod"><span class="role-icon">⬡</span> Moderator</span></td>
           </tr>
 
           <tr class="rm-row rm-visible" data-role="examiner">
             <td class="rm-col-num">08</td>
-            <td><span class="rm-name rm-name--examiner">[SYNC]-Errs-</span></td>
-            <td><span class="rm-role-pill rm-pill--examiner">◎ Examiner</span></td>
+            <td>
+              <span class="rm-name rm-name--examiner bida-wrap" id="errsWrap">
+                <span class="bida-original" id="errsOriginal">[SYNC]-Errs-</span>
+                <span class="bida-icon-layer" id="errsIcon">✦ BIDA ✦</span>
+              </span>
+            </td>
+            <td><span class="rm-role-pill rm-pill--examiner"><span class="role-icon">◎</span> Examiner</span></td>
           </tr>
 
           <tr class="rm-row rm-visible" data-role="recruiter">
             <td class="rm-col-num">09</td>
-            <td><span class="rm-name rm-name--recruiter">[SYNC]-Kael-</span></td>
-            <td><span class="rm-role-pill rm-pill--recruiter">✦ Recruiter</span></td>
+            <td>
+              <span class="rm-name rm-name--recruiter kael-wrap" id="kaelWrap">
+                <span class="kael-original" id="kaelOriginal">[SYNC]-Kael-</span>
+                <span class="kael-icon-layer" id="kaelIcon">✦ The ICON ✦</span>
+              </span>
+            </td>
+            <td><span class="rm-role-pill rm-pill--recruiter"><span class="role-icon">✦</span> Recruiter</span></td>
           </tr>
 
           <tr class="rm-row rm-visible" data-role="member">
@@ -6641,6 +6766,104 @@ async function submitApplication() {
       empty.classList.toggle('show', visible === 0);
     });
   });
+})();
+
+/* ── KAEL → "The ICON" TRANSFORMATION ── */
+(function() {
+  const wrap     = document.getElementById('kaelWrap');
+  const original = document.getElementById('kaelOriginal');
+  const icon     = document.getElementById('kaelIcon');
+  if (!wrap) return;
+  let state = 'idle', phaseTimer = null;
+  function clearPhase() { if (phaseTimer) { clearTimeout(phaseTimer); phaseTimer = null; } }
+  function setClasses(...cls) {
+    wrap.classList.remove('kael-exiting','kael-shown','kael-pulsing','kael-icon-exiting','kael-restoring');
+    cls.forEach(c => { if (c) wrap.classList.add(c); });
+  }
+  function enter() {
+    if (state === 'idle' || state === 'restoring') {
+      clearPhase(); state = 'entering';
+      original.style.cssText = ''; icon.style.cssText = '';
+      setClasses('kael-exiting');
+      phaseTimer = setTimeout(() => {
+        original.style.opacity = '0'; original.style.visibility = 'hidden';
+        state = 'shown'; icon.style.visibility = 'visible';
+        setClasses('kael-shown');
+        phaseTimer = setTimeout(() => {
+          state = 'pulsing'; setClasses('kael-pulsing');
+          icon.style.opacity = '1'; icon.style.transform = 'translate(-50%,-50%) scale(1)';
+          icon.style.filter = 'none'; icon.style.letterSpacing = '0.22em';
+        }, 620);
+      }, 460);
+    }
+  }
+  function leave() {
+    if (state === 'pulsing' || state === 'shown' || state === 'entering') {
+      clearPhase(); state = 'leaving';
+      setClasses('kael-icon-exiting');
+      phaseTimer = setTimeout(() => {
+        icon.style.opacity = '0'; icon.style.visibility = 'hidden'; icon.style.transform = '';
+        state = 'restoring'; original.style.visibility = 'visible'; original.style.opacity = '';
+        setClasses('kael-restoring');
+        phaseTimer = setTimeout(() => {
+          state = 'idle'; setClasses(); original.style.cssText = ''; icon.style.cssText = '';
+        }, 420);
+      }, 360);
+    }
+  }
+  wrap.addEventListener('mouseenter', enter);
+  wrap.addEventListener('mouseleave', leave);
+})();
+
+/* ── BIDA TRANSFORMATION (Jxiam & Errs) ── */
+(function() {
+  function makeBida(wrapId, originalId, iconId) {
+    const wrap = document.getElementById(wrapId);
+    const original = document.getElementById(originalId);
+    const icon = document.getElementById(iconId);
+    if (!wrap) return;
+    let state = 'idle', phaseTimer = null;
+    function clearPhase() { if (phaseTimer) { clearTimeout(phaseTimer); phaseTimer = null; } }
+    function setClasses(...cls) {
+      wrap.classList.remove('bida-exiting','bida-shown','bida-pulsing','bida-icon-exiting','bida-restoring');
+      cls.forEach(c => { if (c) wrap.classList.add(c); });
+    }
+    function enter() {
+      if (state === 'idle' || state === 'restoring') {
+        clearPhase(); state = 'entering';
+        original.style.cssText = ''; icon.style.cssText = '';
+        setClasses('bida-exiting');
+        phaseTimer = setTimeout(() => {
+          original.style.opacity = '0'; original.style.visibility = 'hidden';
+          state = 'shown'; icon.style.visibility = 'visible';
+          setClasses('bida-shown');
+          phaseTimer = setTimeout(() => {
+            state = 'pulsing'; setClasses('bida-pulsing');
+            icon.style.opacity = '1'; icon.style.transform = 'translate(-50%,-50%) scale(1)';
+            icon.style.filter = 'none'; icon.style.letterSpacing = '0.28em';
+          }, 620);
+        }, 460);
+      }
+    }
+    function leave() {
+      if (state === 'pulsing' || state === 'shown' || state === 'entering') {
+        clearPhase(); state = 'leaving';
+        setClasses('bida-icon-exiting');
+        phaseTimer = setTimeout(() => {
+          icon.style.opacity = '0'; icon.style.visibility = 'hidden'; icon.style.transform = '';
+          state = 'restoring'; original.style.visibility = 'visible'; original.style.opacity = '';
+          setClasses('bida-restoring');
+          phaseTimer = setTimeout(() => {
+            state = 'idle'; setClasses(); original.style.cssText = ''; icon.style.cssText = '';
+          }, 420);
+        }, 360);
+      }
+    }
+    wrap.addEventListener('mouseenter', enter);
+    wrap.addEventListener('mouseleave', leave);
+  }
+  makeBida('jxiamWrap', 'jxiamOriginal', 'jxiamIcon');
+  makeBida('errsWrap',  'errsOriginal',  'errsIcon');
 })();
 </script>
 </body>
