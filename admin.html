@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SYNCHRONIZED | Admin</title>
+  <meta name="theme-color" content="#ff2d78">
+  <meta name="robots" content="noindex, nofollow">
+  <!-- Preconnect for faster font loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --pink: #ff2d78; --cyan: #00f0ff; --gold: #ffd700;
+      --dark: #050510; --dark2: #0a0a1e; --dark3: #0f0f2a;
+      --text: #e8e8f8; --muted: #dae7e6;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--dark); color: var(--text);
+      font-family: 'Exo 2', sans-serif; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: flex-start; padding: 2rem 1rem 4rem; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+      pointer-events: none; z-index: 9999;
+    }
+    .grid-bg {
+      position: fixed; inset: 0;
+      background-image: linear-gradient(rgba(0,240,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,240,255,0.04) 1px, transparent 1px);
+      background-size: 60px 60px; pointer-events: none; z-index: 0;
+    }
+    .orb { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.18; pointer-events: none; }
+    .orb-pink { width: 420px; height: 420px; background: var(--pink); top: -120px; right: -120px; }
+    .orb-cyan  { width: 320px; height: 320px; background: var(--cyan); bottom: -80px; left: -80px; }
+    .box {
+      position: relative; z-index: 1; width: 100%; max-width: 560px;
+      background: var(--dark2); border: 1px solid rgba(0,240,255,0.15);
+      padding: 2.5rem 2rem; margin-top: 1.5rem;
+      clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
+    }
+    .box-logo { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .box-logo img { height: 34px; width: auto; }
+    .box-logo-text { font-family: 'Orbitron', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.2em; color: var(--cyan); text-transform: uppercase; }
+    .box-logo-text span { color: var(--pink); }
+    .box-label { font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 0.4em; color: var(--pink); text-transform: uppercase; margin-bottom: 0.4rem; }
+    .box-title { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1.5rem; letter-spacing: 0.08em; color: #fff; margin-bottom: 0.2rem; }
+    .box-title span { color: var(--cyan); }
+    .box-divider { width: 55px; height: 2px; background: linear-gradient(90deg, var(--pink), transparent); margin: 0.65rem 0 1.75rem; }
+    .field { margin-bottom: 1.2rem; }
+    .field label { display: block; font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.76rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.45rem; }
+    .field input, .field textarea { width: 100%; background: var(--dark3); border: 1px solid rgba(0,240,255,0.15); color: var(--text); font-family: 'Exo 2', sans-serif; font-size: 0.93rem; padding: 0.72rem 0.95rem; border-radius: 2px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; resize: none; }
+    .field input:focus, .field textarea:focus { border-color: rgba(0,240,255,0.45); box-shadow: 0 0 0 3px rgba(0,240,255,0.08); }
+    .field input[type="password"] { letter-spacing: 0.2em; }
+    .field textarea { min-height: 145px; line-height: 1.65; }
+    .toolbar { display: flex; gap: 6px; margin-bottom: 7px; flex-wrap: wrap; }
+    .tool-btn { background: rgba(0,240,255,0.05); border: 1px solid rgba(0,240,255,0.2); color: var(--muted); font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 13px; border-radius: 2px; cursor: pointer; transition: all 0.18s; }
+    .tool-btn:hover, .tool-btn.active { background: rgba(0,240,255,0.12); border-color: rgba(0,240,255,0.5); color: var(--cyan); }
+    #emojiGrid { display: none; background: #0b0b22; border: 1px solid rgba(0,240,255,0.14); border-radius: 4px; padding: 8px; margin-bottom: 8px; max-height: 160px; overflow-y: auto; }
+    #emojiGrid::-webkit-scrollbar { width: 3px; }
+    #emojiGrid::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.2); border-radius: 2px; }
+    .eg-inner { display: flex; flex-wrap: wrap; gap: 2px; }
+    .emoji-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 4px 6px; border-radius: 3px; transition: background 0.15s; line-height: 1; }
+    .emoji-btn:hover { background: rgba(0,240,255,0.12); }
+    #imgPreviews { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 8px; }
+    .img-thumb { position: relative; width: 76px; height: 76px; }
+    .img-thumb img { width: 76px; height: 76px; object-fit: cover; border-radius: 3px; border: 1px solid rgba(0,240,255,0.2); }
+    .img-thumb-del { position: absolute; top: -6px; right: -6px; background: var(--pink); border: none; color: #fff; border-radius: 50%; width: 18px; height: 18px; font-size: 0.6rem; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+    .img-thumb-del:hover { background: #ff5599; }
+    .char-count { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; letter-spacing: 0.1em; color: rgba(136,136,170,0.5); text-align: right; margin-top: 3px; }
+    .btn-primary { width: 100%; background: var(--pink); color: #fff; font-family: 'Orbitron', sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 14px 28px; border: none; border-radius: 2px; cursor: pointer; transition: all 0.2s; clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-primary:hover { background: #ff5599; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,45,120,0.4); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-secondary { width: 100%; background: transparent; color: var(--cyan); font-family: 'Orbitron', sans-serif; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 10px 28px; border: 1px solid rgba(0,240,255,0.3); border-radius: 2px; cursor: pointer; transition: all 0.2s; margin-top: 0.75rem; }
+    .btn-secondary:hover { background: rgba(0,240,255,0.06); }
+    .msg { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; padding: 10px 13px; border-radius: 2px; margin-bottom: 1.2rem; display: none; text-transform: uppercase; }
+    .msg.error   { color: var(--pink); background: rgba(255,45,120,0.08); border: 1px solid rgba(255,45,120,0.25); display: block; }
+    .msg.success { color: var(--cyan); background: rgba(0,240,255,0.08); border: 1px solid rgba(0,240,255,0.25); display: block; }
+    .posts-section { margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.5rem; }
+    .posts-label { font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 0.28em; color: var(--muted); text-transform: uppercase; margin-bottom: 1rem; }
+    .post-item { background: var(--dark3); border: 1px solid rgba(0,240,255,0.09); border-radius: 2px; padding: 0.8rem 1rem; margin-bottom: 0.75rem; position: relative; clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px)); transition: border-color 0.2s, opacity 0.3s, transform 0.3s; }
+    .post-item:hover { border-color: rgba(0,240,255,0.2); }
+    .post-item.deleting { opacity: 0; transform: translateX(20px); }
+    .post-item-body { padding-right: 2.5rem; }
+    .post-item-content { font-size: 0.88rem; color: #d8d8f0; line-height: 1.65; margin-bottom: 0.5rem; word-break: break-word; }
+    .post-item-content a { color: var(--cyan); text-decoration: none; }
+    .post-item-content a:hover { text-decoration: underline; }
+    .post-item-images { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 0.5rem; }
+    .post-item-images img { max-width: 110px; max-height: 75px; object-fit: cover; border-radius: 3px; border: 1px solid rgba(0,240,255,0.15); cursor: pointer; }
+    .post-item-meta { font-family: 'Share Tech Mono', monospace; font-size: 0.57rem; letter-spacing: 0.1em; color: rgba(136,136,170,0.5); text-transform: uppercase; }
+    .post-delete { position: absolute; top: 0.55rem; right: 0.55rem; background: none; border: 1px solid rgba(255,45,120,0.2); color: rgba(255,45,120,0.5); cursor: pointer; font-size: 0.68rem; padding: 4px 9px; border-radius: 2px; transition: all 0.18s; font-family: 'Share Tech Mono', monospace; line-height: 1; }
+    .post-delete:hover { background: rgba(255,45,120,0.12); color: var(--pink); border-color: rgba(255,45,120,0.55); }
+    .post-delete:disabled { opacity: 0.4; cursor: not-allowed; }
+    .posts-empty { font-family: 'Share Tech Mono', monospace; font-size: 0.63rem; letter-spacing: 0.15em; color: rgba(136,136,170,0.4); text-transform: uppercase; padding: 1rem 0; text-align: center; }
+    .skel-line { height: 9px; border-radius: 2px; background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.05) 75%); background-size: 200% 100%; animation: skelShimmer 1.5s infinite; margin-bottom: 7px; }
+    @keyframes skelShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+    @media (max-width: 560px) { .box { padding: 1.75rem 1.1rem; } .box-title { font-size: 1.25rem; } }
+  </style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="orb orb-pink"></div>
+<div class="orb orb-cyan"></div>
+
+<!-- LOGIN -->
+<div class="box" id="loginBox">
+  <div class="box-logo">
+    <img src="sync-logo.png" alt="SYNC" onerror="this.style.display='none'">
+    <div class="box-logo-text">SYNC<span>·</span>ADMIN</div>
+  </div>
+  <div class="box-label">Restricted Access</div>
+  <h1 class="box-title">Admin <span>Login</span></h1>
+  <div class="box-divider"></div>
+  <div class="msg" id="loginMsg"></div>
+  <div class="field">
+    <label>Password</label>
+    <input type="password" id="passwordInput" placeholder="Enter admin password" autocomplete="current-password">
+  </div>
+  <button class="btn-primary" onclick="doLogin()">&#9654;&nbsp; Enter</button>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="box" id="adminBox" style="display:none; max-width:600px;">
+  <div class="box-logo">
+    <img src="sync-logo.png" alt="SYNC" onerror="this.style.display='none'">
+    <div class="box-logo-text">SYNC<span>·</span>ADMIN</div>
+  </div>
+  <div class="box-label">Announcement Panel</div>
+  <h1 class="box-title">Post <span>Announcement</span></h1>
+  <div class="box-divider"></div>
+  <div class="msg" id="postMsg"></div>
+  <div class="field">
+    <label>Author Name</label>
+    <input type="text" id="authorInput" placeholder="e.g. [SYNC]-Lujuria-" value="SYNCHRONIZED">
+  </div>
+  <div class="field">
+    <label>Announcement</label>
+    <div class="toolbar">
+      <button type="button" class="tool-btn" id="emojiToggleBtn" onclick="toggleEmoji()">&#128522; Emoji</button>
+      <label class="tool-btn" style="margin:0;cursor:pointer;">
+        &#128444; Image
+        <input type="file" id="imgFileInput" accept="image/*" multiple style="display:none;" onchange="handleImages(this)">
+      </label>
+    </div>
+    <div id="emojiGrid"><div class="eg-inner" id="emojiInner"></div></div>
+    <textarea id="contentInput" placeholder="Type your announcement here... supports long text, emojis and URLs"></textarea>
+    <div class="char-count" id="charCount">0 chars</div>
+  </div>
+  <button class="btn-primary" id="postBtn" onclick="postAnnouncement()">&#9654;&nbsp; Post Announcement</button>
+  <button class="btn-secondary" onclick="doLogout()">&larr; Logout</button>
+  <div class="posts-section">
+    <div class="posts-label">&#128225;&nbsp; Current Announcements</div>
+    <div id="postsList">
+      <div class="skel-line" style="width:55%;"></div>
+      <div class="skel-line" style="width:100%;"></div>
+      <div class="skel-line" style="width:70%;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const WORKER_URL = 'https://sync-worker.lastresort962.workers.dev';
+  const SECRET     = 'sync123';
+  const PASSWORD   = 'sync@admin2026';
+
+  let pendingImages = [];
+
+  // AUTO-LOGIN CHECK
+  window.onload = function() {
+    if (localStorage.getItem('sync_admin_auth') === 'true') {
+      showAdmin();
+    }
+  };
+
+  function showAdmin() {
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('adminBox').style.display = 'block';
+    loadPosts();
+  }
+
+  // LOGIN
+  function doLogin() {
+    const val = document.getElementById('passwordInput').value;
+    const msg = document.getElementById('loginMsg');
+    if (val === PASSWORD) {
+      localStorage.setItem('sync_admin_auth', 'true');
+      showAdmin();
+    } else {
+      msg.textContent = 'Incorrect password — try again';
+      msg.className = 'msg error';
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('passwordInput').focus();
+    }
+  }
+
+  function doLogout() {
+    localStorage.removeItem('sync_admin_auth');
+    document.getElementById('loginBox').style.display = 'block';
+    document.getElementById('adminBox').style.display = 'none';
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('loginMsg').className = 'msg';
+  }
+
+  document.getElementById('passwordInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  // CHAR COUNT
+  document.getElementById('contentInput').addEventListener('input', function() {
+    document.getElementById('charCount').textContent = this.value.length + ' chars';
+  });
+  document.getElementById('contentInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) postAnnouncement();
+  });
+
+  // EMOJI PICKER
+  var EMOJIS = ['😀','😂','🥰','😍','😎','🤩','🥳','😤','😡','💀','👀','🔥','💯','✨','🎉','🎮','🏆','👑','⚡','💥','🌟','🎯','🛡️','⚔️','🤝','💪','👊','🙌','❤️','💙','💜','🩷','💚','🖤','🤍','❌','✅','📢','📡','🔔','🗓️','📸','🎵','🕹️','👾','🤖','🧠','😴','😭','🫡','💬','👋','🫂','🎊','🥇','⭐','🌈','🐉','🍀'];
+  (function() {
+    var inner = document.getElementById('emojiInner');
+    EMOJIS.forEach(function(em) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'emoji-btn';
+      btn.textContent = em;
+      btn.onclick = function() {
+        var ta = document.getElementById('contentInput');
+        var pos = ta.selectionStart != null ? ta.selectionStart : ta.value.length;
+        ta.value = ta.value.slice(0, pos) + em + ta.value.slice(pos);
+        ta.selectionStart = ta.selectionEnd = pos + em.length;
+        ta.focus();
+        document.getElementById('charCount').textContent = ta.value.length + ' chars';
+      };
+      inner.appendChild(btn);
+    });
+  })();
+
+  function toggleEmoji() {
+    var grid = document.getElementById('emojiGrid');
+    var btn  = document.getElementById('emojiToggleBtn');
+    var isOpen = grid.style.display === 'block';
+    grid.style.display = isOpen ? 'none' : 'block';
+    btn.classList.toggle('active', !isOpen);
+  }
+
+  // IMAGE HANDLER
+  function handleImages(input) {
+    var files = Array.from(input.files);
+    var container = document.getElementById('imgPreviews');
+    files.forEach(function(file) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var b64 = e.target.result;
+        var idx = pendingImages.push(b64) - 1;
+        var wrap = document.createElement('div');
+        wrap.className = 'img-thumb';
+        var img = document.createElement('img');
+        img.src = b64;
+        var del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'img-thumb-del';
+        del.textContent = 'x';
+        del.title = 'Remove';
+        del.onclick = function() {
+          pendingImages[idx] = null;
+          container.removeChild(wrap);
+        };
+        wrap.appendChild(img);
+        wrap.appendChild(del);
+        container.appendChild(wrap);
+      };
+      reader.readAsDataURL(file);
+    });
+    input.value = '';
+  }
+
+  // POST
+  async function postAnnouncement() {
+    var content = document.getElementById('contentInput').value.trim();
+    var author  = document.getElementById('authorInput').value.trim() || 'SYNCHRONIZED';
+    var msg     = document.getElementById('postMsg');
+    var btn     = document.getElementById('postBtn');
+    var images  = pendingImages.filter(Boolean);
+
+    if (!content && images.length === 0) {
+      msg.textContent = 'Please write something or attach an image first';
+      msg.className = 'msg error';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Posting...';
+    msg.className = 'msg';
+
+    try {
+      var res = await fetch(WORKER_URL + '/post?secret=' + SECRET, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: content, author: author, images: images })
+      });
+
+      if (res.ok) {
+        msg.textContent = 'Announcement posted!';
+        msg.className = 'msg success';
+        document.getElementById('contentInput').value = '';
+        document.getElementById('charCount').textContent = '0 chars';
+        document.getElementById('imgPreviews').innerHTML = '';
+        document.getElementById('emojiGrid').style.display = 'none';
+        document.getElementById('emojiToggleBtn').classList.remove('active');
+        pendingImages = [];
+        loadPosts();
+      } else {
+        var errTxt = await res.text().catch(function() { return ''; });
+        msg.textContent = 'Server error ' + res.status + (errTxt ? ': ' + errTxt.slice(0,80) : '');
+        msg.className = 'msg error';
+      }
+    } catch(e) {
+      msg.textContent = 'Network error — check connection and try again';
+      msg.className = 'msg error';
+    }
+
+    btn.disabled = false;
+    btn.textContent = '▶  Post Announcement';
+  }
+
+  // LOAD POSTS
+  async function loadPosts() {
+    var list = document.getElementById('postsList');
+    list.innerHTML = '<div class="skel-line" style="width:55%;"></div><div class="skel-line" style="width:100%;"></div><div class="skel-line" style="width:72%;"></div>';
+
+    try {
+      var res = await fetch(WORKER_URL + '/announcements', { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var posts = await res.json();
+
+      if (!Array.isArray(posts) || posts.length === 0) {
+        list.innerHTML = '<div class="posts-empty">No announcements yet</div>';
+        return;
+      }
+
+      list.innerHTML = '';
+      posts.forEach(function(p, i) {
+        var item = document.createElement('div');
+        item.className = 'post-item';
+
+        var rawMedia = [].concat(p.images || [], p.attachments || []).filter(Boolean);
+        var imgsHtml = rawMedia.length
+          ? '<div class="post-item-images">' + rawMedia.map(function(a) {
+              var url = typeof a === 'string' ? a : a.url;
+              return url ? '<img src="' + url + '" loading="lazy" referrerpolicy="no-referrer" onclick="window.open(\'' + url + '\',\'_blank\')" alt="img" style="min-height: 50px; background: rgba(0,240,255,0.05);">' : '';
+            }).join('') + '</div>'
+          : '';
+
+        item.innerHTML =
+          '<button class="post-delete" onclick="deletePost(this,' + i + ')">✕ Del</button>' +
+          '<div class="post-item-body">' +
+            '<div class="post-item-content">' + cleanAndLink(p.content || '') + '</div>' +
+            imgsHtml +
+            '<div class="post-item-meta">' + escHtml(p.author || 'SYNCHRONIZED') + ' &middot; ' + timeAgo(p.timestamp) + '</div>' +
+          '</div>';
+
+        list.appendChild(item);
+      });
+
+    } catch(e) {
+      list.innerHTML =
+        '<div style="color:rgba(255,45,120,0.8);font-size:0.8rem;font-family:Share Tech Mono,monospace;line-height:2;">' +
+          '&#10005; Could not load posts<br>' +
+          '<span style="font-size:0.65rem;opacity:0.6;">' + escHtml(e.message) + '</span><br>' +
+          '<button onclick="loadPosts()" style="margin-top:8px;background:rgba(0,240,255,0.08);border:1px solid rgba(0,240,255,0.3);color:#00f0ff;font-family:Orbitron,sans-serif;font-size:0.7rem;letter-spacing:0.1em;padding:7px 16px;cursor:pointer;border-radius:2px;">&#8635; Retry</button>' +
+        '</div>';
+    }
+  }
+
+  // DELETE
+  async function deletePost(btn, index) {
+    if (!confirm('Delete this announcement?')) return;
+    var item = btn.closest('.post-item');
+    btn.disabled = true;
+    btn.textContent = '...';
+
+    try {
+      var res = await fetch(WORKER_URL + '/announcements', { cache: 'no-store' });
+      if (!res.ok) throw new Error('Fetch failed: HTTP ' + res.status);
+      var posts = await res.json();
+      if (!Array.isArray(posts)) throw new Error('Invalid data');
+      if (index < 0 || index >= posts.length) throw new Error('Index out of range');
+
+      posts.splice(index, 1);
+
+      var saveRes = await fetch(WORKER_URL + '/save?secret=' + SECRET, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(posts)
+      });
+
+      if (!saveRes.ok) throw new Error('Save failed: HTTP ' + saveRes.status);
+
+      item.classList.add('deleting');
+      setTimeout(loadPosts, 320);
+
+    } catch(e) {
+      btn.disabled = false;
+      btn.textContent = '✕ Del';
+      alert('Delete failed: ' + e.message);
+    }
+  }
+
+  // HELPERS
+  function timeAgo(iso) {
+    if (!iso) return '—';
+    var diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+    if (diff < 60)    return 'just now';
+    if (diff < 3600)  return Math.floor(diff/60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+    return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function cleanAndLink(text) {
+    if (!text) return '';
+
+    // Step 1 — work on raw text BEFORE any HTML escaping
+    let raw = text;
+
+    // Normalize literal \n storage artifacts
+    raw = raw.replace(/\\n/g, '\n');
+
+    // Strip Discord custom emojis <:name:id> / <a:name:id> — must happen before escaping
+    // because they contain < > characters that would be corrupted by escHtml
+    raw = raw.replace(/<a?:[a-zA-Z0-9_]+:[0-9]+>/g, '');
+
+    // Collapse 3+ blank lines to 2
+    raw = raw.replace(/\n{3,}/g, '\n\n');
+
+    // Step 2 — collect HTML spans via safe placeholders (null-byte delimited)
+    // so HTML escaping never corrupts them
+    const spans = [];
+    function ph(html) {
+      const id = '\x00' + spans.length + '\x00';
+      spans.push(html);
+      return id;
+    }
+
+    // Discord bold-italic ***text***
+    raw = raw.replace(/\*\*\*(.+?)\*\*\*/gs, (_, t) => ph('<strong><em>' + t.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</em></strong>'));
+    // Discord bold **text**
+    raw = raw.replace(/\*\*(.+?)\*\*/gs, (_, t) => ph('<strong>' + t.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</strong>'));
+    // Discord underline __text__
+    raw = raw.replace(/__(.+?)__/gs, (_, t) => ph('<u>' + t.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</u>'));
+    // Discord italic *text*
+    raw = raw.replace(/\*(.+?)\*/gs, (_, t) => ph('<em>' + t.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</em>'));
+
+    // Discord mentions & channels
+    raw = raw.replace(/@everyone\b/g, () => ph('<strong style="color:#00f0ff;">@everyone</strong>'));
+    raw = raw.replace(/@here\b/g,     () => ph('<strong style="color:#00f0ff;">@here</strong>'));
+    raw = raw.replace(/@([A-Za-z0-9_]+)/g, (_, n) => ph('<strong style="color:#00f0ff;">@' + n + '</strong>'));
+    raw = raw.replace(/#([A-Za-z0-9_-]+)/g, (_, c) => ph('<strong style="color:#ffd700;">#' + c + '</strong>'));
+
+    // Step 3 — HTML-escape the remaining plain text
+    let out = raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+    // Step 4 — make URLs clickable (safe: stop at &, <, ", space)
+    out = out.replace(/(https?:\/\/[^\s&<"]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+
+    // Step 5 — restore HTML span placeholders
+    out = out.replace(/\x00(\d+)\x00/g, (_, i) => spans[+i]);
+
+    // Step 6 — newlines → <br>
+    out = out.replace(/\n/g, '<br>');
+
+    return out;
+  }
+</script>
+</body>
+</html>
