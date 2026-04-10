@@ -33,6 +33,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="preload" href="sync-logo.png" as="image">
 
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -184,6 +185,8 @@
     opacity: 0.25;
     animation: pulse 6s ease-in-out infinite;
     pointer-events: none;
+    will-change: opacity, transform;
+    contain: strict;
   }
   .orb-pink { width: 500px; height: 500px; background: var(--hot-pink); top: -100px; right: -100px; animation-delay: 0s; }
   .orb-cyan { width: 400px; height: 400px; background: var(--cyan); bottom: -80px; left: -80px; animation-delay: 3s; }
@@ -426,6 +429,7 @@
   .marquee-track {
     display: inline-flex;
     animation: marquee 18s linear infinite;
+    will-change: transform;
   }
 
   .marquee-track span {
@@ -997,6 +1001,7 @@
     border-radius: 3px;
     filter: saturate(1.3) contrast(1.05);
     transition: filter 0.3s, transform 0.4s;
+    will-change: filter, transform;
   }
   .gallery-featured:hover img {
     filter: saturate(1.5) contrast(1.1);
@@ -1052,6 +1057,7 @@
     display: block;
     filter: saturate(1.2);
     transition: filter 0.3s, transform 0.4s;
+    will-change: filter, transform;
   }
   .gallery-item:hover img {
     filter: saturate(1.5) brightness(1.1);
@@ -1154,10 +1160,10 @@
       width: 100%;
       max-width: 280px;
       display: block;
-      /* Using your existing animations */
       animation: logoFloat 3.5s ease-in-out infinite, logoPulse 3.5s ease-in-out infinite;
       filter: drop-shadow(0 0 15px var(--hot-pink));
       transition: transform 0.3s ease, filter 0.3s ease;
+      will-change: transform, filter;
     }
 
     /* Extra effect: Glows brighter when you hover over the join box */
@@ -1223,8 +1229,8 @@
 
   /* ── GLOW PULSE ── */
   @keyframes logoPulse {
-    0%, 100% { filter: drop-shadow(0 0 15px #ff2d78) drop-shadow(0 0 30px #7b2fff) drop-shadow(0 0 10px #00f0ff); }
-    50% { filter: drop-shadow(0 0 40px #ff2d78) drop-shadow(0 0 80px #7b2fff) drop-shadow(0 0 50px #00f0ff); }
+    0%, 100% { filter: drop-shadow(0 0 15px #ff2d78) drop-shadow(0 0 30px #7b2fff); }
+    50%       { filter: drop-shadow(0 0 30px #ff2d78) drop-shadow(0 0 60px #7b2fff); }
   }
 
   /* ── GLITCH ── */
@@ -1247,6 +1253,7 @@
   #logo-wrapper {
     position: relative;
     will-change: transform;
+    contain: layout style;
     /* JS takes over transform — no CSS animation on wrapper */
   }
 
@@ -1297,10 +1304,9 @@
   }
 
   @keyframes heroGlowCycle {
-    0%   { filter: drop-shadow(0 0 18px rgba(255,45,120,1))   drop-shadow(0 0 45px rgba(123,47,255,0.7))  drop-shadow(0 0 80px rgba(0,240,255,0.35)); }
-    33%  { filter: drop-shadow(0 0 26px rgba(0,240,255,1))    drop-shadow(0 0 65px rgba(123,47,255,0.9))  drop-shadow(0 0 110px rgba(255,45,120,0.45)); }
-    66%  { filter: drop-shadow(0 0 22px rgba(123,47,255,1))   drop-shadow(0 0 55px rgba(255,45,120,0.8))  drop-shadow(0 0 100px rgba(0,240,255,0.55)); }
-    100% { filter: drop-shadow(0 0 18px rgba(255,45,120,1))   drop-shadow(0 0 45px rgba(123,47,255,0.7))  drop-shadow(0 0 80px rgba(0,240,255,0.35)); }
+    0%   { filter: drop-shadow(0 0 18px rgba(255,45,120,0.9))  drop-shadow(0 0 45px rgba(123,47,255,0.6)); }
+    50%  { filter: drop-shadow(0 0 26px rgba(0,240,255,0.9))   drop-shadow(0 0 65px rgba(123,47,255,0.8)); }
+    100% { filter: drop-shadow(0 0 18px rgba(255,45,120,0.9))  drop-shadow(0 0 45px rgba(123,47,255,0.6)); }
   }
 
   #main-logo.glitching {
@@ -1413,6 +1419,7 @@
     width: var(--sz); height: var(--sz);
     margin-top: calc(var(--sz) / -2);
     margin-left: calc(var(--sz) / -2);
+    will-change: transform;
   }
   .ls-ring-1 {
     --sz: min(80vmin, 500px);
@@ -1848,7 +1855,7 @@
 (function() {
   // ── Particle stars ──
   const starContainer = document.getElementById('ls-stars');
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < 30; i++) {
     const s = document.createElement('div');
     s.className = 'ls-star';
     const size = Math.random() * 2.5 + 0.5;
@@ -2410,6 +2417,7 @@
     clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
     transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     animation: annFadeIn 0.5s ease both;
+    contain: layout style;
   }
 
   .ann-card:hover {
@@ -4707,12 +4715,16 @@ async function submitApplication() {
   const ctx     = canvas.getContext('2d');
 
   // ── Canvas sizing ──
+  let resizeTimer = null;
   function resizeCanvas() {
     canvas.width  = hero.offsetWidth;
     canvas.height = hero.offsetHeight;
   }
   resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resizeCanvas, 150);
+  });
 
   // ── Movement state ──
   // Logo drifts smoothly between random "anchor" targets, with occasional wild lunges
@@ -4766,6 +4778,9 @@ async function submitApplication() {
     sclVel += (sclTarget - scl) * 0.05;
     sclVel *= 0.75;
     scl    += sclVel;
+
+    // Skip DOM write when motion is negligible
+    if (Math.abs(vel.x) < 0.01 && Math.abs(vel.y) < 0.01 && Math.abs(rotVel) < 0.005 && Math.abs(sclVel) < 0.001) return;
 
     wrapper.style.transform = `translate(${pos.x.toFixed(2)}px, ${pos.y.toFixed(2)}px) rotate(${rot.toFixed(2)}deg) scale(${scl.toFixed(3)})`;
   }
@@ -4855,12 +4870,14 @@ async function submitApplication() {
     }, 60);
 
     // Spawn sparks
-    spawnSparks(cx + heroR.left, cy + heroR.top, 14);
+    spawnSparks(cx + heroR.left, cy + heroR.top, 8);
   }
 
   // ── Spark particles ──
   let sparks = [];
   function spawnSparks(pageX, pageY, count) {
+    // Cap total sparks to avoid particle explosion
+    if (sparks.length > 60) return;
     const heroR = hero.getBoundingClientRect();
     const sx = pageX - heroR.left - window.scrollX;
     const sy = pageY - heroR.top;
@@ -4956,6 +4973,16 @@ async function submitApplication() {
     }
   }, { threshold: 0.05 });
   heroObserver.observe(hero);
+
+  // ── Pause everything when tab is hidden ──
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      cancelAnimationFrame(heroRaf);
+      heroRaf = null;
+    } else if (heroVisible) {
+      if (!heroRaf) loop();
+    }
+  });
 })();
 </script>
 
@@ -4987,6 +5014,7 @@ async function submitApplication() {
     const bars     = document.querySelectorAll('.vbar');
     let isPlaying  = false;
     let currentTrack = 0;
+    let seekRaf = null;
 
     // ── PLAYLIST — edit your songs here ──
     const playlist = [
@@ -5077,11 +5105,15 @@ async function submitApplication() {
       return m + ':' + (sec < 10 ? '0' : '') + sec;
     }
     audio.addEventListener('timeupdate', () => {
-      document.getElementById('trackCurrent').textContent = fmtTime(audio.currentTime);
-      const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
-      const seek = document.getElementById('seekSlider');
-      seek.value = pct;
-      seek.style.background = `linear-gradient(90deg, var(--hot-pink) ${pct}%, rgba(255,255,255,0.15) ${pct}%)`;
+      if (seekRaf) return;
+      seekRaf = requestAnimationFrame(() => {
+        seekRaf = null;
+        document.getElementById('trackCurrent').textContent = fmtTime(audio.currentTime);
+        const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+        const seek = document.getElementById('seekSlider');
+        seek.value = pct;
+        seek.style.background = `linear-gradient(90deg, var(--hot-pink) ${pct}%, rgba(255,255,255,0.15) ${pct}%)`;
+      });
     });
     audio.addEventListener('durationchange', () => {
       document.getElementById('trackDuration').textContent = fmtTime(audio.duration);
@@ -5109,7 +5141,7 @@ async function submitApplication() {
     };
     document.addEventListener('mousedown',  enableAutoplay);
     document.addEventListener('keydown',    enableAutoplay);
-    document.addEventListener('touchstart', enableAutoplay);
+    document.addEventListener('touchstart', enableAutoplay, { passive: true });
 
     // Close dropdown when clicking outside the player OR dropdown
     document.addEventListener('click', (e) => {
@@ -5175,13 +5207,14 @@ async function submitApplication() {
   const GOLD  = { r: 255, g: 215, b: 0   };
 
   let W, H, nodes = [], raf;
-  const NODE_COUNT = 48;
+  const NODE_COUNT = window.innerWidth < 768 ? 24 : 48;
   const CONNECT_DIST = 140;
 
   function resize() {
     const section = document.getElementById('members');
     W = canvas.width  = section.offsetWidth;
     H = canvas.height = section.offsetHeight;
+    buildCenterGrad();
   }
 
   function randColor() {
@@ -5205,63 +5238,69 @@ async function submitApplication() {
 
   function init() {
     resize();
+    buildCenterGrad();
     nodes = Array.from({ length: NODE_COUNT }, makeNode);
   }
 
-  function draw() {
+  // Cache center gradient — only rebuilt on resize
+  let centerGrad = null;
+  function buildCenterGrad() {
+    centerGrad = ctx.createRadialGradient(W * 0.5, H * 0.45, 0, W * 0.5, H * 0.45, W * 0.55);
+    centerGrad.addColorStop(0,   'rgba(255,45,120,0.06)');
+    centerGrad.addColorStop(0.4, 'rgba(0,240,255,0.04)');
+    centerGrad.addColorStop(1,   'transparent');
+  }
+
+  // Pre-build color strings for nodes
+  function nodeColorStr(c, a) { return `rgba(${c.r},${c.g},${c.b},${a})`; }
+
+  // Throttle: draw at ~30fps for the background canvas
+  let lastDraw = 0;
+  function draw(ts) {
+    raf = requestAnimationFrame(draw);
+    if (ts - lastDraw < 33) return; // ~30fps cap
+    lastDraw = ts;
+
     ctx.clearRect(0, 0, W, H);
 
-    // Soft radial glow at center
-    const grad = ctx.createRadialGradient(W * 0.5, H * 0.45, 0, W * 0.5, H * 0.45, W * 0.55);
-    grad.addColorStop(0,   'rgba(255,45,120,0.06)');
-    grad.addColorStop(0.4, 'rgba(0,240,255,0.04)');
-    grad.addColorStop(1,   'transparent');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
+    // Soft radial glow at center (cached)
+    if (centerGrad) { ctx.fillStyle = centerGrad; ctx.fillRect(0, 0, W, H); }
 
-    // Draw connections
+    // Draw connections — use averaged color, no per-line gradient allocation
     for (let i = 0; i < nodes.length; i++) {
+      const a = nodes[i];
       for (let j = i + 1; j < nodes.length; j++) {
-        const a = nodes[i], b = nodes[j];
+        const b = nodes[j];
         const dx = a.x - b.x, dy = a.y - b.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < CONNECT_DIST) {
-          const alpha = (1 - dist / CONNECT_DIST) * 0.22;
+        const dist2 = dx * dx + dy * dy;
+        if (dist2 < CONNECT_DIST * CONNECT_DIST) {
+          const dist = Math.sqrt(dist2);
+          const alpha = (1 - dist / CONNECT_DIST) * 0.18;
+          // Mix the two node colors cheaply
           const ca = a.color, cb = b.color;
-          const lg = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
-          lg.addColorStop(0, `rgba(${ca.r},${ca.g},${ca.b},${alpha})`);
-          lg.addColorStop(1, `rgba(${cb.r},${cb.g},${cb.b},${alpha})`);
+          const mr = (ca.r + cb.r) >> 1, mg = (ca.g + cb.g) >> 1, mb = (ca.b + cb.b) >> 1;
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
           ctx.lineTo(b.x, b.y);
-          ctx.strokeStyle = lg;
+          ctx.strokeStyle = `rgba(${mr},${mg},${mb},${alpha})`;
           ctx.lineWidth = 0.8;
           ctx.stroke();
         }
       }
     }
 
-    // Draw nodes
+    // Draw nodes — use shadowBlur for halo instead of createRadialGradient
     for (const n of nodes) {
       n.pulse += n.pulseSpeed;
       const glow = 0.7 + 0.3 * Math.sin(n.pulse);
       const { r: cr, g: cg, b: cb } = n.color;
+      const coreR = n.r * glow;
 
-      // Outer halo
-      const radial = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 5 * glow);
-      radial.addColorStop(0,   `rgba(${cr},${cg},${cb},0.28)`);
-      radial.addColorStop(1,   `rgba(${cr},${cg},${cb},0)`);
       ctx.beginPath();
-      ctx.arc(n.x, n.y, n.r * 5 * glow, 0, Math.PI * 2);
-      ctx.fillStyle = radial;
-      ctx.fill();
-
-      // Core dot
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, n.r * glow, 0, Math.PI * 2);
+      ctx.arc(n.x, n.y, coreR, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(${cr},${cg},${cb},0.9)`;
-      ctx.shadowBlur = 8;
-      ctx.shadowColor = `rgba(${cr},${cg},${cb},0.8)`;
+      ctx.shadowBlur = n.r * 12 * glow;
+      ctx.shadowColor = `rgba(${cr},${cg},${cb},0.7)`;
       ctx.fill();
       ctx.shadowBlur = 0;
 
@@ -5273,14 +5312,12 @@ async function submitApplication() {
       if (n.y < -10) n.y = H + 10;
       if (n.y > H + 10) n.y = -10;
     }
-
-    raf = requestAnimationFrame(draw);
   }
 
   // Only animate when section is visible (perf)
   const observer = new IntersectionObserver(entries => {
     if (entries[0].isIntersecting) {
-      if (!raf) draw();
+      if (!raf) raf = requestAnimationFrame(draw);
     } else {
       cancelAnimationFrame(raf);
       raf = null;
@@ -5315,9 +5352,16 @@ async function submitApplication() {
 
   // ── SCROLL TO TOP BUTTON ──
   const scrollBtn = document.getElementById('scrollTop');
+  let scrollTicking = false;
   window.addEventListener('scroll', () => {
-    scrollBtn.classList.toggle('visible', window.scrollY > 300);
-  });
+    if (!scrollTicking) {
+      requestAnimationFrame(() => {
+        scrollBtn.classList.toggle('visible', window.scrollY > 300);
+        scrollTicking = false;
+      });
+      scrollTicking = true;
+    }
+  }, { passive: true });
 
   // ── AUTO-ASSIGN ROLE COLOR CLASSES ──
   // Maps role text (lowercase) → CSS class on .member-role
@@ -6752,18 +6796,25 @@ async function submitApplication() {
       btn.classList.add('active');
       const filter = btn.dataset.filter;
       let visible = 0;
-      rows.forEach((row, i) => {
+      // Batch DOM reads first, then writes in rAF
+      const updates = [];
+      rows.forEach(row => {
         const role = row.dataset.role;
         const show = filter === 'all' || role === filter;
-        row.classList.remove('rm-hidden', 'rm-visible');
-        if (show) {
-          visible++;
-          setTimeout(() => { row.classList.remove('rm-hidden'); row.classList.add('rm-visible'); }, i * 12);
-        } else {
-          row.classList.add('rm-hidden');
-        }
+        if (show) visible++;
+        updates.push({ row, show });
       });
-      empty.classList.toggle('show', visible === 0);
+      requestAnimationFrame(() => {
+        updates.forEach(({ row, show }) => {
+          row.classList.remove('rm-hidden', 'rm-visible');
+          if (show) {
+            row.classList.add('rm-visible');
+          } else {
+            row.classList.add('rm-hidden');
+          }
+        });
+        empty.classList.toggle('show', visible === 0);
+      });
     });
   });
 })();
