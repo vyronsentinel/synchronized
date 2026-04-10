@@ -1177,6 +1177,25 @@
     box-shadow: 0 0 6px rgba(255,45,120,0.7);
   }
 
+  #seekSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--hot-pink);
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(255,45,120,0.7);
+  }
+  #seekSlider::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--hot-pink);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 6px rgba(255,45,120,0.7);
+  }
+
   @keyframes barBounce {
     0%, 100% { transform: scaleY(0.3); }
     50% { transform: scaleY(1); }
@@ -4602,11 +4621,17 @@ async function submitApplication() {
     </div>
     <!-- Duration display -->
     <div style="display:flex;align-items:center;gap:6px;margin-top:5px;">
-      <span id="trackCurrent" style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--cyan);letter-spacing:0.05em;">0:00</span>
-      <div style="flex:1;height:2px;background:rgba(255,255,255,0.12);border-radius:2px;overflow:hidden;">
-        <div id="trackProgress" style="height:100%;width:0%;background:linear-gradient(90deg,var(--hot-pink),var(--cyan));border-radius:2px;transition:width 0.5s linear;"></div>
-      </div>
-      <span id="trackDuration" style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.05em;">0:00</span>
+      <span id="trackCurrent" style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--cyan);letter-spacing:0.05em;flex-shrink:0;">0:00</span>
+      <input type="range" id="seekSlider" min="0" max="100" step="0.1" value="0" oninput="seekTrack(this.value)" style="
+        -webkit-appearance:none;
+        flex:1;
+        height:3px;
+        background: linear-gradient(90deg, var(--hot-pink) 0%, rgba(255,255,255,0.15) 0%);
+        border-radius:2px;
+        outline:none;
+        cursor:pointer;
+      ">
+      <span id="trackDuration" style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.05em;flex-shrink:0;">0:00</span>
     </div>
   </div>
 
@@ -5054,11 +5079,19 @@ async function submitApplication() {
     audio.addEventListener('timeupdate', () => {
       document.getElementById('trackCurrent').textContent = fmtTime(audio.currentTime);
       const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
-      document.getElementById('trackProgress').style.width = pct + '%';
+      const seek = document.getElementById('seekSlider');
+      seek.value = pct;
+      seek.style.background = `linear-gradient(90deg, var(--hot-pink) ${pct}%, rgba(255,255,255,0.15) ${pct}%)`;
     });
     audio.addEventListener('durationchange', () => {
       document.getElementById('trackDuration').textContent = fmtTime(audio.duration);
     });
+
+    window.seekTrack = function(val) {
+      if (audio.duration) {
+        audio.currentTime = (val / 100) * audio.duration;
+      }
+    };
 
     // Load first track silently
     loadTrack(0, false);
