@@ -5,6 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SYNCHRONIZED | iDate</title>
 
+    <!-- ╔══════════════════════════════════════════════╗ -->
+    <!-- ║           SECURITY PROTECTION LAYER          ║ -->
+    <!-- ╚══════════════════════════════════════════════╝ -->
+
+    <!-- 1. Content Security Policy — blocks XSS & unauthorized resource injection -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline';
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' data: https://synchronized.site;
+      connect-src 'self';
+      frame-ancestors 'none';
+      base-uri 'self';
+      form-action 'self';
+    ">
+
+    <!-- 2. Clickjacking Protection — prevents your site from being iframed -->
+    <meta http-equiv="X-Frame-Options" content="DENY">
+
+    <!-- 3. MIME Sniffing Protection -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+
+    <!-- 4. Referrer Policy — limits referrer info leakage -->
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- 5. Permissions Policy — disables sensitive browser APIs -->
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
+
     <!-- SEO & Link Preview Tags -->
     <meta name="description" content="SYNCHRONIZED is iDate Clan's official hub — rankings, roster, events, and more.">
 
@@ -3014,7 +3043,7 @@
     t = t.replace(/@everyone/g, '<strong style="color:#00f0ff;">@everyone</strong>');
     t = t.replace(/@here/g,     '<strong style="color:#00f0ff;">@here</strong>');
     t = t.replace(/@(\w+)/g,    '<strong style="color:#00f0ff;">@$1</strong>');
-    t = t.replace(/#([a-zA-Z][a-zA-Z0-9_-]*)/g, '<strong style="color:#ffd700;">#$1</strong>');
+    t = t.replace(/#(\w+)/g,    '<strong style="color:#ffd700;">#$1</strong>');
     // Markdown
     t = t.replace(/\*\*(.*?)\*\*/gs, '<strong>$1</strong>');
     t = t.replace(/__(.*?)__/gs,     '<u>$1</u>');
@@ -6914,6 +6943,64 @@ async function submitApplication() {
   }
   makeBida('jxiamWrap', 'jxiamOriginal', 'jxiamIcon');
   makeBida('errsWrap',  'errsOriginal',  'errsIcon');
+})();
+</script>
+
+<!-- ╔══════════════════════════════════════════════╗ -->
+<!-- ║         SECURITY SCRIPTS — DO NOT REMOVE     ║ -->
+<!-- ╚══════════════════════════════════════════════╝ -->
+<script>
+(function() {
+  'use strict';
+
+  /* ── IFRAME / CLICKJACKING GUARD ──────────────────────────────────────
+     If this page is loaded inside an iframe on another domain, break out. */
+  if (window.self !== window.top) {
+    try {
+      window.top.location.href = 'https://synchronized.site/';
+    } catch(e) {
+      document.body.innerHTML =
+        '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#050510;color:#ff2d78;font-family:monospace;font-size:1.2rem;">[ UNAUTHORIZED FRAME BLOCKED ]</div>';
+    }
+  }
+
+  /* ── RIGHT-CLICK DETERRENT ──────────────────────────────────────────── */
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+  });
+
+  /* ── DEVTOOLS KEYBOARD SHORTCUT DETERRENT ───────────────────────────── */
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'F12') { e.preventDefault(); return false; }
+    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) {
+      e.preventDefault(); return false;
+    }
+    if (e.ctrlKey && e.key === 'u') { e.preventDefault(); return false; }
+  });
+
+  /* ── CONSOLE WARNING BANNER ─────────────────────────────────────────── */
+  var cyan    = 'color:#00f0ff; font-weight:bold; font-size:14px;';
+  var pink    = 'color:#ff2d78; font-weight:bold; font-size:14px;';
+  var warning = 'color:#ffd700; font-weight:bold; font-size:13px;';
+  var normal  = 'color:#e8e8f8; font-size:12px;';
+  console.log('%c╔══════════════════════════════════════╗', cyan);
+  console.log('%c  ⚠  SYNCHRONIZED — SECURITY NOTICE  ⚠  ', pink);
+  console.log('%c╚══════════════════════════════════════╝', cyan);
+  console.log('%c This site is protected and monitored.', warning);
+  console.log('%c Unauthorized access, scraping, or tampering is strictly prohibited.', normal);
+  console.log('%c Found a vulnerability? Contact: discord.gg/XW7nY97d', normal);
+
+  /* ── ANTI-SCRAPING: Detect headless/automated browsers ─────────────── */
+  var isHeadless = (
+    navigator.webdriver === true ||
+    (navigator.plugins.length === 0 && !navigator.userAgent.includes('Firefox'))
+  );
+  if (isHeadless) {
+    document.body.style.display = 'none';
+    console.warn('[SYNC] Automated browser detected. Access denied.');
+  }
+
 })();
 </script>
 </body>
