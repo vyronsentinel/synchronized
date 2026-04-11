@@ -11,16 +11,16 @@
 
     <!-- 1. Content Security Policy — blocks XSS & unauthorized resource injection -->
     <meta http-equiv="Content-Security-Policy" content="
-      default-src 'self';
-      script-src 'self' 'unsafe-inline';
-      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-      font-src 'self' https://fonts.gstatic.com;
-      img-src 'self' data: https://synchronized.site;
-      connect-src 'self';
-      frame-ancestors 'none';
-      base-uri 'self';
-      form-action 'self';
-    ">
+  default-src 'self';
+  script-src 'self' 'unsafe-inline';
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src 'self' https://fonts.gstatic.com;
+  img-src 'self' data: https://synchronized.site https://sync-worker.lastresort962.workers.dev;
+  connect-src 'self' https://sync-worker.lastresort962.workers.dev https://discord.com;
+  frame-ancestors 'none';
+  base-uri 'self';
+  form-action 'self';
+">
 
     <!-- 2. Clickjacking Protection — prevents your site from being iframed -->
     <meta http-equiv="X-Frame-Options" content="DENY">
