@@ -3043,7 +3043,7 @@
     t = t.replace(/@everyone/g, '<strong style="color:#00f0ff;">@everyone</strong>');
     t = t.replace(/@here/g,     '<strong style="color:#00f0ff;">@here</strong>');
     t = t.replace(/@(\w+)/g,    '<strong style="color:#00f0ff;">@$1</strong>');
-    t = t.replace(/#(\w+)/g,    '<strong style="color:#ffd700;">#$1</strong>');
+    t = t.replace(/#([a-zA-Z_][a-zA-Z0-9_-]*)/g, '<strong style="color:#ffd700;">#$1</strong>');
     // Markdown
     t = t.replace(/\*\*(.*?)\*\*/gs, '<strong>$1</strong>');
     t = t.replace(/__(.*?)__/gs,     '<u>$1</u>');
