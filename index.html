@@ -6992,7 +6992,10 @@ async function submitApplication() {
   console.log('%c Found a vulnerability? Contact: discord.gg/XW7nY97d', normal);
 
   /* ── ANTI-SCRAPING: Detect headless/automated browsers ─────────────── */
-  var isHeadless = (
+  var fbCrawler = navigator.userAgent.includes('facebookexternalhit') || 
+                  navigator.userAgent.includes('Facebot');
+
+  var isHeadless = !fbCrawler && (
     navigator.webdriver === true ||
     (navigator.plugins.length === 0 && !navigator.userAgent.includes('Firefox'))
   );
