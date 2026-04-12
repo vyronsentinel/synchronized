@@ -1970,8 +1970,17 @@
     // Phase 3: remove from layout
     setTimeout(() => {
       ls.classList.add('ls-gone');
+      sessionStorage.setItem('sync_ls_dismissed', '1');
     }, 1050);
   };
+
+  // ── bfcache restore: if returning via history.back(), skip the loading screen ──
+  window.addEventListener('pageshow', function(e) {
+    if (e.persisted || sessionStorage.getItem('sync_ls_dismissed') === '1') {
+      const ls = document.getElementById('ls');
+      if (ls) { ls.style.transition = 'none'; ls.classList.add('ls-gone'); }
+    }
+  });
 })();
 </script>
 
@@ -3023,39 +3032,58 @@
   let postsLoaded = false;
 
   function timeAgo(iso) {
-    const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-    if (diff < 60) return 'just now';
-    if (diff < 3600) return Math.floor(diff/60) + 'm ago';
-    if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+    if (!iso) return '—';
+    const ts = new Date(iso).getTime();
+    if (isNaN(ts)) return '—';
+    const diff = Math.floor((Date.now() - ts) / 1000);
+    if (diff < 0)      return 'just now';
+    if (diff < 60)     return 'just now';
+    if (diff < 3600)   return Math.floor(diff/60) + 'm ago';
+    if (diff < 86400)  return Math.floor(diff/3600) + 'h ago';
     if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
     return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
   }
 
-  function cleanContent(text) {
-    if (!text) return '';
-    // Strip Discord custom emojis BEFORE HTML-escaping
-    let t = text.replace(/<a?:[a-zA-Z0-9_]+:[0-9]+>/g, '');
-    t = t.replace(/\\n/g, '\n');
-    t = t.replace(/\n{3,}/g, '\n\n');
-    // HTML-escape
-    t = t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    // Mentions
-    t = t.replace(/@everyone/g, '<strong style="color:#00f0ff;">@everyone</strong>');
-    t = t.replace(/@here/g,     '<strong style="color:#00f0ff;">@here</strong>');
-    t = t.replace(/@(\w+)/g,    '<strong style="color:#00f0ff;">@$1</strong>');
-    t = t.replace(/#([a-zA-Z_][a-zA-Z0-9_-]*)/g, '<strong style="color:#ffd700;">#$1</strong>');
-    // Markdown
-    t = t.replace(/\*\*(.*?)\*\*/gs, '<strong>$1</strong>');
-    t = t.replace(/__(.*?)__/gs,     '<u>$1</u>');
-    t = t.replace(/\*(.*?)\*/gs,     '<em>$1</em>');
-    t = t.replace(/_([^_]+)_/gs,     '<em>$1</em>');
-    return t.trim();
+  function escHtmlInline(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
+  // Safe renderer: escapes plain text, preserves markdown/mention/link formatting
   function linkify(text) {
-    return cleanContent(text)
-      .replace(/(https?:\/\/[^\s<"]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
-      .replace(/\n/g, '<br>');
+    if (!text) return '';
+    let raw = text;
+    // Strip Discord custom emojis first
+    raw = raw.replace(/<a?:[a-zA-Z0-9_]+:[0-9]+>/g, '');
+    raw = raw.replace(/\\n/g, '\n');
+    raw = raw.replace(/\n{3,}/g, '\n\n');
+    // Collect HTML spans via placeholders to avoid double-escaping
+    const spans = [];
+    function ph(html) { const id = '\x00PH' + spans.length + '\x00'; spans.push(html); return id; }
+    function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    // Markdown (order: *** before ** before *)
+    raw = raw.replace(/\*\*\*(.+?)\*\*\*/gs, (_, t) => ph('<strong><em>' + esc(t) + '</em></strong>'));
+    raw = raw.replace(/\*\*(.+?)\*\*/gs,     (_, t) => ph('<strong>' + esc(t) + '</strong>'));
+    raw = raw.replace(/__(.+?)__/gs,          (_, t) => ph('<u>' + esc(t) + '</u>'));
+    raw = raw.replace(/\*(.+?)\*/gs,          (_, t) => ph('<em>' + esc(t) + '</em>'));
+    raw = raw.replace(/_([^_]+)_/gs,          (_, t) => ph('<em>' + esc(t) + '</em>'));
+    // Mentions & channels
+    raw = raw.replace(/@everyone\b/g, () => ph('<strong style="color:#00f0ff;">@everyone</strong>'));
+    raw = raw.replace(/@here\b/g,     () => ph('<strong style="color:#00f0ff;">@here</strong>'));
+    raw = raw.replace(/@(\w+)/g,       (_, n) => ph('<strong style="color:#00f0ff;">@' + esc(n) + '</strong>'));
+    raw = raw.replace(/#([a-zA-Z_][a-zA-Z0-9_-]*)/g, (_, c) => ph('<strong style="color:#ffd700;">#' + esc(c) + '</strong>'));
+    // Split on placeholders, escape plain segments, linkify within them
+    const parts = raw.split(/(\x00PH\d+\x00)/);
+    let out = parts.map(function(seg) {
+      if (/^\x00PH\d+\x00$/.test(seg)) return seg;
+      let s = seg.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      s = s.replace(/(https?:\/\/[^\s<"]+)/g, function(url) {
+        return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + '</a>';
+      });
+      return s;
+    }).join('');
+    out = out.replace(/\x00PH(\d+)\x00/g, (_, i) => spans[+i]);
+    out = out.replace(/\n/g, '<br>');
+    return out.trim();
   }
 
   window.loadAnnouncements = async function() {
@@ -3063,11 +3091,13 @@
     const skeleton = document.getElementById('ann-popup-skeleton');
     try {
       const res   = await fetch(WORKER_URL + '/announcements', { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       const posts = await res.json();
       if (skeleton) skeleton.remove();
       body.innerHTML = '';
-      if (!posts || posts.length === 0) {
+      if (!Array.isArray(posts) || posts.length === 0) {
         body.innerHTML = `<div class="ann-popup-empty"><div class="ann-popup-empty-icon">📡</div>No announcements yet — check back soon</div>`;
+        // Don't set postsLoaded=true on empty — allow retry when popup reopened
         return;
       }
       // badge
@@ -3079,15 +3109,18 @@
         const card = document.createElement('div');
         card.className = 'ann-popup-card';
         card.style.animationDelay = (i * 0.07) + 's';
-        const avatarHtml = post.avatar
-          ? `<img src="${post.avatar}" alt="${(post.author||'S').charAt(0)}" onerror="this.outerHTML='<img src=\\'sync-logo.png\\' alt=\\'SYNC\\' style=\\'width:100%;height:100%;object-fit:contain;border-radius:0;filter:drop-shadow(0 0 8px rgba(255,45,120,0.7)) drop-shadow(0 0 16px rgba(123,47,255,0.5));\\' />'">` 
+        const safeAvatar = post.avatar ? escHtmlInline(post.avatar) : null;
+        const avatarAlt  = escHtmlInline((post.author||'S').charAt(0));
+        const avatarHtml = safeAvatar
+          ? `<img src="${safeAvatar}" alt="${avatarAlt}" onerror="this.outerHTML='<img src=\\'sync-logo.png\\' alt=\\'SYNC\\' style=\\'width:100%;height:100%;object-fit:contain;border-radius:0;filter:drop-shadow(0 0 8px rgba(255,45,120,0.7)) drop-shadow(0 0 16px rgba(123,47,255,0.5));\\' />'">` 
           : `<img src="sync-logo.png" alt="SYNC" style="width:100%;height:100%;object-fit:contain;border-radius:0;filter:drop-shadow(0 0 8px rgba(255,45,120,0.7)) drop-shadow(0 0 16px rgba(123,47,255,0.5));" />`;
         const rawMedia = [].concat(post.images || [], post.attachments || []);
         const imageHtml = rawMedia
           .filter(a => typeof a === 'string' ? a.length > 0 : (a && a.url))
           .map(a => {
             const url = typeof a === 'string' ? a : a.url;
-            return url ? `<div class="ann-popup-img"><img src="${url}" alt="image" loading="lazy" referrerpolicy="no-referrer" style="min-height: 100px; background: rgba(0,240,255,0.05);"></div>` : '';
+            const safeUrl = url ? escHtmlInline(url) : null;
+            return safeUrl ? `<div class="ann-popup-img"><img src="${safeUrl}" alt="image" loading="lazy" referrerpolicy="no-referrer" style="min-height: 100px; background: rgba(0,240,255,0.05);"></div>` : '';
           })
           .join('');
         card.innerHTML = `
@@ -5965,7 +5998,7 @@ async function submitApplication() {
       if (clickTimer) clearTimeout(clickTimer);
       if (clickCount >= 3) {
         clickCount = 0;
-        admOpen();
+        window.location.href = 'admin.html';
       } else {
         clickTimer = setTimeout(() => { clickCount = 0; }, 800);
       }
@@ -6015,12 +6048,13 @@ async function submitApplication() {
     document.getElementById('adm-login-view').style.display = 'block';
     document.getElementById('adm-panel-view').style.display  = 'none';
     document.getElementById('adm-pw').value = '';
-    document.getElementById('adm-login-msg').className = 'adm-msg';
+    const loginMsg = document.getElementById('adm-login-msg');
+    loginMsg.className = 'adm-msg'; loginMsg.textContent = '';
   };
 
   // ── Char count (no limit) ──
   document.getElementById('adm-content').addEventListener('input', function() {
-    const len = this.value.length;
+    const len = Array.from(this.value).length;
     const el  = document.getElementById('adm-char');
     el.textContent = len + ' chars';
     el.className = 'adm-char';
@@ -6043,9 +6077,9 @@ async function submitApplication() {
       const ta = document.getElementById('adm-content');
       const pos = ta.selectionStart;
       ta.value = ta.value.slice(0, pos) + em + ta.value.slice(pos);
-      ta.selectionStart = ta.selectionEnd = pos + em.length;
+      ta.selectionStart = ta.selectionEnd = pos + Array.from(em).reduce((n, ch) => n + ch.length, 0);
       ta.focus();
-      document.getElementById('adm-char').textContent = ta.value.length + ' chars';
+      document.getElementById('adm-char').textContent = Array.from(ta.value).length + ' chars';
     });
     emojiList.appendChild(btn);
   });
@@ -6060,11 +6094,15 @@ async function submitApplication() {
   window.admHandleImages = function(input) {
     const files = Array.from(input.files);
     const previews = document.getElementById('adm-img-previews');
+    const MAX_SIZE = 2 * 1024 * 1024;
     files.forEach(file => {
+      if (file.size > MAX_SIZE) {
+        alert('Image "' + file.name + '" is too large (' + (file.size/1024/1024).toFixed(1) + 'MB). Please use images under 2MB.');
+        return;
+      }
       const reader = new FileReader();
       reader.onload = function(e) {
         const base64 = e.target.result;
-        admImages.push(base64);
         // preview
         const wrap = document.createElement('div');
         wrap.style.cssText = 'position:relative;width:80px;height:80px;';
@@ -6075,9 +6113,11 @@ async function submitApplication() {
         del.type = 'button';
         del.textContent = '✕';
         del.style.cssText = 'position:absolute;top:-5px;right:-5px;background:#ff2d78;border:none;color:#fff;border-radius:50%;width:18px;height:18px;font-size:0.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;';
-        const idx = admImages.length - 1;
+        const imageRef = { data: base64 };
+        admImages.push(imageRef);
         del.addEventListener('click', () => {
-          admImages.splice(idx, 1);
+          const pos = admImages.indexOf(imageRef);
+          if (pos !== -1) admImages.splice(pos, 1);
           previews.removeChild(wrap);
           if (admImages.length === 0) previews.style.display = 'none';
         });
@@ -6098,9 +6138,9 @@ async function submitApplication() {
     const msg     = document.getElementById('adm-post-msg');
     const btn     = document.getElementById('adm-post-btn');
     if (!content && admImages.length === 0) { msg.textContent = '✕ Please write an announcement or attach an image'; msg.className = 'adm-msg error'; return; }
-    btn.disabled = true; btn.textContent = 'Posting...'; msg.className = 'adm-msg';
+    btn.disabled = true; btn.innerHTML = '&#9654;&nbsp;&nbsp; Posting...'; msg.className = 'adm-msg'; msg.textContent = '';
     try {
-      const payload = { content: content || '', author, images: admImages };
+      const payload = { content: content || '', author, images: admImages.map(r => r.data || r) };
       const res = await fetch(`${WORKER_URL}/post?secret=${SECRET}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -6115,45 +6155,50 @@ async function submitApplication() {
         document.getElementById('adm-img-previews').innerHTML = '';
         document.getElementById('adm-img-previews').style.display = 'none';
         document.getElementById('adm-emoji-grid').style.display = 'none';
-        admLoadPosts();
-        if (typeof loadAnnouncements === 'function') loadAnnouncements();
+        setTimeout(() => {
+          admLoadPosts();
+          if (typeof loadAnnouncements === 'function') loadAnnouncements();
+        }, 800);
       } else {
         msg.textContent = '✕ Failed — check your connection';
         msg.className = 'adm-msg error';
       }
     } catch { msg.textContent = '✕ Network error — try again'; msg.className = 'adm-msg error'; }
-    btn.disabled = false; btn.textContent = '▶   Post Announcement';
+    btn.disabled = false; btn.innerHTML = '&#9654;&nbsp;&nbsp; Post Announcement';
   };
 
   // ── Load posts ──
   // ── Load posts ──
   window.admLoadPosts = async function() {
     const list = document.getElementById('adm-posts-list');
+    list.innerHTML = '<div style="font-family:Share Tech Mono,monospace;font-size:0.62rem;color:rgba(136,136,170,0.4);letter-spacing:0.15em;text-transform:uppercase;">Loading...</div>';
     try {
-      const res   = await fetch(`${WORKER_URL}/announcements`, { cache: 'no-store' });
+      const res = await fetch(`${WORKER_URL}/announcements`, { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       const posts = await res.json();
-      if (!posts || posts.length === 0) {
+      if (!Array.isArray(posts) || posts.length === 0) {
         list.innerHTML = '<div style="font-family:Share Tech Mono,monospace;font-size:0.62rem;color:rgba(136,136,170,0.4);letter-spacing:0.15em;text-transform:uppercase;">No announcements yet</div>';
         return;
       }
+      function escA(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
       list.innerHTML = posts.map((p, i) => {
-        // FIXED: Removed the 'linkify' function that was causing the crash
         const escapedContent = (p.content||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
         const rawMedia = [].concat(p.images || [], p.attachments || []);
         const imagesHtml = rawMedia.map(a => {
             const url = typeof a === 'string' ? a : a.url;
-            return url ? `<img src="${url}" style="max-width:100%;max-height:120px;object-fit:cover;border-radius:3px;margin-top:4px;border:1px solid rgba(0,240,255,0.15);" loading="lazy" referrerpolicy="no-referrer">` : '';
+            return url ? `<img src="${escA(url)}" style="max-width:100%;max-height:120px;object-fit:cover;border-radius:3px;margin-top:4px;border:1px solid rgba(0,240,255,0.15);" loading="lazy" referrerpolicy="no-referrer">` : '';
         }).join('');
+        const editedBadge = p.edited ? ' <span style="color:rgba(0,240,255,0.4);font-size:0.55rem;">· edited</span>' : '';
         return `
         <div class="adm-post-item">
           <button class="adm-post-del" onclick="admDeletePost(${i})" title="Delete">✕</button>
           <div class="adm-post-content">${escapedContent}</div>
           ${imagesHtml}
-          <div class="adm-post-meta">${(p.author||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')} · ${admTimeAgo(p.timestamp)}</div>
+          <div class="adm-post-meta">${escA(p.author||'SYNCHRONIZED')} · ${admTimeAgo(p.timestamp)}${editedBadge}</div>
         </div>`;
       }).join('');
-    } catch {
-      list.innerHTML = '<div style="color:rgba(255,45,120,0.6);font-size:0.75rem;">Could not load posts</div>';
+    } catch(err) {
+      list.innerHTML = `<div style="color:rgba(255,45,120,0.6);font-size:0.75rem;">Could not load posts — ${String(err.message).replace(/</g,'&lt;')}</div>`;
     }
   };
 
@@ -6161,23 +6206,31 @@ async function submitApplication() {
   window.admDeletePost = async function(index) {
     if (!confirm('Delete this announcement?')) return;
     try {
-      const res   = await fetch(`${WORKER_URL}/announcements`);
+      const res = await fetch(`${WORKER_URL}/announcements`, { cache: 'no-store' });
+      if (!res.ok) throw new Error('Fetch failed: HTTP ' + res.status);
       const posts = await res.json();
+      if (!Array.isArray(posts)) throw new Error('Invalid data from server');
+      if (index < 0 || index >= posts.length) throw new Error('Post index out of range');
       posts.splice(index, 1);
-      await fetch(`${WORKER_URL}/save?secret=${SECRET}`, {
+      const saveRes = await fetch(`${WORKER_URL}/save?secret=${SECRET}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(posts),
       });
+      if (!saveRes.ok) throw new Error('Save failed: HTTP ' + saveRes.status);
       admLoadPosts();
       if (typeof loadAnnouncements === 'function') loadAnnouncements();
-    } catch { alert('Could not delete post'); }
+    } catch(err) { alert('Could not delete post: ' + err.message); }
   };
 
   // ── Helpers ──
   function admTimeAgo(iso) {
-    const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-    if (diff < 60) return 'just now';
+    if (!iso) return '—';
+    const ts = new Date(iso).getTime();
+    if (isNaN(ts)) return '—';
+    const diff = Math.floor((Date.now() - ts) / 1000);
+    if (diff < 0)    return 'just now';
+    if (diff < 60)   return 'just now';
     if (diff < 3600) return Math.floor(diff/60) + 'm ago';
     if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
     return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
