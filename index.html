@@ -927,9 +927,9 @@
   .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
   .mobile-menu {
-    display: none;
+    display: block;
     position: fixed;
-    top: 56px;
+    top: 64px;
     left: 0;
     right: 0;
     background: rgba(5,5,16,0.97);
@@ -937,9 +937,17 @@
     border-bottom: 1px solid rgba(0,240,255,0.15);
     z-index: 999;
     flex-direction: column;
-    padding: 1rem 0;
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.38s cubic-bezier(0.4,0,0.2,1), opacity 0.28s ease, padding 0.28s ease;
+    opacity: 0;
   }
-  .mobile-menu.open { display: flex; }
+  .mobile-menu.open {
+    max-height: 420px;
+    opacity: 1;
+    padding: 0.5rem 0 0.75rem;
+  }
   .mobile-menu a {
     font-family: 'Exo 2', sans-serif;
     font-size: 1rem;
@@ -5918,90 +5926,7 @@ async function submitApplication() {
     50%      { filter: brightness(1.6) drop-shadow(0 0 8px #00f0ff); }
   }
   .logo-hint { animation: logoHint 0.3s ease; }
-
-  /* ── PAGE-EXIT TRANSITION OVERLAY ── */
-  #page-exit-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 999999;
-    pointer-events: none;
-    opacity: 0;
-  }
-
-  /* Dark base layer that fades in */
-  #page-exit-overlay .exit-bg {
-    position: absolute;
-    inset: 0;
-    background: #050510;
-    opacity: 0;
-    transition: opacity 0.45s ease;
-  }
-
-  /* Cyan scan line that sweeps top→bottom */
-  #page-exit-overlay .exit-scanline {
-    position: absolute;
-    left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #00f0ff 20%, #ff2d78 50%, #00f0ff 80%, transparent);
-    box-shadow: 0 0 18px 4px rgba(0,240,255,0.6);
-    top: -4px;
-    opacity: 0;
-    transition: none;
-  }
-
-  /* Pink vignette flash */
-  #page-exit-overlay .exit-flash {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at center, rgba(255,45,120,0.25) 0%, transparent 70%);
-    opacity: 0;
-  }
-
-  /* "ACCESSING ADMIN" text */
-  #page-exit-overlay .exit-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem;
-    letter-spacing: 0.45em;
-    text-transform: uppercase;
-    color: #00f0ff;
-    opacity: 0;
-    white-space: nowrap;
-    text-shadow: 0 0 12px rgba(0,240,255,0.8);
-  }
-
-  #page-exit-overlay.running {
-    pointer-events: all;
-    opacity: 1;
-  }
-
-  @keyframes exitScanSweep {
-    0%   { top: -4px; opacity: 1; }
-    100% { top: 100%; opacity: 0.4; }
-  }
-  @keyframes exitFlash {
-    0%   { opacity: 0; }
-    15%  { opacity: 1; }
-    100% { opacity: 0; }
-  }
-  @keyframes exitTextReveal {
-    0%   { opacity: 0; letter-spacing: 0.65em; }
-    40%  { opacity: 1; letter-spacing: 0.45em; }
-    80%  { opacity: 1; }
-    100% { opacity: 0; }
-  }
 </style>
-
-<!-- Page-exit transition overlay -->
-<div id="page-exit-overlay">
-  <div class="exit-bg"></div>
-  <div class="exit-scanline"></div>
-  <div class="exit-flash"></div>
-  <div class="exit-text">// Accessing Admin Panel</div>
-</div>
 
 <!-- Admin Modal HTML -->
 <div id="admin-overlay">
@@ -6081,41 +6006,11 @@ async function submitApplication() {
       if (clickTimer) clearTimeout(clickTimer);
       if (clickCount >= 3) {
         clickCount = 0;
-        triggerAdminTransition();
+        window.location.href = 'admin.html';
       } else {
         clickTimer = setTimeout(() => { clickCount = 0; }, 800);
       }
     });
-  }
-
-  // ── Admin page-exit transition ──
-  function triggerAdminTransition() {
-    const overlay  = document.getElementById('page-exit-overlay');
-    const bg       = overlay.querySelector('.exit-bg');
-    const scanline = overlay.querySelector('.exit-scanline');
-    const flash    = overlay.querySelector('.exit-flash');
-    const text     = overlay.querySelector('.exit-text');
-
-    overlay.classList.add('running');
-
-    // 1. Pink flash immediately
-    flash.style.animation = 'exitFlash 0.5s ease forwards';
-
-    // 2. Scan line sweeps across screen
-    scanline.style.animation = 'exitScanSweep 0.55s ease-in forwards';
-
-    // 3. Background fades in slightly after
-    setTimeout(() => { bg.style.opacity = '1'; }, 120);
-
-    // 4. Text fades in and tightens
-    setTimeout(() => {
-      text.style.animation = 'exitTextReveal 0.65s ease forwards';
-    }, 200);
-
-    // 5. Navigate after the animation peaks
-    setTimeout(() => {
-      window.location.href = 'admin.html';
-    }, 820);
   }
 
   // ── Open / Close ──
