@@ -134,6 +134,35 @@
     @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
     .posts-empty { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; color: rgba(136,136,170,0.45); text-transform: uppercase; text-align: center; padding: 1.5rem 0; }
     @media (max-width: 560px) { .box { padding: 1.75rem 1.1rem; } .box-title { font-size: 1.25rem; } }
+
+    /* ── PAGE TRANSITIONS ── */
+    .box {
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .box.transitioning-out {
+      opacity: 0;
+      transform: translateY(14px) scale(0.98);
+      pointer-events: none;
+    }
+    .box.transitioning-in {
+      opacity: 0;
+      transform: translateY(-14px) scale(0.98);
+    }
+
+    /* ── BACK TO MAIN LINK (shown in login box after logout) ── */
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 0.85rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      color: rgba(0,240,255,0.5);
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--cyan); }
   </style>
 </head>
 <body>
@@ -176,6 +205,7 @@
     <input type="password" id="passwordInput" placeholder="Enter admin password" autocomplete="current-password">
   </div>
   <button class="btn-primary" onclick="doLogin()">&#9654;&nbsp; Enter</button>
+  <a href="index.html" class="back-link">&#8962;&nbsp; Back to Main Page</a>
 </div>
 
 <!-- ADMIN PANEL -->
@@ -272,14 +302,34 @@
 
   // ── AUTO-LOGIN (session only — gone when tab closes) ──
   window.addEventListener('load', function() {
-    if (sessionStorage.getItem('sync_admin_auth') === '1') showAdmin();
+    if (sessionStorage.getItem('sync_admin_auth') === '1') {
+      // Instant switch — no transition needed on initial page load
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('adminBox').style.display = 'block';
+      loadPosts();
+    }
   });
 
   function showAdmin() {
     sessionStorage.setItem('sync_admin_auth', '1');
-    document.getElementById('loginBox').style.display = 'none';
-    document.getElementById('adminBox').style.display = 'block';
-    loadPosts();
+    var loginBox = document.getElementById('loginBox');
+    var adminBox = document.getElementById('adminBox');
+
+    // Fade out login box
+    loginBox.classList.add('transitioning-out');
+    setTimeout(function() {
+      loginBox.style.display = 'none';
+      loginBox.classList.remove('transitioning-out');
+
+      // Prepare admin box to slide in from top
+      adminBox.style.display = 'block';
+      adminBox.classList.add('transitioning-in');
+      // Force reflow so the initial state is rendered before transition starts
+      void adminBox.offsetWidth;
+      adminBox.classList.remove('transitioning-in');
+
+      loadPosts();
+    }, 360);
   }
 
   // ── LOGIN ──
@@ -302,11 +352,25 @@
     var ok = await showConfirm('Log out?', 'You will need to enter your password again to return.', '🔒');
     if (!ok) return;
     sessionStorage.removeItem('sync_admin_auth');
-    document.getElementById('loginBox').style.display = 'block';
-    document.getElementById('adminBox').style.display = 'none';
-    document.getElementById('passwordInput').value = '';
-    var loginMsg = document.getElementById('loginMsg');
-    loginMsg.className = 'msg'; loginMsg.textContent = '';
+
+    var loginBox = document.getElementById('loginBox');
+    var adminBox = document.getElementById('adminBox');
+
+    // Fade out admin panel
+    adminBox.classList.add('transitioning-out');
+    setTimeout(function() {
+      adminBox.style.display = 'none';
+      adminBox.classList.remove('transitioning-out');
+      document.getElementById('passwordInput').value = '';
+      var loginMsg = document.getElementById('loginMsg');
+      loginMsg.className = 'msg'; loginMsg.textContent = '';
+
+      // Slide in login box
+      loginBox.style.display = 'block';
+      loginBox.classList.add('transitioning-in');
+      void loginBox.offsetWidth;
+      loginBox.classList.remove('transitioning-in');
+    }, 360);
   }
 
   document.getElementById('passwordInput').addEventListener('keydown', function(e) {
