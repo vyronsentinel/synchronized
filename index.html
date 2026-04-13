@@ -875,6 +875,7 @@
   @media (max-width: 600px) {
     nav { padding: 0 1rem; height: 56px; }
     .nav-logo { font-size: 1rem; }
+    .mobile-menu { top: 56px; }
     #hero { padding: 70px 1rem 2rem; min-height: 100svh; }
     #logo-wrapper img { max-width: 420px !important; }
     .hero-title { font-size: clamp(2.8rem, 12vw, 5rem); }
@@ -901,6 +902,52 @@
     .members-grid { grid-template-columns: 1fr; }
     .hero-card { width: 150px; }
     .join-box { padding: 1.5rem 1rem; }
+  }
+
+  /* ── HERO CTA: stack vertically on mobile ── */
+  @media (max-width: 600px) {
+    #hero-cta-btns {
+      flex-direction: column !important;
+      align-items: center;
+    }
+    #hero-cta-btns .btn-primary,
+    #hero-cta-btns .btn-secondary,
+    #hero-cta-btns a[href="#apply"],
+    #hero-cta-btns a[href="#about"] {
+      width: 100%;
+      max-width: 300px;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* Apply form: birthday + age stack to single column */
+    .birthday-age-grid {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Apply form container: reduce padding */
+    #apply .section-wrapper > div {
+      padding: 1.5rem 1rem !important;
+    }
+
+    /* Join section: make Apply Now button full-width like Discord btn */
+    #join-btns a[href="#apply"] {
+      width: 100%;
+      max-width: 280px;
+      justify-content: center;
+    }
+
+    /* Music player: hide volume slider on tiny screens */
+    #music-player > div:last-of-type input[type="range"] {
+      width: 36px;
+    }
+
+    /* Playlist dropdown: full-width on mobile */
+    #playlist-dropdown {
+      right: 8px;
+      left: 8px;
+      min-width: unset;
+    }
   }
 
 
@@ -2054,7 +2101,7 @@
       <p class="hero-sub">Stay Home &amp; Keep <span>Gaming</span></p>
 
       <!-- Buttons moved inside hero-left so they sit right below the subtitle -->
-      <div class="hero-cta" style="margin-top:1.5rem; display:flex; flex-direction:row; flex-wrap:wrap; justify-content:center; gap:0.75rem;">
+      <div class="hero-cta" style="margin-top:1.5rem; display:flex; flex-direction:row; flex-wrap:wrap; justify-content:center; gap:0.75rem;" id="hero-cta-btns">
         <a href="https://discord.gg/XW7nY97d" target="_blank" class="btn-primary">
           <svg class="discord-icon" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
           Join Discord
@@ -2778,6 +2825,16 @@
     #ann-nav-btn { padding: 7px 12px; gap: 0; }
   }
 
+  /* On mobile, move ann-nav-btn away from hamburger to avoid overlap */
+  @media (max-width: 600px) {
+    #ann-nav-btn {
+      /* Shift left so it doesn't collide with the right-side hamburger */
+      left: auto;
+      right: 52px;
+      transform: none;
+    }
+  }
+
   /* ── POPUP PANEL ── */
   #ann-popup {
     position: fixed;
@@ -3000,6 +3057,13 @@
 
   /* Hidden section anchor for nav link */
   #announcements { position: absolute; pointer-events: none; height: 0; }
+
+  @media (max-width: 600px) {
+    #ann-popup {
+      top: 66px;
+      max-height: 78vh;
+    }
+  }
 </style>
 
 <!-- Anchor for nav "News" link -->
@@ -4295,7 +4359,7 @@
   <div class="section-divider"></div>  <p>
     Think you've got what it takes to run with SYNCHRONIZED? We're always looking for dedicated players who are passionate about iDate and thrive in a team environment.
   </p>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;flex-wrap:wrap;">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;flex-wrap:wrap;" id="join-btns">
     <a href="https://discord.gg/XW7nY97d" target="_blank" class="join-discord-btn">
       <svg class="discord-icon" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
       Join Our Discord
@@ -4392,7 +4456,7 @@
           <textarea id="f-reason" placeholder="Why did you leave your previous clan?" class="form-input" style="height:80px;resize:vertical;"></textarea>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;" class="birthday-age-grid">
           <div>
             <label class="form-label">Birthday <span style="color:var(--hot-pink)">*</span></label>
             <input type="date" id="f-birthday" class="form-input" oninput="calcAge()">
@@ -4647,6 +4711,30 @@ async function submitApplication() {
   box-shadow: 0 0 24px rgba(255,45,120,0.25);
   min-width: 220px;
 ">
+<style>
+  @media (max-width: 480px) {
+    #music-player {
+      bottom: 12px;
+      right: 12px;
+      left: 12px;
+      max-width: calc(100vw - 24px);
+      min-width: unset !important;
+      padding: 8px 12px;
+      gap: 8px;
+    }
+    #playlist-dropdown {
+      bottom: 78px !important;
+      right: 12px !important;
+      left: 12px !important;
+      min-width: unset !important;
+    }
+    #volSlider { width: 36px !important; }
+  }
+  @media (max-width: 380px) {
+    /* Hide volume on very small phones to save space */
+    #music-player > div:has(#volSlider) { display: none; }
+  }
+</style>
   <!-- Play/Pause button -->
   <button id="playBtn" onclick="toggleMusic()" style="
     background: var(--hot-pink);
