@@ -3192,7 +3192,7 @@
           .map(a => {
             const url = typeof a === 'string' ? a : a.url;
             const safeUrl = url ? escHtmlInline(url) : null;
-            return safeUrl ? `<div class="ann-popup-img"><img src="${safeUrl}" alt="image" loading="lazy" referrerpolicy="no-referrer" style="min-height: 100px; background: rgba(0,240,255,0.05);"></div>` : '';
+            return safeUrl ? `<div class="ann-popup-img"><img src="${safeUrl}" alt="image" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" style="min-height: 100px; background: rgba(0,240,255,0.05);"></div>`
           })
           .join('');
         card.innerHTML = `
