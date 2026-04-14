@@ -6628,6 +6628,67 @@ async function submitApplication() {
 }
 
 /* ══════════════════════════════════════════
+   AUTO-ADJUST ON RESIZE — ADDITIONAL BREAKPOINTS
+   ══════════════════════════════════════════ */
+
+/* ── LARGE TABLET / SMALL DESKTOP (max 1024px) ── */
+@media (max-width: 1024px) {
+  .section-wrapper { padding: 4rem 1.5rem; }
+  #about .about-grid { gap: 2.5rem; }
+  .hero-title { font-size: clamp(2.8rem, 8vw, 5.5rem); }
+  nav { padding: 0 1.5rem; }
+}
+
+/* ── TABLET (max 768px) ── */
+@media (max-width: 768px) {
+  nav { padding: 0 1rem; }
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+  .section-wrapper { padding: 3rem 1.2rem; }
+  .section-title { font-size: clamp(1.6rem, 5vw, 2.4rem); }
+  #about .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .about-visual { order: -1; }
+  .hero-card { width: 200px; }
+  .stat-row { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 1rem; }
+  .stat-item { border-left: none; border-top: 2px solid var(--hot-pink); padding: 0.75rem 1.5rem 0; text-align: center; }
+  .hero-cta { align-items: center; }
+  .btn-primary, .btn-secondary { padding: 12px 22px; font-size: 0.82rem; }
+  .orb-pink { width: 300px; height: 300px; }
+  .orb-cyan { width: 250px; height: 250px; }
+  .corner-tl, .corner-tr, .corner-bl, .corner-br { display: none; }
+}
+
+/* ── LANDSCAPE PHONES (max 667px height, landscape) ── */
+@media (max-height: 500px) and (orientation: landscape) {
+  #hero { min-height: auto; padding: 70px 1rem 1.5rem; }
+  .orb { display: none; }
+  .hero-card { width: 140px; }
+  .stat-item .stat-num { font-size: 1.8rem; }
+  .section-wrapper { padding: 2rem 1rem; }
+}
+
+/* ── ENSURE IMAGES NEVER OVERFLOW ── */
+img, video, iframe, embed, object {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── FLUID CONTAINER SAFETY ── */
+.section-wrapper,
+.hero-inner,
+.about-grid,
+.members-grid {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── PREVENT HORIZONTAL SCROLL ON ANY SIZE ── */
+body, html {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* ══════════════════════════════════════════
    NAME GLOW STYLES (ported from roster.html)
    ══════════════════════════════════════════ */
 .rm-name { font-family:'Exo 2',sans-serif; font-weight:700; font-size:0.92rem; letter-spacing:0.04em; display:inline-block; cursor:pointer; }
@@ -7099,6 +7160,139 @@ async function submitApplication() {
   }
   makeBida('jxiamWrap', 'jxiamOriginal', 'jxiamIcon');
   makeBida('errsWrap',  'errsOriginal',  'errsIcon');
+})();
+</script>
+
+<!-- ╔══════════════════════════════════════════════╗ -->
+<!-- ║        AUTO-ADJUST ON RESIZE / MINIMIZE      ║ -->
+<!-- ╚══════════════════════════════════════════════╝ -->
+<script>
+(function() {
+  'use strict';
+
+  // ── BREAKPOINT DEFINITIONS ──────────────────────────────────────────────
+  var BP = { xs: 380, sm: 600, md: 768, lg: 900, xl: 1024 };
+
+  // ── VIEWPORT HELPERS ────────────────────────────────────────────────────
+  function vw() { return window.innerWidth || document.documentElement.clientWidth; }
+  function vh() { return window.innerHeight || document.documentElement.clientHeight; }
+
+  // ── APPLY VIEWPORT CLASS TO <html> ──────────────────────────────────────
+  // Adds classes like 'vp-xs', 'vp-sm', 'vp-md', 'vp-lg', 'vp-xl'
+  // so you can also use these in CSS if needed.
+  function applyViewportClass() {
+    var w = vw();
+    var root = document.documentElement;
+    root.classList.remove('vp-xs','vp-sm','vp-md','vp-lg','vp-xl');
+    if      (w <= BP.xs) root.classList.add('vp-xs');
+    else if (w <= BP.sm) root.classList.add('vp-sm');
+    else if (w <= BP.md) root.classList.add('vp-md');
+    else if (w <= BP.lg) root.classList.add('vp-lg');
+    else                  root.classList.add('vp-xl');
+  }
+
+  // ── MOBILE MENU AUTO-CLOSE ON RESIZE ────────────────────────────────────
+  function handleMenuOnResize() {
+    if (vw() > BP.lg) {
+      var menu = document.querySelector('.mobile-menu');
+      var hamburger = document.querySelector('.hamburger');
+      if (menu && menu.classList.contains('open')) {
+        menu.classList.remove('open');
+        if (hamburger) hamburger.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    }
+  }
+
+  // ── ROSTER MODAL: REFLOW ON RESIZE ──────────────────────────────────────
+  function handleModalOnResize() {
+    var overlay = document.getElementById('roster-modal-overlay');
+    if (!overlay || !overlay.classList.contains('open')) return;
+    // Force reflow so the modal scrolls properly after resize
+    var modal = overlay.querySelector('.roster-modal');
+    if (modal) {
+      modal.style.maxHeight = '';
+      void modal.offsetHeight; // trigger reflow
+    }
+  }
+
+  // ── ORB SIZE SCALING ─────────────────────────────────────────────────────
+  // Scales decorative orbs proportionally to viewport so they don't overflow
+  function scaleOrbs() {
+    var w = vw();
+    var orbPink = document.querySelector('.orb-pink');
+    var orbCyan = document.querySelector('.orb-cyan');
+    if (!orbPink || !orbCyan) return;
+    var scale = Math.min(1, w / 1200);
+    var pSize = Math.round(500 * scale);
+    var cSize = Math.round(400 * scale);
+    orbPink.style.width  = pSize + 'px';
+    orbPink.style.height = pSize + 'px';
+    orbCyan.style.width  = cSize + 'px';
+    orbCyan.style.height = cSize + 'px';
+  }
+
+  // ── HERO MIN-HEIGHT FIX (100vh vs 100svh fallback) ──────────────────────
+  // Fixes the "address bar" height issue on mobile browsers
+  function fixHeroHeight() {
+    var hero = document.getElementById('hero');
+    if (!hero) return;
+    // Use actual inner height for hero min-height on mobile
+    if (vw() <= BP.sm) {
+      hero.style.minHeight = vh() + 'px';
+    } else {
+      hero.style.minHeight = '';
+    }
+  }
+
+  // ── MAIN ADJUST FUNCTION ────────────────────────────────────────────────
+  function onResize() {
+    applyViewportClass();
+    handleMenuOnResize();
+    handleModalOnResize();
+    scaleOrbs();
+    fixHeroHeight();
+  }
+
+  // ── DEBOUNCE FOR PERFORMANCE ────────────────────────────────────────────
+  var resizeTimer;
+  function debouncedResize() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(onResize, 60);
+  }
+
+  // ── LISTEN TO RESIZE & ORIENTATION CHANGE ──────────────────────────────
+  window.addEventListener('resize', debouncedResize, { passive: true });
+  window.addEventListener('orientationchange', function() {
+    // Delay slightly to let browser settle after orientation change
+    setTimeout(onResize, 200);
+  }, { passive: true });
+
+  // ── VISIBILITY CHANGE (minimize/restore tab/window) ─────────────────────
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') {
+      // Re-run adjust when window is restored from minimized/hidden state
+      onResize();
+    }
+  });
+
+  // ── RESIZE OBSERVER on main content ────────────────────────────────────
+  // Catches layout shifts that window.resize might miss (e.g. scrollbar appear/disappear)
+  if (typeof ResizeObserver !== 'undefined') {
+    var ro = new ResizeObserver(function(entries) {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(onResize, 60);
+    });
+    ro.observe(document.body);
+  }
+
+  // ── INITIAL RUN ─────────────────────────────────────────────────────────
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', onResize);
+  } else {
+    onResize();
+  }
+
 })();
 </script>
 
