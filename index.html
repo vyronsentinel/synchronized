@@ -5233,11 +5233,13 @@ async function submitApplication() {
       }
     }
 
-    // ── SHUFFLE playlist on load (Fisher-Yates) ──
+    // ── SHUFFLE playlist on load (Fisher-Yates) — blush.mp3 always plays first ──
+    const firstTrack = playlist.shift();
     for (let i = playlist.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [playlist[i], playlist[j]] = [playlist[j], playlist[i]];
     }
+    playlist.unshift(firstTrack);
 
     // Build playlist DOM
     const container = document.getElementById('playlist-items');
@@ -5303,16 +5305,16 @@ async function submitApplication() {
       }
     };
 
-    // Load first track silently
+    // Load blush (track 0) silently — always starts here regardless of autoplay block
     loadTrack(0, false);
     audio.volume = 0.5;
 
     // Try autoplay on page load
     window.addEventListener('load', () => { audio.muted = false; toggleMusic(); });
 
-    // Fallback: autoplay on first user interaction
+    // Fallback: autoplay on first user interaction — re-loads track 0 in case src was lost
     const enableAutoplay = () => {
-      if (!isPlaying) toggleMusic();
+      if (!isPlaying) { loadTrack(0, false); toggleMusic(); }
       document.removeEventListener('mousedown', enableAutoplay);
       document.removeEventListener('keydown',   enableAutoplay);
       document.removeEventListener('touchstart',enableAutoplay);
