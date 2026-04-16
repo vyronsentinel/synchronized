@@ -2221,8 +2221,8 @@
             </div>
           </div>
 
-          <div class="gallery-item" onclick="openLightbox('MOST.png')">
-            <img src="MOST.png" alt="Valentine's ReVibe — Full Squad"
+          <div class="gallery-item" onclick="openLightbox('FAM.png')">
+            <img src="FAM.PNG" alt="Valentine's ReVibe — Full Squad"
               style="object-position: bottom;"
               onerror="this.style.background='linear-gradient(135deg,#0a0020,#1a0030)';this.style.minHeight='130px'">
             <div class="gallery-item-label">
@@ -5233,13 +5233,11 @@ async function submitApplication() {
       }
     }
 
-    // ── SHUFFLE playlist on load (Fisher-Yates) — blush.mp3 always plays first ──
-    const firstTrack = playlist.shift();
+    // ── SHUFFLE playlist on load (Fisher-Yates) ──
     for (let i = playlist.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [playlist[i], playlist[j]] = [playlist[j], playlist[i]];
     }
-    playlist.unshift(firstTrack);
 
     // Build playlist DOM
     const container = document.getElementById('playlist-items');
@@ -5305,16 +5303,16 @@ async function submitApplication() {
       }
     };
 
-    // Load blush (track 0) silently — always starts here regardless of autoplay block
+    // Load first track silently
     loadTrack(0, false);
     audio.volume = 0.5;
 
     // Try autoplay on page load
     window.addEventListener('load', () => { audio.muted = false; toggleMusic(); });
 
-    // Fallback: autoplay on first user interaction — re-loads track 0 in case src was lost
+    // Fallback: autoplay on first user interaction
     const enableAutoplay = () => {
-      if (!isPlaying) { loadTrack(0, false); toggleMusic(); }
+      if (!isPlaying) toggleMusic();
       document.removeEventListener('mousedown', enableAutoplay);
       document.removeEventListener('keydown',   enableAutoplay);
       document.removeEventListener('touchstart',enableAutoplay);
