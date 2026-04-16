@@ -16,6 +16,7 @@
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src 'self' https://fonts.gstatic.com;
   img-src 'self' data: https://synchronized.site https://sync-worker.lastresort962.workers.dev;
+  media-src 'self';
   connect-src 'self' https://sync-worker.lastresort962.workers.dev https://discord.com;
   frame-ancestors 'none';
   base-uri 'self';
@@ -5194,12 +5195,12 @@ async function submitApplication() {
 
     // ── PLAYLIST — edit your songs here ──
     const playlist = [
+      { src: 'blush.mp3', label: 'Blush - BINI' },  
       { src: 'allstar.mp3', label: 'All Star - Smash Mouth' },
       { src: 'celepretty.mp3', label: 'Celepretty - Park Boram' },
       { src: 'paradise.mp3', label: 'Paradise - T-MAX' },
       { src: 'swd.mp3',   label: 'She Was Dead - SR-17' },
       { src: 'lolipop.mp3', label: 'Lolipop - BigBang & 2NE1' }
-        { src: 'blush.mp3', label: 'Blush - BINI' },
     ];
 
     function updateBars(playing) {
