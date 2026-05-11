@@ -133,7 +133,7 @@
     @keyframes skelShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
     @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
     .posts-empty { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; color: rgba(136,136,170,0.45); text-transform: uppercase; text-align: center; padding: 1.5rem 0; }
-    .admin-mode-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; margin-bottom: 1.35rem; }
+    .admin-mode-switch { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; margin-bottom: 1.35rem; }
     .admin-mode-btn { background: rgba(0,240,255,0.04); border: 1px solid rgba(0,240,255,0.22); color: var(--muted); font-family: 'Orbitron', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 12px 14px; border-radius: 2px; cursor: pointer; transition: all 0.2s; }
     .admin-mode-btn:hover { border-color: rgba(0,240,255,0.5); color: var(--cyan); background: rgba(0,240,255,0.08); }
     .admin-mode-btn.active { background: var(--pink); border-color: var(--pink); color: #fff; box-shadow: 0 8px 26px rgba(255,45,120,0.24); }
@@ -225,6 +225,7 @@
   <div class="admin-mode-switch" role="group" aria-label="Choose admin action">
     <button type="button" class="admin-mode-btn active" id="modeAnnouncementBtn" aria-pressed="true" onclick="switchAdminTool('announcement')">Announcement</button>
     <button type="button" class="admin-mode-btn" id="modeReleasesBtn" aria-pressed="false" onclick="switchAdminTool('releases')">8Keys Releases</button>
+    <button type="button" class="admin-mode-btn" id="modeRosterBtn" aria-pressed="false" onclick="switchAdminTool('roster')">Roster</button>
   </div>
   <div class="admin-tool-panel" id="announcementTool">
   <div class="msg" id="postMsg"></div>
@@ -289,6 +290,44 @@
     <div class="release-list">
       <div class="posts-label">Current 8Keys Releases</div>
       <div id="releaseList"></div>
+    </div>
+  </div>
+
+  <div class="release-manager admin-tool-panel" id="rosterManager" hidden>
+    <div class="posts-label">Clan Roster</div>
+    <p class="release-help">Manage clan members and their roles.</p>
+    <div class="msg" id="rosterMsg"></div>
+
+    <input type="hidden" id="rosterEditIndex" value="-1">
+
+    <div class="field">
+      <label>Member Name</label>
+      <input type="text" id="rosterName" placeholder="e.g. [SYNC]-Luj-*CM">
+    </div>
+
+    <div class="field">
+      <label>Role</label>
+      <select id="rosterRole" style="width:100%;background:var(--dark3);border:1px solid rgba(0,240,255,0.15);color:var(--text);font-family:'Exo 2',sans-serif;font-size:0.93rem;padding:0.72rem 0.95rem;border-radius:2px;outline:none;">
+        <option value="clan-master">♛ Clan Master</option>
+        <option value="vice">♜ Vice Clan Master</option>
+        <option value="high-council">◈ High Council</option>
+        <option value="mod">⬡ Moderator</option>
+        <option value="examiner">◎ Examiner</option>
+        <option value="recruiter">✦ Recruiter</option>
+        <option value="member">◆ Member</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Avatar URL (optional)</label>
+      <input type="text" id="rosterAvatar" placeholder="https://example.com/avatar.png">
+    </div>
+
+    <button class="btn-primary" id="saveRosterBtn" onclick="saveRosterMember()">&#9654;&nbsp; Add Member</button>
+
+    <div class="release-list">
+      <div class="posts-label">Current Roster</div>
+      <div id="rosterList"></div>
     </div>
   </div>
 
@@ -745,28 +784,44 @@
   function switchAdminTool(tool) {
     var announcementTool = document.getElementById('announcementTool');
     var releaseTool = document.getElementById('releaseManager');
+    var rosterTool = document.getElementById('rosterManager');
     var announcementBtn = document.getElementById('modeAnnouncementBtn');
     var releaseBtn = document.getElementById('modeReleasesBtn');
+    var rosterBtn = document.getElementById('modeRosterBtn');
     var label = document.querySelector('#adminBox .box-label');
     var title = document.querySelector('#adminBox .box-title');
+    var isAnnouncement = tool === 'announcement';
     var isReleases = tool === 'releases';
+    var isRoster = tool === 'roster';
 
-    announcementTool.hidden = isReleases;
+    announcementTool.hidden = !isAnnouncement;
     releaseTool.hidden = !isReleases;
-    announcementBtn.classList.toggle('active', !isReleases);
+    rosterTool.hidden = !isRoster;
+    announcementBtn.classList.toggle('active', isAnnouncement);
     releaseBtn.classList.toggle('active', isReleases);
-    announcementBtn.setAttribute('aria-pressed', isReleases ? 'false' : 'true');
+    rosterBtn.classList.toggle('active', isRoster);
+    announcementBtn.setAttribute('aria-pressed', isAnnouncement ? 'true' : 'false');
     releaseBtn.setAttribute('aria-pressed', isReleases ? 'true' : 'false');
+    rosterBtn.setAttribute('aria-pressed', isRoster ? 'true' : 'false');
 
-    label.textContent = isReleases ? '8Keys Release Panel' : 'Announcement Panel';
-    title.innerHTML = isReleases ? 'Add <span>8Keys Release</span>' : 'Post <span>Announcement</span>';
-    if (isReleases) initReleaseManager();
+    if (isReleases) {
+      label.textContent = '8Keys Release Panel';
+      title.innerHTML = 'Add <span>8Keys Release</span>';
+      initReleaseManager();
+    } else if (isRoster) {
+      label.textContent = 'Clan Roster Panel';
+      title.innerHTML = 'Manage <span>Clan Roster</span>';
+      initRosterManager();
+    } else {
+      label.textContent = 'Announcement Panel';
+      title.innerHTML = 'Post <span>Announcement</span>';
+    }
   }
 
   function getRequestedAdminTool() {
     try {
       var tool = new URLSearchParams(window.location.search).get('tool');
-      return tool === 'releases' ? 'releases' : tool === 'announcement' ? 'announcement' : '';
+      return tool === 'releases' ? 'releases' : tool === 'roster' ? 'roster' : tool === 'announcement' ? 'announcement' : '';
     } catch(e) {
       return '';
     }
@@ -1016,6 +1071,176 @@
         return escHtml(song.title || 'Untitled') + (song.artist ? ' by ' + escHtml(song.artist) : '') + (song.difficulty !== undefined && song.difficulty !== '' ? ' [' + escHtml(song.difficulty) + '/10 stars]' : '') + (song.bpm ? ' / ' + escHtml(song.bpm) + ' BPM' : '') + (song.duration ? ' / ' + escHtml(song.duration) : '') + ' - ' + escHtml(versions) + (song.experimental ? ' - Experimental' : '') + (song.edited ? ' - Updated' : '');
       }).join('<br>');
       return '<div class="release-item"><div class="release-item-head"><div><div class="release-item-title">' + escHtml(item.poster || 'Release') + '</div><div class="release-item-meta">' + (item.label ? escHtml(item.label) + ' / ' : '') + escHtml((item.songs || []).length) + ' song' + ((item.songs || []).length === 1 ? '' : 's') + '</div></div><div class="release-item-buttons"><button type="button" class="release-mini-btn" onclick="editRelease(' + index + ')">Edit</button><button type="button" class="release-mini-btn delete" onclick="deleteRelease(' + index + ')">Delete</button></div></div><div class="release-item-songs">' + songs + '</div></div>';
+    }).join('');
+  }
+
+  // ── ROSTER MANAGER ──
+  const ROSTER_STORAGE_KEY = 'idate_clan_roster';
+  const ROSTER_POST_PREFIX = '__SYNC_ROSTER__';
+  const ROSTER_POST_AUTHOR = 'SYNC-ROSTER';
+  const ROSTER_ROLES = [
+    { id: 'clan-master',   label: '♛ Clan Master' },
+    { id: 'vice',          label: '♜ Vice Clan Master' },
+    { id: 'high-council',  label: '◈ High Council' },
+    { id: 'mod',           label: '⬡ Moderator' },
+    { id: 'examiner',      label: '◎ Examiner' },
+    { id: 'recruiter',     label: '✦ Recruiter' },
+    { id: 'member',        label: '◆ Member' }
+  ];
+  var rosterCache = [];
+
+  function isRosterPost(post) {
+    return !!(post && typeof post.content === 'string' && post.content.indexOf(ROSTER_POST_PREFIX) === 0);
+  }
+
+  function rosterToPost(member) {
+    return {
+      author: ROSTER_POST_AUTHOR,
+      content: ROSTER_POST_PREFIX + JSON.stringify(member),
+      images: [],
+      timestamp: member.updatedAt || new Date().toISOString()
+    };
+  }
+
+  function rosterFromPost(post) {
+    try {
+      return JSON.parse(String(post.content || '').slice(ROSTER_POST_PREFIX.length));
+    } catch(e) {
+      return null;
+    }
+  }
+
+  async function initRosterManager() {
+    await loadRoster();
+    renderRosterList();
+  }
+
+  function getRoster() {
+    return rosterCache.slice();
+  }
+
+  function getLocalRoster() {
+    try {
+      var saved = localStorage.getItem(ROSTER_STORAGE_KEY);
+      if (!saved) return [];
+      var parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch(e) {
+      return [];
+    }
+  }
+
+  async function loadRoster() {
+    try {
+      var posts = await fetchAllPosts();
+      rosterCache = posts.map(rosterFromPost).filter(Boolean);
+      if (!rosterCache.length) rosterCache = getLocalRoster();
+      localStorage.setItem(ROSTER_STORAGE_KEY, JSON.stringify(rosterCache));
+    } catch(e) {
+      rosterCache = getLocalRoster();
+      showRosterMsg('Using local roster data. Shared sync could not load.', 'error');
+    }
+  }
+
+  async function setRoster(items) {
+    rosterCache = items.slice();
+    localStorage.setItem(ROSTER_STORAGE_KEY, JSON.stringify(items));
+    var posts = await fetchAllPosts();
+    var visiblePosts = posts.filter(function(post) { return !isRosterPost(post); });
+    var rosterPosts = items.map(rosterToPost);
+    var saveRes = await fetch(WORKER_URL + '/save?secret=' + SECRET, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(visiblePosts.concat(rosterPosts))
+    });
+    if (!saveRes.ok) throw new Error('Roster sync failed: HTTP ' + saveRes.status);
+  }
+
+  function showRosterMsg(text, type) {
+    var msg = document.getElementById('rosterMsg');
+    msg.textContent = text;
+    msg.className = 'msg ' + (type || 'success');
+    msg.style.display = 'block';
+    setTimeout(function() { msg.style.display = 'none'; }, 2300);
+  }
+
+  function readRosterForm() {
+    var name = document.getElementById('rosterName').value.trim();
+    var role = document.getElementById('rosterRole').value;
+    var avatar = document.getElementById('rosterAvatar').value.trim();
+    if (!name) throw new Error('Member name is required.');
+    if (!role) throw new Error('Please select a role.');
+    var member = { name: name, role: role };
+    if (avatar) member.avatar = avatar;
+    member.updatedAt = new Date().toISOString();
+    return member;
+  }
+
+  function resetRosterForm() {
+    document.getElementById('rosterEditIndex').value = '-1';
+    document.getElementById('rosterName').value = '';
+    document.getElementById('rosterRole').value = 'member';
+    document.getElementById('rosterAvatar').value = '';
+    document.getElementById('saveRosterBtn').innerHTML = '&#9654;&nbsp; Add Member';
+  }
+
+  async function saveRosterMember() {
+    try {
+      var member = readRosterForm();
+      var items = getRoster();
+      var editIndex = Number(document.getElementById('rosterEditIndex').value);
+      if (editIndex >= 0) {
+        items[editIndex] = member;
+        showRosterMsg('Member updated.', 'success');
+      } else {
+        items.push(member);
+        showRosterMsg('Member added.', 'success');
+      }
+      await setRoster(items);
+      resetRosterForm();
+      renderRosterList();
+    } catch(e) {
+      showRosterMsg(e.message, 'error');
+    }
+  }
+
+  function editRosterMember(index) {
+    var item = getRoster()[index];
+    if (!item) return;
+    document.getElementById('rosterEditIndex').value = index;
+    document.getElementById('rosterName').value = item.name || '';
+    document.getElementById('rosterRole').value = item.role || 'member';
+    document.getElementById('rosterAvatar').value = item.avatar || '';
+    document.getElementById('saveRosterBtn').innerHTML = '&#9654;&nbsp; Update Member';
+    document.getElementById('rosterManager').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  async function deleteRosterMember(index) {
+    var ok = await showConfirm('Remove member?', 'This removes the member from the clan roster.', '🗑️');
+    if (!ok) return;
+    var items = getRoster();
+    items.splice(index, 1);
+    await setRoster(items);
+    renderRosterList();
+    showRosterMsg('Member removed.', 'success');
+  }
+
+  function roleLabel(roleId) {
+    var found = ROSTER_ROLES.filter(function(r) { return r.id === roleId; });
+    return found.length ? found[0].label : roleId;
+  }
+
+  function renderRosterList() {
+    var list = document.getElementById('rosterList');
+    if (!list) return;
+    var items = getRoster();
+    if (!items.length) {
+      list.innerHTML = '<div class="posts-empty">No roster members saved yet</div>';
+      return;
+    }
+    list.innerHTML = items.map(function(item, index) {
+      var avatarHtml = item.avatar ? '<img src="' + escHtml(item.avatar) + '" alt="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(0,240,255,0.2);vertical-align:middle;margin-right:8px;">' : '';
+      return '<div class="release-item"><div class="release-item-head"><div>' + avatarHtml + '<span class="release-item-title">' + escHtml(item.name) + '</span><div class="release-item-meta">' + roleLabel(item.role) + '</div></div><div class="release-item-buttons"><button type="button" class="release-mini-btn" onclick="editRosterMember(' + index + ')">Edit</button><button type="button" class="release-mini-btn delete" onclick="deleteRosterMember(' + index + ')">Delete</button></div></div></div>';
     }).join('');
   }
 
