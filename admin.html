@@ -1314,7 +1314,6 @@
   }
 
   // GALLERY MANAGER
-  const GALLERY_STORAGE_KEY = 'sync_photo_gallery';
   const GALLERY_POST_PREFIX = '__SYNC_GALLERY_PHOTO__';
   const GALLERY_POST_AUTHOR = 'SYNC-GALLERY';
   var galleryCache = [];
@@ -1354,41 +1353,18 @@
     return galleryCache.slice();
   }
 
-  function getLocalGallery() {
-    try {
-      var saved = localStorage.getItem(GALLERY_STORAGE_KEY);
-      if (!saved) return [];
-      var parsed = JSON.parse(saved);
-      return Array.isArray(parsed) ? parsed.filter(function(item) {
-        return item && typeof item.src === 'string' && item.src.trim();
-      }) : [];
-    } catch(e) {
-      return [];
-    }
-  }
-
-  function cacheGallery(items) {
-    try {
-      localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(items));
-    } catch(e) {
-      // Large base64 photos can exceed browser cache quota; cloud save should still continue.
-    }
-  }
-
   async function loadGallery() {
     try {
       var posts = await fetchAllPosts();
       galleryCache = posts.map(galleryFromPost).filter(Boolean);
-      cacheGallery(galleryCache);
     } catch(e) {
-      galleryCache = getLocalGallery();
-      showGalleryMsg('Using local photo data. Shared sync could not load.', 'error');
+      galleryCache = [];
+      showGalleryMsg('Shared photo sync could not load.', 'error');
     }
   }
 
   async function setGallery(items) {
     galleryCache = items.slice();
-    cacheGallery(items);
     var posts = await fetchAllPosts();
     var visiblePosts = posts.filter(function(post) { return !isGalleryPost(post); });
     var galleryPosts = items.map(galleryToPost);

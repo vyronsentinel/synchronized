@@ -1502,7 +1502,7 @@
     gap: 1rem;
   }
 
-  /* Featured image (MOST.png) - full width hero */
+  /* Featured gallery image */
   .gallery-featured {
     position: relative;
     border-radius: 4px;
@@ -1618,6 +1618,34 @@
     font-size: 0.6rem;
     margin-bottom: 1px;
   }
+  .gallery-empty {
+    min-height: 280px;
+    border: 1px solid rgba(0,240,255,0.16);
+    background: linear-gradient(135deg, rgba(0,240,255,0.05), rgba(255,45,120,0.04));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(218,231,230,0.55);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 1.5rem;
+  }
+  .gallery-more-btn {
+    background: transparent;
+    border: 1px solid rgba(0,240,255,0.24);
+    color: var(--cyan);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 7px 12px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .gallery-more-btn:hover { border-color: var(--cyan); background: rgba(0,240,255,0.06); }
 
   /* Corner accents on featured */
   .img-corner { position: absolute; width: 16px; height: 16px; z-index: 3; }
@@ -1673,6 +1701,58 @@
     z-index: 1000001;
   }
   #lightbox-close:hover { color: var(--hot-pink); border-color: var(--hot-pink); }
+
+  .gallery-popup {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5,5,16,0.96);
+    z-index: 999998;
+    padding: clamp(1rem, 4vw, 3rem);
+    overflow-y: auto;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .gallery-popup.open { display: block; }
+  .gallery-popup-panel {
+    width: min(1120px, 100%);
+    margin: 0 auto;
+    border: 1px solid rgba(0,240,255,0.18);
+    background: rgba(10,10,30,0.78);
+    padding: clamp(1rem, 3vw, 1.6rem);
+    position: relative;
+  }
+  .gallery-popup-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .gallery-popup-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #fff;
+    font-size: clamp(1rem, 3vw, 1.4rem);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .gallery-popup-title span { color: var(--cyan); }
+  .gallery-popup-close {
+    background: transparent;
+    border: 1px solid rgba(255,45,120,0.35);
+    color: var(--hot-pink);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+  .gallery-popup-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+  }
 
   @media (max-width: 600px) {
     .gallery-grid { grid-template-columns: 1fr; gap: 0.8rem; }
@@ -2642,56 +2722,28 @@
       <div class="about-visual">
 
         <!-- Featured image -->
-        <div class="gallery-featured" id="gallery-featured">
+        <div class="gallery-featured" id="gallery-featured" hidden>
           <div class="img-corner tl"></div>
           <div class="img-corner tr"></div>
           <div class="img-corner bl"></div>
           <div class="img-corner br"></div>
-          <img id="gallery-featured-img" src="MOST.png" alt="SYNCHRONIZED Clan — Valentine's ReVibe"
+          <img id="gallery-featured-img" src="" alt="SYNCHRONIZED photo"
             onclick="openLightbox(this.src)"
             onerror="this.style.background='linear-gradient(135deg,#1a0030,#050020)';this.style.minHeight='240px'">
           <div class="gallery-featured-label">
             <div class="dot"></div>
-            <span id="gallery-featured-title">SYNCHRONIZED — Valentine's ReVibe Event</span>
+            <span id="gallery-featured-title">SYNCHRONIZED ARCHIVE</span>
           </div>
         </div>
 
         <!-- Gallery grid -->
-        <div class="gallery-grid" id="gallery-grid">
-
-          <div class="gallery-item" onclick="openLightbox('2_upscaled.png')">
-            <img src="2_upscaled.png" alt="On the Rocks — SYNC Room"
-              onerror="this.style.background='linear-gradient(135deg,#0a0020,#1a0030)';this.style.minHeight='130px'">
-            <div class="gallery-item-label">
-              <strong>IN-GAME</strong>
-              On the Rocks · SYNC Room
-            </div>
-          </div>
-
-          <div class="gallery-item" onclick="openLightbox('JAM.png')">
-            <img src="JAM.png" alt="In Loving Memory"
-              onerror="this.style.background='linear-gradient(135deg,#0a0020,#1a0030)';this.style.minHeight='130px'">
-            <div class="gallery-item-label">
-              <strong>TRIBUTE</strong>
-              In Loving Memory
-            </div>
-          </div>
-
-          <div class="gallery-item" onclick="openLightbox('FAM.PNG')">
-            <img src="FAM.PNG" alt="Get Together"
-              style="object-position: bottom;"
-              onerror="this.style.background='linear-gradient(135deg,#0a0020,#1a0030)';this.style.minHeight='130px'">
-            <div class="gallery-item-label">
-              <strong>SQUAD</strong>
-              Squad Selfie
-            </div>
-          </div>
-
-        </div>
+        <div class="gallery-grid" id="gallery-grid"></div>
+        <div class="gallery-empty" id="gallery-empty">No gallery photos yet</div>
 
         <!-- Gallery count tag -->
-        <div style="text-align:right; margin-top:0.25rem;">
-          <span id="gallery-count-tag" style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:0.2em; color:var(--muted);">[ 4 PHOTOS · SYNCHRONIZED ARCHIVE ]</span>
+        <div style="display:flex;justify-content:flex-end;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-top:0.25rem;">
+          <button type="button" class="gallery-more-btn" id="gallery-more-btn" onclick="openGalleryPopup()" hidden>View Gallery</button>
+          <span id="gallery-count-tag" style="font-family:'Share Tech Mono',monospace; font-size:0.6rem; letter-spacing:0.2em; color:var(--muted);">[ 0 PHOTOS · SYNCHRONIZED ARCHIVE ]</span>
         </div>
 
       </div>
@@ -2700,6 +2752,17 @@
 <div id="lightbox" onclick="closeLightbox()">
   <img id="lightbox-img" src="" alt="Gallery">
   <button id="lightbox-close" onclick="closeLightbox()">✕ CLOSE</button>
+</div>
+
+<!-- GALLERY POPUP -->
+<div class="gallery-popup" id="gallery-popup" onclick="closeGalleryPopup(event)">
+  <div class="gallery-popup-panel" onclick="event.stopPropagation()">
+    <div class="gallery-popup-head">
+      <div class="gallery-popup-title">Photo <span>Gallery</span></div>
+      <button type="button" class="gallery-popup-close" onclick="closeGalleryPopup()">Close</button>
+    </div>
+    <div class="gallery-popup-grid" id="gallery-popup-grid"></div>
+  </div>
 </div>
     </div>
   </div>
@@ -6163,38 +6226,13 @@ async function submitApplication() {
 <script>
 (function() {
   const WORKER_URL = 'https://sync-worker.lastresort962.workers.dev';
-  const GALLERY_STORAGE_KEY = 'sync_photo_gallery';
   const GALLERY_POST_PREFIX = '__SYNC_GALLERY_PHOTO__';
-
-  const fallbackGallery = [
-    { title: "SYNCHRONIZED - Valentine's ReVibe Event", category: 'EVENT', caption: "SYNCHRONIZED - Valentine's ReVibe Event", src: 'MOST.png', featured: true },
-    { title: 'On the Rocks - SYNC Room', category: 'IN-GAME', caption: 'On the Rocks · SYNC Room', src: '2_upscaled.png' },
-    { title: 'In Loving Memory', category: 'TRIBUTE', caption: 'In Loving Memory', src: 'JAM.png' },
-    { title: 'Squad Selfie', category: 'SQUAD', caption: 'Squad Selfie', src: 'FAM.PNG', objectPosition: 'bottom' }
-  ];
+  let fullGallery = [];
 
   function esc(text) {
     return String(text || '').replace(/[&<>"']/g, function(char) {
       return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
     });
-  }
-
-  function localGallery() {
-    try {
-      const saved = localStorage.getItem(GALLERY_STORAGE_KEY);
-      const parsed = saved ? JSON.parse(saved) : [];
-      return normalizeGallery(parsed);
-    } catch (error) {
-      return [];
-    }
-  }
-
-  function cacheGallery(items) {
-    try {
-      localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(items));
-    } catch (error) {
-      // Large cloud images can exceed browser cache quota; rendering should still use fetched data.
-    }
   }
 
   function normalizeGallery(items) {
@@ -6217,23 +6255,47 @@ async function submitApplication() {
           return null;
         }
       }).filter(Boolean) : []);
-      cacheGallery(items);
       return items;
     } catch (error) {
-      return localGallery();
+      return [];
     }
   }
 
+  function galleryCard(item, className) {
+    const safeSrc = esc(item.src);
+    const safeTitle = esc(item.title || item.caption || 'SYNCHRONIZED photo');
+    const safeCategory = esc(item.category || 'ARCHIVE');
+    const safeCaption = esc(item.caption || item.title || '');
+    const objectPosition = item.objectPosition ? ' style="object-position:' + esc(item.objectPosition) + ';"' : '';
+    return '<div class="' + className + '" onclick="openLightbox(\'' + safeSrc.replace(/'/g, '&#39;') + '\')">' +
+      '<img src="' + safeSrc + '" alt="' + safeTitle + '"' + objectPosition + ' loading="lazy" onerror="this.style.background=\'linear-gradient(135deg,#0a0020,#1a0030)\';this.style.minHeight=\'130px\'">' +
+      '<div class="gallery-item-label"><strong>' + safeCategory + '</strong>' + safeCaption + '</div></div>';
+  }
+
   function renderGallery(items) {
-    const validItems = normalizeGallery(items);
-    const gallery = validItems.length ? validItems : fallbackGallery;
+    const gallery = normalizeGallery(items);
+    fullGallery = gallery;
     const featuredIndex = Math.max(0, gallery.findIndex(item => item && item.featured));
     const featured = gallery[featuredIndex] || gallery[0];
-    const rest = gallery.filter((_, index) => index !== featuredIndex);
+    const rest = gallery.filter((_, index) => index !== featuredIndex).slice(0, 4);
+    const featuredWrap = document.getElementById('gallery-featured');
     const featuredImg = document.getElementById('gallery-featured-img');
     const featuredTitle = document.getElementById('gallery-featured-title');
     const grid = document.getElementById('gallery-grid');
+    const empty = document.getElementById('gallery-empty');
     const countTag = document.getElementById('gallery-count-tag');
+    const moreBtn = document.getElementById('gallery-more-btn');
+    if (!gallery.length) {
+      if (featuredWrap) featuredWrap.hidden = true;
+      if (grid) grid.innerHTML = '';
+      if (empty) empty.style.display = 'flex';
+      if (moreBtn) moreBtn.hidden = true;
+      if (countTag) countTag.textContent = '[ 0 PHOTOS · SYNCHRONIZED ARCHIVE ]';
+      renderGalleryPopup([]);
+      return;
+    }
+    if (featuredWrap) featuredWrap.hidden = false;
+    if (empty) empty.style.display = 'none';
     if (featuredImg && featured) {
       featuredImg.src = featured.src;
       featuredImg.alt = featured.title || featured.caption || 'SYNCHRONIZED photo';
@@ -6243,21 +6305,39 @@ async function submitApplication() {
       featuredTitle.textContent = featured.caption || featured.title || 'SYNCHRONIZED Archive';
     }
     if (grid) {
-      grid.innerHTML = rest.map(function(item) {
-        const safeSrc = esc(item.src);
-        const safeTitle = esc(item.title || item.caption || 'SYNCHRONIZED photo');
-        const safeCategory = esc(item.category || 'ARCHIVE');
-        const safeCaption = esc(item.caption || item.title || '');
-        const objectPosition = item.objectPosition ? ' style="object-position:' + esc(item.objectPosition) + ';"' : '';
-        return '<div class="gallery-item" onclick="openLightbox(\'' + safeSrc.replace(/'/g, '&#39;') + '\')">' +
-          '<img src="' + safeSrc + '" alt="' + safeTitle + '"' + objectPosition + ' loading="lazy" onerror="this.style.background=\'linear-gradient(135deg,#0a0020,#1a0030)\';this.style.minHeight=\'130px\'">' +
-          '<div class="gallery-item-label"><strong>' + safeCategory + '</strong>' + safeCaption + '</div></div>';
-      }).join('');
+      grid.innerHTML = rest.map(item => galleryCard(item, 'gallery-item')).join('');
     }
     if (countTag) {
-      countTag.textContent = '[ ' + gallery.length + ' PHOTOS · SYNCHRONIZED ARCHIVE ]';
+      const shown = Math.min(gallery.length, 5);
+      countTag.textContent = '[ ' + shown + ' OF ' + gallery.length + ' PHOTOS · SYNCHRONIZED ARCHIVE ]';
     }
+    if (moreBtn) moreBtn.hidden = gallery.length === 0;
+    renderGalleryPopup(gallery);
   }
+
+  function renderGalleryPopup(items) {
+    const popupGrid = document.getElementById('gallery-popup-grid');
+    if (!popupGrid) return;
+    popupGrid.innerHTML = normalizeGallery(items).map(item => galleryCard(item, 'gallery-item')).join('');
+  }
+
+  window.openGalleryPopup = function() {
+    renderGalleryPopup(fullGallery);
+    const popup = document.getElementById('gallery-popup');
+    if (popup) {
+      popup.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+  };
+
+  window.closeGalleryPopup = function(event) {
+    if (event && event.target !== event.currentTarget) return;
+    const popup = document.getElementById('gallery-popup');
+    if (popup) {
+      popup.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  };
 
   fetchGallery().then(renderGallery);
 })();
