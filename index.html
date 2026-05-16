@@ -1568,10 +1568,10 @@
     flex-shrink: 0;
   }
 
-  /* 3-image sub-grid */
+  /* gallery sub-grid */
   .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 0.6rem;
   }
   .gallery-item {
@@ -2642,22 +2642,22 @@
       <div class="about-visual">
 
         <!-- Featured image -->
-        <div class="gallery-featured">
+        <div class="gallery-featured" id="gallery-featured">
           <div class="img-corner tl"></div>
           <div class="img-corner tr"></div>
           <div class="img-corner bl"></div>
           <div class="img-corner br"></div>
-          <img src="MOST.png" alt="SYNCHRONIZED Clan — Valentine's ReVibe"
+          <img id="gallery-featured-img" src="MOST.png" alt="SYNCHRONIZED Clan — Valentine's ReVibe"
             onclick="openLightbox(this.src)"
             onerror="this.style.background='linear-gradient(135deg,#1a0030,#050020)';this.style.minHeight='240px'">
           <div class="gallery-featured-label">
             <div class="dot"></div>
-            <span>SYNCHRONIZED — Valentine's ReVibe Event</span>
+            <span id="gallery-featured-title">SYNCHRONIZED — Valentine's ReVibe Event</span>
           </div>
         </div>
 
-        <!-- 3-image grid -->
-        <div class="gallery-grid">
+        <!-- Gallery grid -->
+        <div class="gallery-grid" id="gallery-grid">
 
           <div class="gallery-item" onclick="openLightbox('2_upscaled.png')">
             <img src="2_upscaled.png" alt="On the Rocks — SYNC Room"
@@ -3576,8 +3576,14 @@
   let popupOpen = false;
   let postsLoaded = false;
   const RELEASE_POST_PREFIX = '__SYNC_8KEYS_RELEASE__';
-  function isReleasePost(post) {
-    return !!(post && typeof post.content === 'string' && post.content.indexOf(RELEASE_POST_PREFIX) === 0);
+  const ROSTER_POST_PREFIX = '__SYNC_ROSTER__';
+  const GALLERY_POST_PREFIX = '__SYNC_GALLERY_PHOTO__';
+  function isManagedPost(post) {
+    return !!(post && typeof post.content === 'string' && (
+      post.content.indexOf(RELEASE_POST_PREFIX) === 0 ||
+      post.content.indexOf(ROSTER_POST_PREFIX) === 0 ||
+      post.content.indexOf(GALLERY_POST_PREFIX) === 0
+    ));
   }
 
   function timeAgo(iso) {
@@ -3642,7 +3648,7 @@
       const res   = await fetch(WORKER_URL + '/announcements', { cache: 'no-store' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       let posts = await res.json();
-      posts = Array.isArray(posts) ? posts.filter(post => !isReleasePost(post)) : posts;
+      posts = Array.isArray(posts) ? posts.filter(post => !isManagedPost(post)) : posts;
       if (skeleton) skeleton.remove();
       body.innerHTML = '';
       if (!Array.isArray(posts) || posts.length === 0) {
@@ -6154,6 +6160,94 @@ async function submitApplication() {
   if (gcTag) gcTag.textContent = `[ ${CLAN_CONFIG.photoCount} PHOTOS · SYNCHRONIZED ARCHIVE ]`;
 </script>
 
+<script>
+(function() {
+  const WORKER_URL = 'https://sync-worker.lastresort962.workers.dev';
+  const GALLERY_STORAGE_KEY = 'sync_photo_gallery';
+  const GALLERY_POST_PREFIX = '__SYNC_GALLERY_PHOTO__';
+
+  const fallbackGallery = [
+    { title: "SYNCHRONIZED - Valentine's ReVibe Event", category: 'EVENT', caption: "SYNCHRONIZED - Valentine's ReVibe Event", src: 'MOST.png', featured: true },
+    { title: 'On the Rocks - SYNC Room', category: 'IN-GAME', caption: 'On the Rocks · SYNC Room', src: '2_upscaled.png' },
+    { title: 'In Loving Memory', category: 'TRIBUTE', caption: 'In Loving Memory', src: 'JAM.png' },
+    { title: 'Squad Selfie', category: 'SQUAD', caption: 'Squad Selfie', src: 'FAM.PNG', objectPosition: 'bottom' }
+  ];
+
+  function esc(text) {
+    return String(text || '').replace(/[&<>"']/g, function(char) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
+    });
+  }
+
+  function localGallery() {
+    try {
+      const saved = localStorage.getItem(GALLERY_STORAGE_KEY);
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  async function fetchGallery() {
+    try {
+      const res = await fetch(WORKER_URL + '/announcements', { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const posts = await res.json();
+      const items = Array.isArray(posts) ? posts.map(function(post) {
+        try {
+          return post && typeof post.content === 'string' && post.content.indexOf(GALLERY_POST_PREFIX) === 0
+            ? JSON.parse(post.content.slice(GALLERY_POST_PREFIX.length))
+            : null;
+        } catch (error) {
+          return null;
+        }
+      }).filter(Boolean) : [];
+      localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(items));
+      return items;
+    } catch (error) {
+      return localGallery();
+    }
+  }
+
+  function renderGallery(items) {
+    const gallery = Array.isArray(items) && items.length ? items : fallbackGallery;
+    const featuredIndex = Math.max(0, gallery.findIndex(item => item && item.featured));
+    const featured = gallery[featuredIndex] || gallery[0];
+    const rest = gallery.filter((_, index) => index !== featuredIndex);
+    const featuredImg = document.getElementById('gallery-featured-img');
+    const featuredTitle = document.getElementById('gallery-featured-title');
+    const grid = document.getElementById('gallery-grid');
+    const countTag = document.getElementById('gallery-count-tag');
+    if (featuredImg && featured) {
+      featuredImg.src = featured.src;
+      featuredImg.alt = featured.title || featured.caption || 'SYNCHRONIZED photo';
+      featuredImg.style.objectPosition = featured.objectPosition || 'center top';
+    }
+    if (featuredTitle && featured) {
+      featuredTitle.textContent = featured.caption || featured.title || 'SYNCHRONIZED Archive';
+    }
+    if (grid) {
+      grid.innerHTML = rest.map(function(item) {
+        const safeSrc = esc(item.src);
+        const safeTitle = esc(item.title || item.caption || 'SYNCHRONIZED photo');
+        const safeCategory = esc(item.category || 'ARCHIVE');
+        const safeCaption = esc(item.caption || item.title || '');
+        const objectPosition = item.objectPosition ? ' style="object-position:' + esc(item.objectPosition) + ';"' : '';
+        return '<div class="gallery-item" onclick="openLightbox(\'' + safeSrc.replace(/'/g, '&#39;') + '\')">' +
+          '<img src="' + safeSrc + '" alt="' + safeTitle + '"' + objectPosition + ' loading="lazy" onerror="this.style.background=\'linear-gradient(135deg,#0a0020,#1a0030)\';this.style.minHeight=\'130px\'">' +
+          '<div class="gallery-item-label"><strong>' + safeCategory + '</strong>' + safeCaption + '</div></div>';
+      }).join('');
+    }
+    if (countTag) {
+      countTag.textContent = '[ ' + gallery.length + ' PHOTOS · SYNCHRONIZED ARCHIVE ]';
+    }
+  }
+
+  fetchGallery().then(renderGallery);
+})();
+</script>
+
 <!-- ══════════════════════════════════════════
      FIX 2 — SCROLL REVEAL
 ══════════════════════════════════════════ -->
@@ -6854,7 +6948,11 @@ async function submitApplication() {
       if (!res.ok) throw new Error('HTTP ' + res.status);
       let posts = await res.json();
       const visiblePosts = Array.isArray(posts)
-        ? posts.map((post, index) => ({ post, index })).filter(entry => !(entry.post && typeof entry.post.content === 'string' && entry.post.content.indexOf('__SYNC_8KEYS_RELEASE__') === 0))
+        ? posts.map((post, index) => ({ post, index })).filter(entry => !(entry.post && typeof entry.post.content === 'string' && (
+          entry.post.content.indexOf('__SYNC_8KEYS_RELEASE__') === 0 ||
+          entry.post.content.indexOf('__SYNC_ROSTER__') === 0 ||
+          entry.post.content.indexOf('__SYNC_GALLERY_PHOTO__') === 0
+        )))
         : [];
       if (!visiblePosts.length) {
         list.innerHTML = '<div style="font-family:Share Tech Mono,monospace;font-size:0.62rem;color:rgba(136,136,170,0.4);letter-spacing:0.15em;text-transform:uppercase;">No announcements yet</div>';
