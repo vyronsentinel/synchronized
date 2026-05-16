@@ -6183,10 +6183,16 @@ async function submitApplication() {
     try {
       const saved = localStorage.getItem(GALLERY_STORAGE_KEY);
       const parsed = saved ? JSON.parse(saved) : [];
-      return Array.isArray(parsed) ? parsed : [];
+      return normalizeGallery(parsed);
     } catch (error) {
       return [];
     }
+  }
+
+  function normalizeGallery(items) {
+    return Array.isArray(items)
+      ? items.filter(item => item && typeof item.src === 'string' && item.src.trim())
+      : [];
   }
 
   async function fetchGallery() {
@@ -6194,7 +6200,7 @@ async function submitApplication() {
       const res = await fetch(WORKER_URL + '/announcements', { cache: 'no-store' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const posts = await res.json();
-      const items = Array.isArray(posts) ? posts.map(function(post) {
+      const items = normalizeGallery(Array.isArray(posts) ? posts.map(function(post) {
         try {
           return post && typeof post.content === 'string' && post.content.indexOf(GALLERY_POST_PREFIX) === 0
             ? JSON.parse(post.content.slice(GALLERY_POST_PREFIX.length))
@@ -6202,7 +6208,7 @@ async function submitApplication() {
         } catch (error) {
           return null;
         }
-      }).filter(Boolean) : [];
+      }).filter(Boolean) : []);
       localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(items));
       return items;
     } catch (error) {
@@ -6211,7 +6217,8 @@ async function submitApplication() {
   }
 
   function renderGallery(items) {
-    const gallery = Array.isArray(items) && items.length ? items : fallbackGallery;
+    const validItems = normalizeGallery(items);
+    const gallery = validItems.length ? validItems : fallbackGallery;
     const featuredIndex = Math.max(0, gallery.findIndex(item => item && item.featured));
     const featured = gallery[featuredIndex] || gallery[0];
     const rest = gallery.filter((_, index) => index !== featuredIndex);

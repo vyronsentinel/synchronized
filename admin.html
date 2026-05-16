@@ -1338,7 +1338,8 @@
 
   function galleryFromPost(post) {
     try {
-      return JSON.parse(String(post.content || '').slice(GALLERY_POST_PREFIX.length));
+      var item = JSON.parse(String(post.content || '').slice(GALLERY_POST_PREFIX.length));
+      return item && typeof item.src === 'string' && item.src.trim() ? item : null;
     } catch(e) {
       return null;
     }
@@ -1358,7 +1359,9 @@
       var saved = localStorage.getItem(GALLERY_STORAGE_KEY);
       if (!saved) return [];
       var parsed = JSON.parse(saved);
-      return Array.isArray(parsed) ? parsed : [];
+      return Array.isArray(parsed) ? parsed.filter(function(item) {
+        return item && typeof item.src === 'string' && item.src.trim();
+      }) : [];
     } catch(e) {
       return [];
     }
