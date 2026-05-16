@@ -133,7 +133,7 @@
     @keyframes skelShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
     @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
     .posts-empty { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; color: rgba(136,136,170,0.45); text-transform: uppercase; text-align: center; padding: 1.5rem 0; }
-    .admin-mode-switch { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; margin-bottom: 1.35rem; }
+    .admin-mode-switch { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.7rem; margin-bottom: 1.35rem; }
     .admin-mode-btn { background: rgba(0,240,255,0.04); border: 1px solid rgba(0,240,255,0.22); color: var(--muted); font-family: 'Orbitron', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 12px 14px; border-radius: 2px; cursor: pointer; transition: all 0.2s; }
     .admin-mode-btn:hover { border-color: rgba(0,240,255,0.5); color: var(--cyan); background: rgba(0,240,255,0.08); }
     .admin-mode-btn.active { background: var(--pink); border-color: var(--pink); color: #fff; box-shadow: 0 8px 26px rgba(255,45,120,0.24); }
@@ -161,6 +161,11 @@
     .release-mini-btn:hover { background: rgba(0,240,255,0.08); color: var(--cyan); }
     .release-mini-btn.delete { border-color: rgba(255,45,120,0.24); color: rgba(255,45,120,0.74); }
     .release-mini-btn.delete:hover { background: rgba(255,45,120,0.1); color: var(--pink); }
+    .gallery-preview-wrap { display: none; position: relative; width: 150px; max-width: 100%; margin-top: 0.55rem; }
+    .gallery-preview-wrap img { width: 150px; height: 92px; object-fit: cover; border-radius: 3px; border: 1px solid rgba(0,240,255,0.2); }
+    .gallery-current-image { margin-top: -0.45rem; margin-bottom: 1rem; display: none; }
+    .gallery-current-image img { width: 100%; max-height: 150px; object-fit: cover; border: 1px solid rgba(0,240,255,0.16); border-radius: 3px; }
+    .gallery-item-thumb { width: 74px; height: 50px; object-fit: cover; border-radius: 3px; border: 1px solid rgba(0,240,255,0.2); vertical-align: middle; margin-right: 8px; }
     @media (max-width: 680px) { .admin-mode-switch, .release-grid, .song-fields-grid { grid-template-columns: 1fr; } .release-item-head { flex-direction: column; } }
     @media (max-width: 560px) { .box { padding: 1.75rem 1.1rem; } .box-title { font-size: 1.25rem; } }
 
@@ -226,6 +231,7 @@
     <button type="button" class="admin-mode-btn active" id="modeAnnouncementBtn" aria-pressed="true" onclick="switchAdminTool('announcement')">Announcement</button>
     <button type="button" class="admin-mode-btn" id="modeReleasesBtn" aria-pressed="false" onclick="switchAdminTool('releases')">8Keys Releases</button>
     <button type="button" class="admin-mode-btn" id="modeRosterBtn" aria-pressed="false" onclick="switchAdminTool('roster')">Roster</button>
+    <button type="button" class="admin-mode-btn" id="modeGalleryBtn" aria-pressed="false" onclick="switchAdminTool('gallery')">Photos</button>
   </div>
   <div class="admin-tool-panel" id="announcementTool">
   <div class="msg" id="postMsg"></div>
@@ -331,6 +337,57 @@
     </div>
   </div>
 
+  <div class="release-manager admin-tool-panel" id="galleryManager" hidden>
+    <div class="posts-label">Photo Gallery</div>
+    <p class="release-help">Add, edit, feature, reorder, and remove homepage gallery photos.</p>
+    <div class="msg" id="galleryMsg"></div>
+
+    <input type="hidden" id="galleryEditIndex" value="-1">
+
+    <div class="field">
+      <label>Photo Title</label>
+      <input type="text" id="galleryTitle" placeholder="SYNCHRONIZED Event">
+    </div>
+
+    <div class="field">
+      <label>Category</label>
+      <input type="text" id="galleryCategory" placeholder="IN-GAME, TRIBUTE, SQUAD">
+    </div>
+
+    <div class="field">
+      <label>Caption</label>
+      <input type="text" id="galleryCaption" placeholder="Short text shown over the photo">
+    </div>
+
+    <div class="field">
+      <label>Image</label>
+      <label class="tool-btn" style="margin:0;cursor:pointer;display:inline-block;">
+        &#128444; Choose Photo
+        <input type="file" id="galleryFileInput" accept="image/*" style="display:none;" onchange="handleGalleryImage(this)">
+      </label>
+      <div class="gallery-preview-wrap" id="galleryPreviewWrap">
+        <img src="" alt="Selected photo preview" id="galleryPreviewImg">
+        <button type="button" class="img-thumb-del" onclick="clearGalleryImage()">x</button>
+      </div>
+    </div>
+
+    <div class="gallery-current-image" id="galleryCurrentImage">
+      <div class="posts-label" style="margin-bottom:0.45rem;">Current Image</div>
+      <img src="" alt="Current gallery image" id="galleryCurrentImg">
+    </div>
+
+    <label class="check-pill" style="border-radius:2px;margin-bottom:1rem;">
+      <input type="checkbox" id="galleryFeatured"> Featured photo
+    </label>
+
+    <button class="btn-primary" id="saveGalleryBtn" onclick="saveGalleryPhoto()">&#9654;&nbsp; Add Photo</button>
+
+    <div class="release-list">
+      <div class="posts-label">Current Photos</div>
+      <div id="galleryList"></div>
+    </div>
+  </div>
+
   <button class="btn-secondary" onclick="confirmLogout()">&larr; Logout</button>
   <button class="btn-secondary" onclick="window.location.href='index.html'" style="margin-top:0.4rem;">&#8962;&nbsp; Back to Main Page</button>
 </div>
@@ -341,6 +398,7 @@
   const PASSWORD   = 'sync@admin2026';
 
   let pendingImages = [];
+  let pendingGalleryImage = '';
 
   // ── CONFIRM MODAL ──
   var _confirmResolve = null;
@@ -399,6 +457,7 @@
       adminBox.classList.remove('transitioning-in');
       loadPosts();
       initReleaseManager();
+      initGalleryManager();
       applyRequestedAdminTool();
     }, 360);
   }
@@ -562,7 +621,7 @@
 
       var visiblePosts = posts.map(function(post, index) {
         return { post: post, index: index };
-      }).filter(function(entry) { return !isReleasePost(entry.post); });
+      }).filter(function(entry) { return !isManagedPost(entry.post); });
 
       if (!visiblePosts.length) {
         list.innerHTML = '<div class="posts-empty">No announcements yet</div>'; return;
@@ -785,24 +844,30 @@
     var announcementTool = document.getElementById('announcementTool');
     var releaseTool = document.getElementById('releaseManager');
     var rosterTool = document.getElementById('rosterManager');
+    var galleryTool = document.getElementById('galleryManager');
     var announcementBtn = document.getElementById('modeAnnouncementBtn');
     var releaseBtn = document.getElementById('modeReleasesBtn');
     var rosterBtn = document.getElementById('modeRosterBtn');
+    var galleryBtn = document.getElementById('modeGalleryBtn');
     var label = document.querySelector('#adminBox .box-label');
     var title = document.querySelector('#adminBox .box-title');
     var isAnnouncement = tool === 'announcement';
     var isReleases = tool === 'releases';
     var isRoster = tool === 'roster';
+    var isGallery = tool === 'gallery';
 
     announcementTool.hidden = !isAnnouncement;
     releaseTool.hidden = !isReleases;
     rosterTool.hidden = !isRoster;
+    galleryTool.hidden = !isGallery;
     announcementBtn.classList.toggle('active', isAnnouncement);
     releaseBtn.classList.toggle('active', isReleases);
     rosterBtn.classList.toggle('active', isRoster);
+    galleryBtn.classList.toggle('active', isGallery);
     announcementBtn.setAttribute('aria-pressed', isAnnouncement ? 'true' : 'false');
     releaseBtn.setAttribute('aria-pressed', isReleases ? 'true' : 'false');
     rosterBtn.setAttribute('aria-pressed', isRoster ? 'true' : 'false');
+    galleryBtn.setAttribute('aria-pressed', isGallery ? 'true' : 'false');
 
     if (isReleases) {
       label.textContent = '8Keys Release Panel';
@@ -812,6 +877,10 @@
       label.textContent = 'Clan Roster Panel';
       title.innerHTML = 'Manage <span>Clan Roster</span>';
       initRosterManager();
+    } else if (isGallery) {
+      label.textContent = 'Photo Gallery Panel';
+      title.innerHTML = 'Manage <span>Photos</span>';
+      initGalleryManager();
     } else {
       label.textContent = 'Announcement Panel';
       title.innerHTML = 'Post <span>Announcement</span>';
@@ -821,7 +890,7 @@
   function getRequestedAdminTool() {
     try {
       var tool = new URLSearchParams(window.location.search).get('tool');
-      return tool === 'releases' ? 'releases' : tool === 'roster' ? 'roster' : tool === 'announcement' ? 'announcement' : '';
+      return tool === 'releases' ? 'releases' : tool === 'roster' ? 'roster' : tool === 'gallery' ? 'gallery' : tool === 'announcement' ? 'announcement' : '';
     } catch(e) {
       return '';
     }
@@ -1241,6 +1310,224 @@
     list.innerHTML = items.map(function(item, index) {
       var avatarHtml = item.avatar ? '<img src="' + escHtml(item.avatar) + '" alt="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid rgba(0,240,255,0.2);vertical-align:middle;margin-right:8px;">' : '';
       return '<div class="release-item"><div class="release-item-head"><div>' + avatarHtml + '<span class="release-item-title">' + escHtml(item.name) + '</span><div class="release-item-meta">' + roleLabel(item.role) + '</div></div><div class="release-item-buttons"><button type="button" class="release-mini-btn" onclick="editRosterMember(' + index + ')">Edit</button><button type="button" class="release-mini-btn delete" onclick="deleteRosterMember(' + index + ')">Delete</button></div></div></div>';
+    }).join('');
+  }
+
+  // GALLERY MANAGER
+  const GALLERY_STORAGE_KEY = 'sync_photo_gallery';
+  const GALLERY_POST_PREFIX = '__SYNC_GALLERY_PHOTO__';
+  const GALLERY_POST_AUTHOR = 'SYNC-GALLERY';
+  var galleryCache = [];
+
+  function isManagedPost(post) {
+    return isReleasePost(post) || isRosterPost(post) || isGalleryPost(post);
+  }
+
+  function isGalleryPost(post) {
+    return !!(post && typeof post.content === 'string' && post.content.indexOf(GALLERY_POST_PREFIX) === 0);
+  }
+
+  function galleryToPost(photo) {
+    return {
+      author: GALLERY_POST_AUTHOR,
+      content: GALLERY_POST_PREFIX + JSON.stringify(photo),
+      images: [],
+      timestamp: photo.updatedAt || new Date().toISOString()
+    };
+  }
+
+  function galleryFromPost(post) {
+    try {
+      return JSON.parse(String(post.content || '').slice(GALLERY_POST_PREFIX.length));
+    } catch(e) {
+      return null;
+    }
+  }
+
+  async function initGalleryManager() {
+    await loadGallery();
+    renderGalleryList();
+  }
+
+  function getGallery() {
+    return galleryCache.slice();
+  }
+
+  function getLocalGallery() {
+    try {
+      var saved = localStorage.getItem(GALLERY_STORAGE_KEY);
+      if (!saved) return [];
+      var parsed = JSON.parse(saved);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch(e) {
+      return [];
+    }
+  }
+
+  async function loadGallery() {
+    try {
+      var posts = await fetchAllPosts();
+      galleryCache = posts.map(galleryFromPost).filter(Boolean);
+      localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(galleryCache));
+    } catch(e) {
+      galleryCache = getLocalGallery();
+      showGalleryMsg('Using local photo data. Shared sync could not load.', 'error');
+    }
+  }
+
+  async function setGallery(items) {
+    galleryCache = items.slice();
+    localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(items));
+    var posts = await fetchAllPosts();
+    var visiblePosts = posts.filter(function(post) { return !isGalleryPost(post); });
+    var galleryPosts = items.map(galleryToPost);
+    var saveRes = await fetch(WORKER_URL + '/save?secret=' + SECRET, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(visiblePosts.concat(galleryPosts))
+    });
+    if (!saveRes.ok) throw new Error('Gallery sync failed: HTTP ' + saveRes.status);
+  }
+
+  function showGalleryMsg(text, type) {
+    var msg = document.getElementById('galleryMsg');
+    msg.textContent = text;
+    msg.className = 'msg ' + (type || 'success');
+    msg.style.display = 'block';
+    setTimeout(function() { msg.style.display = 'none'; }, 2600);
+  }
+
+  function handleGalleryImage(input) {
+    var file = input.files && input.files[0];
+    var wrap = document.getElementById('galleryPreviewWrap');
+    var img = document.getElementById('galleryPreviewImg');
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      showGalleryMsg('Photo is too large. Please use an image under 2MB.', 'error');
+      input.value = '';
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      pendingGalleryImage = e.target.result;
+      img.src = pendingGalleryImage;
+      wrap.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  function clearGalleryImage() {
+    pendingGalleryImage = '';
+    document.getElementById('galleryPreviewImg').src = '';
+    document.getElementById('galleryPreviewWrap').style.display = 'none';
+  }
+
+  function readGalleryForm() {
+    var title = document.getElementById('galleryTitle').value.trim();
+    var category = document.getElementById('galleryCategory').value.trim();
+    var caption = document.getElementById('galleryCaption').value.trim();
+    var featured = document.getElementById('galleryFeatured').checked;
+    var editIndex = Number(document.getElementById('galleryEditIndex').value);
+    var existing = editIndex >= 0 ? getGallery()[editIndex] : null;
+    var src = pendingGalleryImage || (existing && existing.src) || '';
+    if (!title) throw new Error('Photo title is required.');
+    if (!src) throw new Error('Choose a photo first.');
+    return {
+      title: title,
+      category: category || 'ARCHIVE',
+      caption: caption || title,
+      src: src,
+      featured: featured,
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  async function saveGalleryPhoto() {
+    try {
+      var photo = readGalleryForm();
+      var items = getGallery();
+      var editIndex = Number(document.getElementById('galleryEditIndex').value);
+      if (photo.featured) {
+        items = items.map(function(item) {
+          item.featured = false;
+          return item;
+        });
+      }
+      if (editIndex >= 0) {
+        items[editIndex] = photo;
+        showGalleryMsg('Photo updated.', 'success');
+      } else {
+        items.push(photo);
+        showGalleryMsg('Photo added.', 'success');
+      }
+      await setGallery(items);
+      resetGalleryForm();
+      renderGalleryList();
+    } catch(e) {
+      showGalleryMsg(e.message, 'error');
+    }
+  }
+
+  function resetGalleryForm() {
+    document.getElementById('galleryEditIndex').value = '-1';
+    document.getElementById('galleryTitle').value = '';
+    document.getElementById('galleryCategory').value = '';
+    document.getElementById('galleryCaption').value = '';
+    document.getElementById('galleryFeatured').checked = false;
+    document.getElementById('galleryCurrentImage').style.display = 'none';
+    document.getElementById('galleryCurrentImg').src = '';
+    clearGalleryImage();
+    document.getElementById('saveGalleryBtn').innerHTML = '&#9654;&nbsp; Add Photo';
+  }
+
+  function editGalleryPhoto(index) {
+    var item = getGallery()[index];
+    if (!item) return;
+    document.getElementById('galleryEditIndex').value = index;
+    document.getElementById('galleryTitle').value = item.title || '';
+    document.getElementById('galleryCategory').value = item.category || '';
+    document.getElementById('galleryCaption').value = item.caption || '';
+    document.getElementById('galleryFeatured').checked = !!item.featured;
+    document.getElementById('galleryCurrentImg').src = item.src || '';
+    document.getElementById('galleryCurrentImage').style.display = item.src ? 'block' : 'none';
+    clearGalleryImage();
+    document.getElementById('saveGalleryBtn').innerHTML = '&#9654;&nbsp; Update Photo';
+    document.getElementById('galleryManager').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  async function deleteGalleryPhoto(index) {
+    var ok = await showConfirm('Delete photo?', 'This removes the photo from the homepage gallery.', '!');
+    if (!ok) return;
+    var items = getGallery();
+    items.splice(index, 1);
+    await setGallery(items);
+    renderGalleryList();
+    showGalleryMsg('Photo deleted.', 'success');
+  }
+
+  async function moveGalleryPhoto(index, direction) {
+    var items = getGallery();
+    var next = index + direction;
+    if (next < 0 || next >= items.length) return;
+    var item = items.splice(index, 1)[0];
+    items.splice(next, 0, item);
+    await setGallery(items);
+    renderGalleryList();
+  }
+
+  function renderGalleryList() {
+    var list = document.getElementById('galleryList');
+    if (!list) return;
+    var items = getGallery();
+    if (!items.length) {
+      list.innerHTML = '<div class="posts-empty">No gallery photos saved yet</div>';
+      return;
+    }
+    list.innerHTML = items.map(function(item, index) {
+      var thumb = item.src ? '<img class="gallery-item-thumb" src="' + escHtml(item.src) + '" alt="">' : '';
+      var meta = escHtml(item.category || 'ARCHIVE') + (item.featured ? ' / FEATURED' : '');
+      return '<div class="release-item"><div class="release-item-head"><div>' + thumb + '<span class="release-item-title">' + escHtml(item.title || 'Untitled photo') + '</span><div class="release-item-meta">' + meta + '</div><div class="release-item-songs">' + escHtml(item.caption || '') + '</div></div><div class="release-item-buttons"><button type="button" class="release-mini-btn" onclick="moveGalleryPhoto(' + index + ',-1)">Up</button><button type="button" class="release-mini-btn" onclick="moveGalleryPhoto(' + index + ',1)">Down</button><button type="button" class="release-mini-btn" onclick="editGalleryPhoto(' + index + ')">Edit</button><button type="button" class="release-mini-btn delete" onclick="deleteGalleryPhoto(' + index + ')">Delete</button></div></div></div>';
     }).join('');
   }
 
