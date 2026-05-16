@@ -1156,6 +1156,32 @@
     { id: 'recruiter',     label: '✦ Recruiter' },
     { id: 'member',        label: '◆ Member' }
   ];
+  const DEFAULT_ROSTER = [
+    { name: '[SYNC]-Luj-*CM', role: 'clan-master' },
+    { name: '[SYNC]-Zyx-', role: 'vice' },
+    { name: '[SYNC]-Sh1n-', role: 'high-council' },
+    { name: '[SYNC]-Minwonuna-', role: 'high-council' },
+    { name: '[SYNC]-Jxiam-', role: 'high-council' },
+    { name: '[SYNC]-KYO-', role: 'high-council' },
+    { name: '[SYNC]-pinoo*-', role: 'mod' },
+    { name: '[SYNC]-Errs-', role: 'examiner' },
+    { name: '[SYNC]-Kael-', role: 'recruiter' },
+    { name: '[SYNC]Alwin', role: 'member' },
+    { name: '[SYNC]-Cleo-', role: 'member' },
+    { name: '[SYNC]-Clck-', role: 'member' },
+    { name: '[SYNC]Chaeyi', role: 'member' },
+    { name: '[SYNC]-Chichay-', role: 'member' },
+    { name: '[SYNC]Haru', role: 'member' },
+    { name: '[SYNC]-Jai-', role: 'member' },
+    { name: '[SYNC]-KDiii-', role: 'member' },
+    { name: '[SYNC]-meguchan-', role: 'member' },
+    { name: '[SYNC]-Poohday-', role: 'member' },
+    { name: '[SYNC]-Que-', role: 'member' },
+    { name: '[SYNC]-Shane-', role: 'member' },
+    { name: '[SYNC]-Sassy-', role: 'member' },
+    { name: '[SYNC]-Seiymari-', role: 'member' },
+    { name: '[SYNC]-ShnJhc-', role: 'member' }
+  ];
   var rosterCache = [];
 
   function isRosterPost(post) {
@@ -1204,6 +1230,9 @@
       var posts = await fetchAllPosts();
       rosterCache = posts.map(rosterFromPost).filter(Boolean);
       if (!rosterCache.length) rosterCache = getLocalRoster();
+      if (!rosterCache.length) rosterCache = DEFAULT_ROSTER.map(function(member) {
+        return Object.assign({}, member);
+      });
       localStorage.setItem(ROSTER_STORAGE_KEY, JSON.stringify(rosterCache));
     } catch(e) {
       rosterCache = getLocalRoster();

@@ -7746,36 +7746,110 @@ async function submitApplication() {
     if (e.key === 'Escape' && overlay.classList.contains('open')) closeRosterModal();
   });
 
+  const WORKER_URL = 'https://sync-worker.lastresort962.workers.dev';
+  const ROSTER_POST_PREFIX = '__SYNC_ROSTER__';
+  const ROLE_LABELS = {
+    'clan-master': '♛ Clan Master',
+    'vice': '♜ Vice Clan Master',
+    'high-council': '◈ High Council',
+    'mod': '⬡ Moderator',
+    'examiner': '◎ Examiner',
+    'recruiter': '✦ Recruiter',
+    'member': '◆ Member'
+  };
+
+  function esc(text) {
+    return String(text || '').replace(/[&<>"']/g, function(char) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
+    });
+  }
+
+  function roleLabel(role) {
+    return ROLE_LABELS[role] || role || 'Member';
+  }
+
+  function renderRosterRows(items) {
+    const body = document.getElementById('rm-tbody');
+    if (!body || !Array.isArray(items) || !items.length) return;
+    body.innerHTML = items.map(function(member, index) {
+      const role = member.role || 'member';
+      const name = esc(member.name || 'Unnamed Member');
+      return '<tr class="rm-row rm-visible" data-role="' + esc(role) + '">' +
+        '<td class="rm-col-num">' + String(index + 1).padStart(2, '0') + '</td>' +
+        '<td><span class="rm-name rm-name--' + esc(role) + '">' + name + '</span></td>' +
+        '<td><span class="rm-role-pill rm-pill--' + esc(role) + '">' + esc(roleLabel(role)) + '</span></td>' +
+      '</tr>';
+    }).join('');
+    updateRosterCounts();
+    applyRosterFilter(document.querySelector('.rm-filter-btn.active')?.dataset.filter || 'all');
+  }
+
+  function updateRosterCounts() {
+    const rows = Array.from(document.querySelectorAll('.rm-row'));
+    const counts = rows.reduce(function(acc, row) {
+      const role = row.dataset.role || 'member';
+      acc.all = (acc.all || 0) + 1;
+      acc[role] = (acc[role] || 0) + 1;
+      return acc;
+    }, {});
+    document.querySelectorAll('.rm-filter-btn').forEach(function(btn) {
+      const count = btn.querySelector('.rm-filter-count');
+      if (count) count.textContent = counts[btn.dataset.filter || 'all'] || 0;
+    });
+    const footer = document.querySelector('.roster-modal-footer-text');
+    if (footer) footer.textContent = '[ ' + (counts.all || 0) + ' Members · Active Roster ]';
+  }
+
+  async function loadCloudRoster() {
+    try {
+      const res = await fetch(WORKER_URL + '/announcements', { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const posts = await res.json();
+      const roster = Array.isArray(posts) ? posts.map(function(post) {
+        try {
+          return post && typeof post.content === 'string' && post.content.indexOf(ROSTER_POST_PREFIX) === 0
+            ? JSON.parse(post.content.slice(ROSTER_POST_PREFIX.length))
+            : null;
+        } catch (error) {
+          return null;
+        }
+      }).filter(Boolean) : [];
+      if (roster.length) renderRosterRows(roster);
+      else updateRosterCounts();
+    } catch (error) {
+      updateRosterCounts();
+    }
+  }
+
+  function applyRosterFilter(filter) {
+    const rows = document.querySelectorAll('.rm-row');
+    const empty = document.getElementById('rm-empty');
+    let visible = 0;
+    const updates = [];
+    rows.forEach(row => {
+      const role = row.dataset.role;
+      const show = filter === 'all' || role === filter;
+      if (show) visible++;
+      updates.push({ row, show });
+    });
+    requestAnimationFrame(() => {
+      updates.forEach(({ row, show }) => {
+        row.classList.remove('rm-hidden', 'rm-visible');
+        row.classList.add(show ? 'rm-visible' : 'rm-hidden');
+      });
+      if (empty) empty.classList.toggle('show', visible === 0);
+    });
+  }
+
+  loadCloudRoster();
+
   // Filter logic
   const btns  = document.querySelectorAll('.rm-filter-btn');
-  const rows  = document.querySelectorAll('.rm-row');
-  const empty = document.getElementById('rm-empty');
-
   btns.forEach(btn => {
     btn.addEventListener('click', () => {
       btns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      const filter = btn.dataset.filter;
-      let visible = 0;
-      // Batch DOM reads first, then writes in rAF
-      const updates = [];
-      rows.forEach(row => {
-        const role = row.dataset.role;
-        const show = filter === 'all' || role === filter;
-        if (show) visible++;
-        updates.push({ row, show });
-      });
-      requestAnimationFrame(() => {
-        updates.forEach(({ row, show }) => {
-          row.classList.remove('rm-hidden', 'rm-visible');
-          if (show) {
-            row.classList.add('rm-visible');
-          } else {
-            row.classList.add('rm-hidden');
-          }
-        });
-        empty.classList.toggle('show', visible === 0);
-      });
+      applyRosterFilter(btn.dataset.filter);
     });
   });
 })();
