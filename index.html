@@ -7757,6 +7757,10 @@ async function submitApplication() {
     'recruiter': '✦ Recruiter',
     'member': '◆ Member'
   };
+  const ROLE_ORDER = ['clan-master', 'vice', 'high-council', 'mod', 'examiner', 'recruiter', 'member'].reduce(function(map, role, index) {
+    map[role] = index;
+    return map;
+  }, {});
 
   function esc(text) {
     return String(text || '').replace(/[&<>"']/g, function(char) {
@@ -7768,10 +7772,19 @@ async function submitApplication() {
     return ROLE_LABELS[role] || role || 'Member';
   }
 
+  function sortRoster(items) {
+    return items.slice().sort(function(a, b) {
+      const rankA = ROLE_ORDER[a && a.role] != null ? ROLE_ORDER[a.role] : 999;
+      const rankB = ROLE_ORDER[b && b.role] != null ? ROLE_ORDER[b.role] : 999;
+      if (rankA !== rankB) return rankA - rankB;
+      return String(a && a.name || '').localeCompare(String(b && b.name || ''), undefined, { sensitivity: 'base' });
+    });
+  }
+
   function renderRosterRows(items) {
     const body = document.getElementById('rm-tbody');
     if (!body || !Array.isArray(items) || !items.length) return;
-    body.innerHTML = items.map(function(member, index) {
+    body.innerHTML = sortRoster(items).map(function(member, index) {
       const role = member.role || 'member';
       const name = esc(member.name || 'Unnamed Member');
       return '<tr class="rm-row rm-visible" data-role="' + esc(role) + '">' +

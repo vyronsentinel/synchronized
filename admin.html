@@ -1156,6 +1156,10 @@
     { id: 'recruiter',     label: '✦ Recruiter' },
     { id: 'member',        label: '◆ Member' }
   ];
+  const ROSTER_ROLE_ORDER = ROSTER_ROLES.reduce(function(map, role, index) {
+    map[role.id] = index;
+    return map;
+  }, {});
   const DEFAULT_ROSTER = [
     { name: '[SYNC]-Luj-*CM', role: 'clan-master' },
     { name: '[SYNC]-Zyx-', role: 'vice' },
@@ -1214,6 +1218,15 @@
     return rosterCache.slice();
   }
 
+  function sortRoster(items) {
+    return items.slice().sort(function(a, b) {
+      var rankA = ROSTER_ROLE_ORDER[a && a.role] != null ? ROSTER_ROLE_ORDER[a.role] : 999;
+      var rankB = ROSTER_ROLE_ORDER[b && b.role] != null ? ROSTER_ROLE_ORDER[b.role] : 999;
+      if (rankA !== rankB) return rankA - rankB;
+      return String(a && a.name || '').localeCompare(String(b && b.name || ''), undefined, { sensitivity: 'base' });
+    });
+  }
+
   function getLocalRoster() {
     try {
       var saved = localStorage.getItem(ROSTER_STORAGE_KEY);
@@ -1233,6 +1246,7 @@
       if (!rosterCache.length) rosterCache = DEFAULT_ROSTER.map(function(member) {
         return Object.assign({}, member);
       });
+      rosterCache = sortRoster(rosterCache);
       localStorage.setItem(ROSTER_STORAGE_KEY, JSON.stringify(rosterCache));
     } catch(e) {
       rosterCache = getLocalRoster();
@@ -1241,11 +1255,11 @@
   }
 
   async function setRoster(items) {
-    rosterCache = items.slice();
-    localStorage.setItem(ROSTER_STORAGE_KEY, JSON.stringify(items));
+    rosterCache = sortRoster(items);
+    localStorage.setItem(ROSTER_STORAGE_KEY, JSON.stringify(rosterCache));
     var posts = await fetchAllPosts();
     var visiblePosts = posts.filter(function(post) { return !isRosterPost(post); });
-    var rosterPosts = items.map(rosterToPost);
+    var rosterPosts = rosterCache.map(rosterToPost);
     var saveRes = await fetch(WORKER_URL + '/save?secret=' + SECRET, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
