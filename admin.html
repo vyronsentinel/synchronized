@@ -1367,11 +1367,19 @@
     }
   }
 
+  function cacheGallery(items) {
+    try {
+      localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(items));
+    } catch(e) {
+      // Large base64 photos can exceed browser cache quota; cloud save should still continue.
+    }
+  }
+
   async function loadGallery() {
     try {
       var posts = await fetchAllPosts();
       galleryCache = posts.map(galleryFromPost).filter(Boolean);
-      localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(galleryCache));
+      cacheGallery(galleryCache);
     } catch(e) {
       galleryCache = getLocalGallery();
       showGalleryMsg('Using local photo data. Shared sync could not load.', 'error');
@@ -1380,7 +1388,7 @@
 
   async function setGallery(items) {
     galleryCache = items.slice();
-    localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(items));
+    cacheGallery(items);
     var posts = await fetchAllPosts();
     var visiblePosts = posts.filter(function(post) { return !isGalleryPost(post); });
     var galleryPosts = items.map(galleryToPost);
