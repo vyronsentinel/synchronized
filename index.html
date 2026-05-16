@@ -1765,6 +1765,9 @@
     .gallery-grid { grid-template-columns: 1fr; gap: 0.8rem; }
     .gallery-item img { height: 160px; max-height: 200px; }
     .gallery-featured img { height: auto; max-height: 300px; }
+    .gallery-popup { padding: 0.75rem; }
+    .gallery-popup-head { align-items: flex-start; }
+    .gallery-popup-close { flex-shrink: 0; }
   }
 
   /* float anim on card */
@@ -7398,10 +7401,17 @@ async function submitApplication() {
 
 /* Mobile adjustments */
 @media(max-width:500px){
-  .roster-modal-filters { padding: 0.65rem 1rem; }
+  #roster-modal-overlay { padding: 0.5rem; align-items: stretch; }
+  #roster-modal-panel { max-height: calc(100svh - 1rem); }
+  .roster-modal-label { letter-spacing: 0.2em; }
+  .roster-modal-title { font-size: 1.05rem; }
+  .roster-modal-filters { padding: 0.65rem 1rem; max-height: 104px; overflow-y: auto; }
+  .roster-modal-body { overflow-x: auto; }
+  .rm-table { min-width: 520px; }
   .rm-filter-btn { font-size:0.66rem; padding:4px 8px; }
   .rm-table thead th, .rm-row td { padding-left: 0.75rem !important; padding-right: 0.75rem; }
   .roster-modal-header { padding: 1rem; }
+  .roster-modal-footer { flex-direction: column; align-items: flex-start; gap: 0.35rem; }
 }
 
 /* ══════════════════════════════════════════
