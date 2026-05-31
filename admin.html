@@ -538,6 +538,27 @@
   }
 
   // ── IMAGE HANDLER ──
+  function resizeImageFile(file, maxSide, quality) {
+    return new Promise(function(resolve, reject) {
+      var reader = new FileReader();
+      reader.onerror = function() { reject(new Error('Could not read image.')); };
+      reader.onload = function(e) {
+        var img = new Image();
+        img.onerror = function() { reject(new Error('Could not load image.')); };
+        img.onload = function() {
+          var scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+          var canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, Math.round(img.width * scale));
+          canvas.height = Math.max(1, Math.round(img.height * scale));
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
   function handleImages(input) {
     var files = Array.from(input.files);
     var container = document.getElementById('imgPreviews');
@@ -547,9 +568,7 @@
         alert('Image "' + file.name + '" is too large (' + (file.size / 1024 / 1024).toFixed(1) + 'MB). Please use images under 2MB.');
         return;
       }
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        var b64 = e.target.result;
+      resizeImageFile(file, 900, 0.76).then(function(b64) {
         var idx = pendingImages.push(b64) - 1;
         var wrap = document.createElement('div'); wrap.className = 'img-thumb';
         var img  = document.createElement('img'); img.src = b64;
@@ -557,8 +576,9 @@
         del.type = 'button'; del.className = 'img-thumb-del'; del.textContent = '✕'; del.title = 'Remove';
         del.onclick = function() { pendingImages[idx] = null; container.removeChild(wrap); };
         wrap.appendChild(img); wrap.appendChild(del); container.appendChild(wrap);
-      };
-      reader.readAsDataURL(file);
+      }).catch(function(err) {
+        alert('Could not process "' + file.name + '": ' + err.message);
+      });
     });
     input.value = '';
   }
@@ -1437,13 +1457,13 @@
       input.value = '';
       return;
     }
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      pendingGalleryImage = e.target.result;
+    resizeImageFile(file, 1200, 0.78).then(function(dataUrl) {
+      pendingGalleryImage = dataUrl;
       img.src = pendingGalleryImage;
       wrap.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
+    }).catch(function(err) {
+      showGalleryMsg('Could not process photo: ' + err.message, 'error');
+    });
     input.value = '';
   }
 
