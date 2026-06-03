@@ -1629,18 +1629,18 @@
     ));
 
     // ── Bold + italic (order matters: *** before ** before *)
-    raw = raw.replace(/\*\*\*(.+?)\*\*\*/gs, (_, t) => ph('<strong><em>' + esc(t) + '</em></strong>'));
-    raw = raw.replace(/\*\*(.+?)\*\*/gs,     (_, t) => ph('<strong>' + esc(t) + '</strong>'));
-    raw = raw.replace(/\*(.+?)\*/gs,          (_, t) => ph('<em>' + esc(t) + '</em>'));
+    raw = raw.replace(/\*\*\*(.+?)\*\*\*/g, (_, t) => ph('<strong><em>' + esc(t) + '</em></strong>'));
+    raw = raw.replace(/\*\*(.+?)\*\*/g,     (_, t) => ph('<strong>' + esc(t) + '</strong>'));
+    raw = raw.replace(/\*(.+?)\*/g,          (_, t) => ph('<em>' + esc(t) + '</em>'));
 
     // ── Underline __text__
-    raw = raw.replace(/__(.+?)__/gs, (_, t) => ph('<u>' + esc(t) + '</u>'));
+    raw = raw.replace(/__(.+?)__/g, (_, t) => ph('<u>' + esc(t) + '</u>'));
 
     // ── Italic _text_ (single underscore, not at word boundaries with digits)
     raw = raw.replace(/_([^_\n]+)_/g, (_, t) => ph('<em>' + esc(t) + '</em>'));
 
     // ── Strikethrough ~~text~~
-    raw = raw.replace(/~~(.+?)~~/gs, (_, t) => ph('<s>' + esc(t) + '</s>'));
+    raw = raw.replace(/~~(.+?)~~/g, (_, t) => ph('<s>' + esc(t) + '</s>'));
 
     // ── Mentions and channels
     raw = raw.replace(/@everyone\b/g, () => ph('<strong style="color:#00f0ff;">@everyone</strong>'));
