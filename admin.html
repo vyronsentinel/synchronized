@@ -1600,31 +1600,74 @@
   function cleanAndLink(text) {
     if (!text) return '';
     let raw = text;
+    // Normalize line endings and escaped newlines
     raw = raw.replace(/\\n/g, '\n');
+    // Strip Discord custom emoji syntax
     raw = raw.replace(/<a?:[a-zA-Z0-9_]+:[0-9]+>/g, '');
+    // Collapse excessive blank lines
     raw = raw.replace(/\n{3,}/g, '\n\n');
+
     const spans = [];
     function ph(html) { const id = '\x00PH' + spans.length + '\x00'; spans.push(html); return id; }
-    function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    // Safe HTML escape — preserves Unicode, emoji, and special chars
+    function esc(t) {
+      return String(t)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // ── Inline code (backticks) — process first so inner chars aren't parsed
+    raw = raw.replace(/`([^`]+)`/g, (_, t) => ph(
+      '<code style="background:rgba(0,240,255,0.08);border:1px solid rgba(0,240,255,0.2);border-radius:3px;padding:1px 5px;font-family:Share Tech Mono,monospace;font-size:0.9em;color:#00f0ff;">' + esc(t) + '</code>'
+    ));
+
+    // ── Spoiler / blurred text  ||text||
+    raw = raw.replace(/\|\|(.+?)\|\|/gs, (_, t) => ph(
+      '<span style="background:rgba(136,136,170,0.3);color:transparent;border-radius:3px;padding:0 3px;cursor:pointer;user-select:none;transition:all 0.2s;" onclick="this.style.color=\'inherit\';this.style.background=\'rgba(136,136,170,0.15)\'" title="Click to reveal">' + esc(t) + '</span>'
+    ));
+
+    // ── Bold + italic (order matters: *** before ** before *)
     raw = raw.replace(/\*\*\*(.+?)\*\*\*/gs, (_, t) => ph('<strong><em>' + esc(t) + '</em></strong>'));
     raw = raw.replace(/\*\*(.+?)\*\*/gs,     (_, t) => ph('<strong>' + esc(t) + '</strong>'));
-    raw = raw.replace(/__(.+?)__/gs,          (_, t) => ph('<u>' + esc(t) + '</u>'));
     raw = raw.replace(/\*(.+?)\*/gs,          (_, t) => ph('<em>' + esc(t) + '</em>'));
+
+    // ── Underline __text__
+    raw = raw.replace(/__(.+?)__/gs, (_, t) => ph('<u>' + esc(t) + '</u>'));
+
+    // ── Italic _text_ (single underscore, not at word boundaries with digits)
+    raw = raw.replace(/_([^_\n]+)_/g, (_, t) => ph('<em>' + esc(t) + '</em>'));
+
+    // ── Strikethrough ~~text~~
+    raw = raw.replace(/~~(.+?)~~/gs, (_, t) => ph('<s>' + esc(t) + '</s>'));
+
+    // ── Mentions and channels
     raw = raw.replace(/@everyone\b/g, () => ph('<strong style="color:#00f0ff;">@everyone</strong>'));
     raw = raw.replace(/@here\b/g,     () => ph('<strong style="color:#00f0ff;">@here</strong>'));
-    raw = raw.replace(/@([A-Za-z0-9_]+)/g, (_, n) => ph('<strong style="color:#00f0ff;">@' + esc(n) + '</strong>'));
-    raw = raw.replace(/#([A-Za-z0-9_-]+)/g, (_, c) => ph('<strong style="color:#ffd700;">#' + esc(c) + '</strong>'));
-    // Split on placeholders; escape only plain text segments, then linkify
+    raw = raw.replace(/@(\w+)/g,       (_, n) => ph('<strong style="color:#00f0ff;">@' + esc(n) + '</strong>'));
+    raw = raw.replace(/#([a-zA-Z_][a-zA-Z0-9_-]*)/g, (_, c) => ph('<strong style="color:#ffd700;">#' + esc(c) + '</strong>'));
+
+    // ── Split on placeholders; escape plain segments then linkify URLs
     const parts = raw.split(/(\x00PH\d+\x00)/);
     let out = parts.map(function(seg) {
       if (/^\x00PH\d+\x00$/.test(seg)) return seg;
-      let s = seg.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-      s = s.replace(/(https?:\/\/[^\s<"]+)/g, function(url) {
-        return '<a href="' + url + '" target="_blank" rel="noopener">' + url + '</a>';
+      // Escape HTML but leave Unicode (emoji, special fonts) intact
+      let s = seg
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+      // Linkify URLs
+      s = s.replace(/(https?:\/\/[^\s<"&]+)/g, function(url) {
+        return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + '</a>';
       });
       return s;
     }).join('');
+
+    // Restore placeholders
     out = out.replace(/\x00PH(\d+)\x00/g, (_, i) => spans[+i]);
+    // Newlines → <br>
     out = out.replace(/\n/g, '<br>');
     return out;
   }
