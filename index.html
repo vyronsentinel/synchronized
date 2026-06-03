@@ -3688,7 +3688,7 @@
     raw = raw.replace(/\n{3,}/g, '\n\n');
 
     const spans = [];
-    function ph(html) { const id = '\x00PH' + spans.length + '\x00'; spans.push(html); return id; }
+    function ph(html) { const id = '\uFFFE\uFFFEPH' + spans.length + '\uFFFE\uFFFE'; spans.push(html); return id; }
     // Safe HTML escape — preserves Unicode, emoji, and special chars
     function esc(t) {
       return String(t)
@@ -3709,18 +3709,18 @@
     ));
 
     // ── Bold + italic (order matters: *** before ** before *)
-    raw = raw.replace(/\*\*\*(.+?)\*\*\*/gs, (_, t) => ph('<strong><em>' + esc(t) + '</em></strong>'));
-    raw = raw.replace(/\*\*(.+?)\*\*/gs,     (_, t) => ph('<strong>' + esc(t) + '</strong>'));
-    raw = raw.replace(/\*(.+?)\*/gs,          (_, t) => ph('<em>' + esc(t) + '</em>'));
+    raw = raw.replace(/\*\*\*(.+?)\*\*\*/g, (_, t) => ph('<strong><em>' + esc(t) + '</em></strong>'));
+    raw = raw.replace(/\*\*(.+?)\*\*/g,     (_, t) => ph('<strong>' + esc(t) + '</strong>'));
+    raw = raw.replace(/\*(.+?)\*/g,          (_, t) => ph('<em>' + esc(t) + '</em>'));
 
     // ── Underline __text__
-    raw = raw.replace(/__(.+?)__/gs, (_, t) => ph('<u>' + esc(t) + '</u>'));
+    raw = raw.replace(/__(.+?)__/g, (_, t) => ph('<u>' + esc(t) + '</u>'));
 
     // ── Italic _text_ (single underscore)
     raw = raw.replace(/_([^_\n]+)_/g, (_, t) => ph('<em>' + esc(t) + '</em>'));
 
     // ── Strikethrough ~~text~~
-    raw = raw.replace(/~~(.+?)~~/gs, (_, t) => ph('<s>' + esc(t) + '</s>'));
+    raw = raw.replace(/~~(.+?)~~/g, (_, t) => ph('<s>' + esc(t) + '</s>'));
 
     // ── Mentions and channels
     raw = raw.replace(/@everyone\b/g, () => ph('<strong style="color:#00f0ff;">@everyone</strong>'));
@@ -3729,9 +3729,9 @@
     raw = raw.replace(/#([a-zA-Z_][a-zA-Z0-9_-]*)/g, (_, c) => ph('<strong style="color:#ffd700;">#' + esc(c) + '</strong>'));
 
     // ── Split on placeholders; escape plain segments then linkify URLs
-    const parts = raw.split(/(\x00PH\d+\x00)/);
+    const parts = raw.split(/(\uFFFE\uFFFEPH\d+\uFFFE\uFFFE)/);
     let out = parts.map(function(seg) {
-      if (/^\x00PH\d+\x00$/.test(seg)) return seg;
+      if (/^\uFFFE\uFFFEPH\d+\uFFFE\uFFFE$/.test(seg)) return seg;
       // Escape HTML but leave Unicode (emoji, special fonts) intact
       let s = seg
         .replace(/&/g, '&amp;')
@@ -3746,7 +3746,7 @@
     }).join('');
 
     // Restore placeholders
-    out = out.replace(/\x00PH(\d+)\x00/g, (_, i) => spans[+i]);
+    out = out.replace(/\uFFFE\uFFFEPH(\d+)\uFFFE\uFFFE/g, (_, i) => spans[+i]);
     // Newlines → <br>
     out = out.replace(/\n/g, '<br>');
     return out.trim();
