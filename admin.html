@@ -133,7 +133,7 @@
     @keyframes skelShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
     @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
     .posts-empty { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; color: rgba(136,136,170,0.45); text-transform: uppercase; text-align: center; padding: 1.5rem 0; }
-    .admin-mode-switch { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.7rem; margin-bottom: 1.35rem; }
+    .admin-mode-switch { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.7rem; margin-bottom: 1.35rem; }
     .admin-mode-btn { background: rgba(0,240,255,0.04); border: 1px solid rgba(0,240,255,0.22); color: var(--muted); font-family: 'Orbitron', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 12px 14px; border-radius: 2px; cursor: pointer; transition: all 0.2s; }
     .admin-mode-btn:hover { border-color: rgba(0,240,255,0.5); color: var(--cyan); background: rgba(0,240,255,0.08); }
     .admin-mode-btn.active { background: var(--pink); border-color: var(--pink); color: #fff; box-shadow: 0 8px 26px rgba(255,45,120,0.24); }
@@ -232,6 +232,7 @@
     <button type="button" class="admin-mode-btn" id="modeReleasesBtn" aria-pressed="false" onclick="switchAdminTool('releases')">8Keys Releases</button>
     <button type="button" class="admin-mode-btn" id="modeRosterBtn" aria-pressed="false" onclick="switchAdminTool('roster')">Roster</button>
     <button type="button" class="admin-mode-btn" id="modeGalleryBtn" aria-pressed="false" onclick="switchAdminTool('gallery')">Photos</button>
+    <button type="button" class="admin-mode-btn" id="modeRedeemBtn" aria-pressed="false" onclick="switchAdminTool('redeem')">🎁 Redeem</button>
   </div>
   <div class="admin-tool-panel" id="announcementTool">
   <div class="msg" id="postMsg"></div>
@@ -388,6 +389,44 @@
     </div>
   </div>
 
+  <!-- REDEEM CODES MANAGER -->
+  <div class="release-manager admin-tool-panel" id="redeemManager" hidden>
+    <div class="posts-label">🎁 Redeem Codes</div>
+    <p class="release-help">Add redeem codes that visitors can view and copy on the main site. Set a title, the code itself, an optional description, and an optional expiry date.</p>
+    <div class="msg" id="redeemAdminMsg"></div>
+
+    <input type="hidden" id="redeemEditIndex" value="-1">
+
+    <div class="release-grid">
+      <div class="field">
+        <label>Code Title <span style="color:var(--pink)">*</span></label>
+        <input type="text" id="redeemTitle" placeholder="e.g. Anniversary Pack">
+      </div>
+      <div class="field">
+        <label>Redeem Code <span style="color:var(--pink)">*</span></label>
+        <input type="text" id="redeemCode" placeholder="e.g. SYNC2026" style="text-transform:uppercase;letter-spacing:0.15em;">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Description (optional)</label>
+      <input type="text" id="redeemDesc" placeholder="e.g. Redeem in-game for exclusive rewards">
+    </div>
+
+    <div class="field">
+      <label>Expiry Date (optional)</label>
+      <input type="date" id="redeemExpiry">
+    </div>
+
+    <button class="btn-primary" id="saveRedeemBtn" onclick="saveRedeemCode()">&#9654;&nbsp; Save Redeem Code</button>
+    <button class="btn-secondary" id="cancelRedeemEditBtn" onclick="cancelRedeemEdit()" style="display:none;margin-top:0.5rem;">✕ Cancel Edit</button>
+
+    <div class="release-list" style="margin-top:1.5rem;">
+      <div class="posts-label">Current Redeem Codes</div>
+      <div id="redeemAdminList"></div>
+    </div>
+  </div>
+
   <button class="btn-secondary" onclick="confirmLogout()">&larr; Logout</button>
   <button class="btn-secondary" onclick="window.location.href='index.html'" style="margin-top:0.4rem;">&#8962;&nbsp; Back to Main Page</button>
 </div>
@@ -458,6 +497,7 @@
       loadPosts();
       initReleaseManager();
       initGalleryManager();
+      renderRedeemAdminList();
       applyRequestedAdminTool();
     }, 360);
   }
@@ -865,29 +905,35 @@
     var releaseTool = document.getElementById('releaseManager');
     var rosterTool = document.getElementById('rosterManager');
     var galleryTool = document.getElementById('galleryManager');
+    var redeemTool = document.getElementById('redeemManager');
     var announcementBtn = document.getElementById('modeAnnouncementBtn');
     var releaseBtn = document.getElementById('modeReleasesBtn');
     var rosterBtn = document.getElementById('modeRosterBtn');
     var galleryBtn = document.getElementById('modeGalleryBtn');
+    var redeemBtn = document.getElementById('modeRedeemBtn');
     var label = document.querySelector('#adminBox .box-label');
     var title = document.querySelector('#adminBox .box-title');
     var isAnnouncement = tool === 'announcement';
     var isReleases = tool === 'releases';
     var isRoster = tool === 'roster';
     var isGallery = tool === 'gallery';
+    var isRedeem = tool === 'redeem';
 
     announcementTool.hidden = !isAnnouncement;
     releaseTool.hidden = !isReleases;
     rosterTool.hidden = !isRoster;
     galleryTool.hidden = !isGallery;
+    redeemTool.hidden = !isRedeem;
     announcementBtn.classList.toggle('active', isAnnouncement);
     releaseBtn.classList.toggle('active', isReleases);
     rosterBtn.classList.toggle('active', isRoster);
     galleryBtn.classList.toggle('active', isGallery);
+    redeemBtn.classList.toggle('active', isRedeem);
     announcementBtn.setAttribute('aria-pressed', isAnnouncement ? 'true' : 'false');
     releaseBtn.setAttribute('aria-pressed', isReleases ? 'true' : 'false');
     rosterBtn.setAttribute('aria-pressed', isRoster ? 'true' : 'false');
     galleryBtn.setAttribute('aria-pressed', isGallery ? 'true' : 'false');
+    redeemBtn.setAttribute('aria-pressed', isRedeem ? 'true' : 'false');
 
     if (isReleases) {
       label.textContent = '8Keys Release Panel';
@@ -901,6 +947,10 @@
       label.textContent = 'Photo Gallery Panel';
       title.innerHTML = 'Manage <span>Photos</span>';
       initGalleryManager();
+    } else if (isRedeem) {
+      label.textContent = 'Redeem Codes Panel';
+      title.innerHTML = 'Manage <span>Redeem Codes</span>';
+      renderRedeemAdminList();
     } else {
       label.textContent = 'Announcement Panel';
       title.innerHTML = 'Post <span>Announcement</span>';
@@ -910,7 +960,7 @@
   function getRequestedAdminTool() {
     try {
       var tool = new URLSearchParams(window.location.search).get('tool');
-      return tool === 'releases' ? 'releases' : tool === 'roster' ? 'roster' : tool === 'gallery' ? 'gallery' : tool === 'announcement' ? 'announcement' : '';
+      return tool === 'releases' ? 'releases' : tool === 'roster' ? 'roster' : tool === 'gallery' ? 'gallery' : tool === 'redeem' ? 'redeem' : tool === 'announcement' ? 'announcement' : '';
     } catch(e) {
       return '';
     }
@@ -1670,6 +1720,127 @@
     // Newlines → <br>
     out = out.replace(/\n/g, '<br>');
     return out;
+  }
+
+  // ══════════════════════════════════════════════════════
+  //  REDEEM CODES MANAGER — admin.html
+  // ══════════════════════════════════════════════════════
+  var REDEEM_STORAGE_KEY = 'sync_redeem_codes';
+
+  function getRedeemCodes() {
+    try {
+      var saved = localStorage.getItem(REDEEM_STORAGE_KEY);
+      var parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch(e) { return []; }
+  }
+
+  function setRedeemCodes(codes) {
+    localStorage.setItem(REDEEM_STORAGE_KEY, JSON.stringify(codes));
+  }
+
+  function showRedeemMsg(text, type) {
+    var msg = document.getElementById('redeemAdminMsg');
+    msg.textContent = text;
+    msg.className = 'msg ' + (type || 'success');
+    msg.style.display = 'block';
+    setTimeout(function() { msg.style.display = 'none'; }, 2400);
+  }
+
+  function renderRedeemAdminList() {
+    var codes = getRedeemCodes();
+    var list = document.getElementById('redeemAdminList');
+    if (!list) return;
+    if (!codes.length) {
+      list.innerHTML = '<div class="posts-empty">No redeem codes saved yet.</div>';
+      return;
+    }
+    list.innerHTML = codes.map(function(code, i) {
+      var expired = code.expiry && new Date(code.expiry).getTime() < Date.now();
+      return '<div class="release-item" style="border-color:' + (expired ? 'rgba(255,45,120,0.18)' : 'rgba(255,215,0,0.15)') + ';opacity:' + (expired ? '0.6' : '1') + ';">' +
+        '<div class="release-item-head">' +
+          '<div>' +
+            '<span class="release-item-title" style="color:' + (expired ? 'rgba(255,255,255,0.5)' : '#fff') + ';">' + escHtml(code.title || 'Untitled') + '</span>' +
+            (expired ? '<span style="margin-left:8px;font-family:\'Share Tech Mono\',monospace;font-size:0.6rem;color:rgba(255,45,120,0.7);letter-spacing:0.1em;text-transform:uppercase;"> — EXPIRED</span>' : '') +
+            '<div class="release-item-meta" style="margin-top:4px;">' +
+              '<span style="font-family:\'Share Tech Mono\',monospace;font-size:0.75rem;letter-spacing:0.15em;color:#ffd700;background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);padding:3px 8px;display:inline-block;">' + escHtml(code.code) + '</span>' +
+            '</div>' +
+            (code.desc ? '<div class="release-item-songs" style="margin-top:6px;font-size:0.8rem;">' + escHtml(code.desc) + '</div>' : '') +
+            (code.expiry ? '<div class="release-item-meta" style="margin-top:4px;">Expires: ' + escHtml(code.expiry) + '</div>' : '') +
+          '</div>' +
+          '<div class="release-item-buttons">' +
+            '<button type="button" class="release-mini-btn" onclick="editRedeemCode(' + i + ')">Edit</button>' +
+            '<button type="button" class="release-mini-btn delete" onclick="deleteRedeemCode(' + i + ')">Delete</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function saveRedeemCode() {
+    var title  = document.getElementById('redeemTitle').value.trim();
+    var code   = document.getElementById('redeemCode').value.trim().toUpperCase();
+    var desc   = document.getElementById('redeemDesc').value.trim();
+    var expiry = document.getElementById('redeemExpiry').value;
+    var editIdx = parseInt(document.getElementById('redeemEditIndex').value, 10);
+
+    if (!title) { showRedeemMsg('Please enter a title.', 'error'); return; }
+    if (!code)  { showRedeemMsg('Please enter a redeem code.', 'error'); return; }
+
+    var codes = getRedeemCodes();
+    var entry = { title: title, code: code, desc: desc, expiry: expiry || '' };
+
+    if (editIdx >= 0 && editIdx < codes.length) {
+      codes[editIdx] = entry;
+      showRedeemMsg('Redeem code updated!', 'success');
+    } else {
+      codes.push(entry);
+      showRedeemMsg('Redeem code saved!', 'success');
+    }
+
+    setRedeemCodes(codes);
+    clearRedeemForm();
+    renderRedeemAdminList();
+  }
+
+  function editRedeemCode(i) {
+    var codes = getRedeemCodes();
+    if (i < 0 || i >= codes.length) return;
+    var code = codes[i];
+    document.getElementById('redeemTitle').value  = code.title  || '';
+    document.getElementById('redeemCode').value   = code.code   || '';
+    document.getElementById('redeemDesc').value   = code.desc   || '';
+    document.getElementById('redeemExpiry').value = code.expiry || '';
+    document.getElementById('redeemEditIndex').value = i;
+    document.getElementById('saveRedeemBtn').textContent = '✔ Update Redeem Code';
+    document.getElementById('cancelRedeemEditBtn').style.display = 'block';
+    document.getElementById('redeemAdminMsg').className = 'msg';
+    window.scrollTo({ top: document.getElementById('redeemManager').offsetTop - 100, behavior: 'smooth' });
+  }
+
+  async function deleteRedeemCode(i) {
+    var ok = await showConfirm('Delete this code?', 'This cannot be undone.', '🎁');
+    if (!ok) return;
+    var codes = getRedeemCodes();
+    codes.splice(i, 1);
+    setRedeemCodes(codes);
+    renderRedeemAdminList();
+    showRedeemMsg('Redeem code deleted.', 'success');
+  }
+
+  function cancelRedeemEdit() {
+    clearRedeemForm();
+    showRedeemMsg('Edit cancelled.', 'success');
+  }
+
+  function clearRedeemForm() {
+    document.getElementById('redeemTitle').value  = '';
+    document.getElementById('redeemCode').value   = '';
+    document.getElementById('redeemDesc').value   = '';
+    document.getElementById('redeemExpiry').value = '';
+    document.getElementById('redeemEditIndex').value = '-1';
+    document.getElementById('saveRedeemBtn').innerHTML = '&#9654;&nbsp; Save Redeem Code';
+    document.getElementById('cancelRedeemEditBtn').style.display = 'none';
   }
 </script>
 </body>
