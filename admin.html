@@ -1692,6 +1692,12 @@
     // ── Strikethrough ~~text~~
     raw = raw.replace(/~~(.+?)~~/g, (_, t) => ph('<s>' + esc(t) + '</s>'));
 
+    // ── Discord ID mentions (<@123>, <@!123>, <@&123>, <#123>). Convert before
+    //    the generic @word rule so they don't leak through as literal <@…> text.
+    raw = raw.replace(/<@&\d+>/g, () => ph('<strong style="color:#ffd700;">@role</strong>'));
+    raw = raw.replace(/<@!?\d+>/g, () => ph('<strong style="color:#00f0ff;">@member</strong>'));
+    raw = raw.replace(/<#\d+>/g, () => ph('<strong style="color:#ffd700;">#channel</strong>'));
+
     // ── Mentions and channels
     raw = raw.replace(/@everyone\b/g, () => ph('<strong style="color:#00f0ff;">@everyone</strong>'));
     raw = raw.replace(/@here\b/g,     () => ph('<strong style="color:#00f0ff;">@here</strong>'));
@@ -1708,9 +1714,11 @@
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
-      // Linkify URLs
-      s = s.replace(/(https?:\/\/[^\s<"&]+)/g, function(url) {
-        return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + '</a>';
+      // Linkify URLs (segment is already HTML-escaped, so keep &amp; entities
+      // inside the URL instead of truncating query strings at the first '&')
+      s = s.replace(/(https?:\/\/(?:&amp;|[^\s<"&])+)/g, function(url) {
+        var href = url.replace(/&amp;/g, '&');
+        return '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + url + '</a>';
       });
       return s;
     }).join('');
