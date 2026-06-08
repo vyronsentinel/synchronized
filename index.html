@@ -1974,7 +1974,7 @@
 
   /* ══════════════════════════════════════════════
      LOADING SCREEN
-  ══════════════════════════════════════════════ */
+  ══════════════════���═══════════════════════════ */
   #ls {
     position: fixed;
     inset: 0;
@@ -3724,6 +3724,13 @@
     // ── Strikethrough ~~text~~
     raw = raw.replace(/~~(.+?)~~/g, (_, t) => ph('<s>' + esc(t) + '</s>'));
 
+    // ── Discord ID mentions (<@123>, <@!123>, <@&123>, <#123>). Discord copies
+    //    these as raw numeric IDs; convert them to styled chips BEFORE the generic
+    //    @word rule runs, otherwise they leak through as literal <@…> text.
+    raw = raw.replace(/<@&\d+>/g, () => ph('<strong style="color:#ffd700;">@role</strong>'));
+    raw = raw.replace(/<@!?\d+>/g, () => ph('<strong style="color:#00f0ff;">@member</strong>'));
+    raw = raw.replace(/<#\d+>/g, () => ph('<strong style="color:#ffd700;">#channel</strong>'));
+
     // ── Mentions and channels
     raw = raw.replace(/@everyone\b/g, () => ph('<strong style="color:#00f0ff;">@everyone</strong>'));
     raw = raw.replace(/@here\b/g,     () => ph('<strong style="color:#00f0ff;">@here</strong>'));
@@ -3740,9 +3747,11 @@
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
-      // Linkify URLs
-      s = s.replace(/(https?:\/\/[^\s<"&]+)/g, function(url) {
-        return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + '</a>';
+      // Linkify URLs (segment is already HTML-escaped, so keep &amp; entities
+      // inside the URL instead of truncating query strings at the first '&')
+      s = s.replace(/(https?:\/\/(?:&amp;|[^\s<"&])+)/g, function(url) {
+        var href = url.replace(/&amp;/g, '&');
+        return '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + url + '</a>';
       });
       return s;
     }).join('');
@@ -3754,6 +3763,23 @@
     return out.trim();
   }
 
+  // A post is only worth showing if it has visible text OR at least one image/
+  // attachment. Discord messages that are empty, whitespace-only, or made up only
+  // of content that gets stripped (custom emoji, deleted embeds, stickers, bare
+  // mentions of removed entities, etc.) would otherwise render as blank cards.
+  function hasRenderableContent(post) {
+    if (!post) return false;
+    const media = [].concat(post.images || [], post.attachments || [])
+      .filter(a => typeof a === 'string' ? a.trim().length > 0 : (a && a.url));
+    if (media.length > 0) return true;
+    const textOnly = linkify(post.content || '')
+      .replace(/<[^>]*>/g, '')                  // strip all HTML tags (incl. <br>)
+      .replace(/&nbsp;/g, '')
+      .replace(/&amp;|&lt;|&gt;|&quot;/g, 'x')   // count real escaped chars as text
+      .replace(/\s+/g, '');
+    return textOnly.length > 0;
+  }
+
   window.loadAnnouncements = async function() {
     const body     = document.getElementById('ann-popup-body');
     const skeleton = document.getElementById('ann-popup-skeleton');
@@ -3761,7 +3787,7 @@
       const res   = await fetch(WORKER_URL + '/announcements', { cache: 'no-store' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       let posts = await res.json();
-      posts = Array.isArray(posts) ? posts.filter(post => !isManagedPost(post)) : posts;
+      posts = Array.isArray(posts) ? posts.filter(post => !isManagedPost(post) && hasRenderableContent(post)) : posts;
       if (skeleton) skeleton.remove();
       body.innerHTML = '';
       if (!Array.isArray(posts) || posts.length === 0) {
@@ -8446,10 +8472,10 @@ async function submitApplication() {
   var fbCrawler = navigator.userAgent.includes('facebookexternalhit') || 
                   navigator.userAgent.includes('Facebot');
 
-  var isHeadless = !fbCrawler && (
-    navigator.webdriver === true ||
-    (navigator.plugins.length === 0 && !navigator.userAgent.includes('Firefox'))
-  );
+  // Only trust the reliable automation signal. Checking navigator.plugins.length
+  // === 0 wrongly flags most mobile browsers and modern desktop Chrome, which
+  // would hide the entire page from legitimate visitors.
+  var isHeadless = !fbCrawler && navigator.webdriver === true;
   if (isHeadless) {
     document.body.style.display = 'none';
     console.warn('[SYNC] Automated browser detected. Access denied.');
