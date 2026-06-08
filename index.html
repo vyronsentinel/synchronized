@@ -83,6 +83,31 @@
 
   html { scroll-behavior: smooth; overflow-x: hidden; }
 
+  /* ── GLOBAL NEON SCROLLBAR (site-wide) ── */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: #00f0ff rgba(8,8,22,0.85);
+  }
+  ::-webkit-scrollbar {
+    width: 11px;
+    height: 11px;
+  }
+  ::-webkit-scrollbar-track {
+    background: rgba(6,6,20,0.9);
+    border-left: 1px solid rgba(0,240,255,0.10);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #00f0ff 0%, #6a5cff 50%, #ff2d78 100%);
+    border-radius: 8px;
+    border: 2px solid rgba(6,6,20,0.9);
+    box-shadow: 0 0 8px rgba(0,240,255,0.35), inset 0 0 4px rgba(255,255,255,0.18);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #5af6ff 0%, #8f7bff 50%, #ff4f93 100%);
+    box-shadow: 0 0 14px rgba(255,45,120,0.55), inset 0 0 5px rgba(255,255,255,0.25);
+  }
+  ::-webkit-scrollbar-corner { background: transparent; }
+
   body {
     background: var(--dark);
     color: var(--text);
@@ -1974,7 +1999,7 @@
 
   /* ══════════════════════════════════════════════
      LOADING SCREEN
-  ══════════════════���══���════════════════════════ */
+  ══════════════════   ══   ════════════════════════ */
   #ls {
     position: fixed;
     inset: 0;
@@ -4461,7 +4486,7 @@
 
   /* ══════════════════════════════════════════
      RECRUITER CARD — EMERALD PULSE
-  ══════════════════════════════════════════ */
+  ════════════════  ═════════════════════════ */
   @keyframes recruiterFloat {
     0%,100% { transform: translateY(0) scale(1); box-shadow: 0 0 18px rgba(0,255,180,0.3), 0 0 40px rgba(0,255,180,0.1), inset 0 0 12px rgba(0,255,180,0.04); border-color: rgba(0,255,180,0.45) !important; }
     50%      { transform: translateY(-8px) scale(1.02); box-shadow: 0 0 50px rgba(0,255,180,0.7), 0 0 90px rgba(0,240,255,0.25), inset 0 0 28px rgba(0,255,180,0.1); border-color: rgba(0,255,180,0.95) !important; }
@@ -5240,6 +5265,31 @@
       max-height: calc(100vh - 1.3rem);
       padding: 1.5rem 1rem !important;
     }
+  }
+
+  /* Apply Now modal — neon scrollbar to match the site */
+  #apply.application-modal,
+  #apply.application-modal .apply-modal-card {
+    scrollbar-width: thin;
+    scrollbar-color: #00f0ff rgba(6,6,20,0.6);
+  }
+  #apply.application-modal::-webkit-scrollbar,
+  #apply.application-modal .apply-modal-card::-webkit-scrollbar { width: 9px; }
+  #apply.application-modal::-webkit-scrollbar-track,
+  #apply.application-modal .apply-modal-card::-webkit-scrollbar-track {
+    background: rgba(6,6,20,0.6);
+    border-radius: 6px;
+  }
+  #apply.application-modal::-webkit-scrollbar-thumb,
+  #apply.application-modal .apply-modal-card::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #00f0ff 0%, #6a5cff 55%, #ff2d78 100%);
+    border-radius: 6px;
+    box-shadow: 0 0 8px rgba(0,240,255,0.4);
+  }
+  #apply.application-modal::-webkit-scrollbar-thumb:hover,
+  #apply.application-modal .apply-modal-card::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #5af6ff 0%, #8f7bff 55%, #ff4f93 100%);
+    box-shadow: 0 0 13px rgba(255,45,120,0.55);
   }
 </style>
 
@@ -6080,7 +6130,7 @@ async function submitApplication() {
 <div id="redeemNavWrap" style="position:fixed;bottom:24px;left:24px;z-index:9000;width:58px;height:62px;">
   <!-- dark mask to hide the page grid lines behind the box -->
   <div style="position:absolute;inset:-22px;background:radial-gradient(ellipse at center,#060614 0%,#060614 44%,rgba(6,6,20,0.55) 62%,transparent 80%);pointer-events:none;z-index:0;"></div>
-  <!-- pulsing glow bloom behind the button — no shape conflict -->
+  <!-- pulsing glow bloom behind the button     no shape conflict -->
   <div id="redeemGlowRing" style="
     position:absolute;inset:-14px;
     background:radial-gradient(ellipse at center,rgba(245,205,100,0.42) 0%,rgba(255,45,120,0.16) 50%,transparent 76%);
