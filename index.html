@@ -8152,7 +8152,7 @@ async function submitApplication() {
 <!-- Redeem Modal Overlay -->
 <div id="redeemModal" style="
   position: fixed; inset: 0;
-  background: rgba(0,0,0,0.82);
+  background: radial-gradient(circle at 28% 18%, rgba(255,45,120,0.13), transparent 46%), radial-gradient(circle at 76% 82%, rgba(0,240,255,0.13), transparent 46%), rgba(2,2,9,0.86);
   z-index: 8500;
   display: flex;
   align-items: center;
@@ -8160,59 +8160,74 @@ async function submitApplication() {
   padding: 1rem;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.22s ease;
-  backdrop-filter: blur(6px);
+  transition: opacity 0.25s ease;
+  backdrop-filter: blur(7px);
 ">
   <div id="redeemModalCard" style="
     position: relative;
     width: 100%;
-    max-width: 520px;
+    max-width: 540px;
     max-height: calc(100vh - 2rem);
     overflow-y: auto;
-    background: linear-gradient(160deg, rgba(10,10,30,0.98), rgba(7,7,20,0.99));
-    border: 1px solid rgba(0,240,255,0.3);
-    padding: 2rem 1.75rem;
-    clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
-    box-shadow: 0 0 60px rgba(0,240,255,0.08), 0 24px 80px rgba(0,0,0,0.7);
+    background: linear-gradient(165deg, rgba(13,12,34,0.99), rgba(7,6,19,0.99));
+    border: 1px solid rgba(0,240,255,0.26);
+    padding: 2.1rem 1.85rem 1.6rem;
+    clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
+    box-shadow: 0 0 70px rgba(0,240,255,0.10), 0 0 130px rgba(255,45,120,0.06), 0 24px 80px rgba(0,0,0,0.7);
     transform: translateY(12px) scale(0.98);
-    transition: transform 0.22s ease;
+    transition: transform 0.25s cubic-bezier(.2,.9,.3,1.25);
     scrollbar-width: thin;
-    scrollbar-color: rgba(0,240,255,0.2) transparent;
+    scrollbar-color: rgba(0,240,255,0.25) transparent;
   ">
-    <!-- Top gradient line -->
-    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--hot-pink),var(--cyan));"></div>
+    <!-- holographic color glows (clipped by card) -->
+    <div aria-hidden="true" style="position:absolute;inset:0;z-index:0;pointer-events:none;">
+      <div style="position:absolute;top:-40px;left:-30px;width:190px;height:190px;background:radial-gradient(circle,rgba(255,45,120,0.20),transparent 70%);"></div>
+      <div style="position:absolute;bottom:-50px;right:-30px;width:210px;height:210px;background:radial-gradient(circle,rgba(0,240,255,0.18),transparent 70%);"></div>
+      <div style="position:absolute;top:42%;right:26%;width:130px;height:130px;background:radial-gradient(circle,rgba(255,215,0,0.10),transparent 70%);"></div>
+    </div>
+    <!-- animated flowing top border -->
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;z-index:3;background:linear-gradient(90deg,var(--hot-pink),var(--gold),var(--cyan),var(--hot-pink));background-size:300% 100%;animation:redeemBorderFlow 6s linear infinite;"></div>
+    <!-- corner brackets -->
+    <div style="position:absolute;top:13px;left:13px;width:18px;height:18px;z-index:3;border-top:2px solid var(--cyan);border-left:2px solid var(--cyan);opacity:0.65;"></div>
+    <div style="position:absolute;bottom:13px;right:13px;width:18px;height:18px;z-index:3;border-bottom:2px solid var(--hot-pink);border-right:2px solid var(--hot-pink);opacity:0.65;"></div>
 
     <!-- Header -->
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;">
+    <div style="position:relative;z-index:2;display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.4rem;">
       <div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;letter-spacing:0.38em;color:var(--hot-pink);text-transform:uppercase;margin-bottom:0.35rem;">iDate Clan</div>
-        <h2 style="font-family:'Orbitron',sans-serif;font-weight:700;font-size:1.35rem;letter-spacing:0.08em;color:#fff;margin:0 0 0.2rem;">Redeem <span style="color:var(--cyan);">Codes</span></h2>
-        <div style="width:50px;height:2px;background:linear-gradient(90deg,var(--cyan),transparent);"></div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.58rem;letter-spacing:0.32em;text-transform:uppercase;margin-bottom:0.45rem;"><span style="color:var(--hot-pink);">iDate Clan</span> <span style="color:rgba(255,255,255,0.28);">//</span> <span style="color:var(--gold);">Rewards</span></div>
+        <h2 style="font-family:'Orbitron',sans-serif;font-weight:800;font-size:1.5rem;letter-spacing:0.05em;color:#fff;margin:0 0 0.5rem;">Redeem <span style="background:linear-gradient(90deg,var(--cyan),var(--hot-pink));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">Codes</span></h2>
+        <div style="display:flex;gap:5px;align-items:center;">
+          <span style="width:34px;height:3px;background:var(--cyan);box-shadow:0 0 8px var(--cyan);"></span>
+          <span style="width:14px;height:3px;background:var(--hot-pink);"></span>
+          <span style="width:7px;height:3px;background:var(--gold);"></span>
+        </div>
       </div>
       <button onclick="closeRedeemModal()" style="
-        background:transparent;border:1px solid rgba(0,240,255,0.25);
-        color:rgba(0,240,255,0.6);font-size:1rem;
-        width:34px;height:34px;border-radius:2px;cursor:pointer;
+        background:transparent;border:1px solid rgba(255,45,120,0.4);
+        color:rgba(255,255,255,0.7);font-size:0.95rem;
+        width:34px;height:34px;border-radius:3px;cursor:pointer;
         display:flex;align-items:center;justify-content:center;
         transition:all 0.18s;flex-shrink:0;
-      " onmouseover="this.style.borderColor='rgba(0,240,255,0.6)';this.style.color='var(--cyan)'"
-         onmouseout="this.style.borderColor='rgba(0,240,255,0.25)';this.style.color='rgba(0,240,255,0.6)'">✕</button>
+      " onmouseover="this.style.borderColor='var(--hot-pink)';this.style.color='var(--hot-pink)';this.style.boxShadow='0 0 14px rgba(255,45,120,0.4)'"
+         onmouseout="this.style.borderColor='rgba(255,45,120,0.4)';this.style.color='rgba(255,255,255,0.7)';this.style.boxShadow='none'">✕</button>
     </div>
 
     <!-- Codes List -->
-    <div id="redeemCodesList" style="display:grid;gap:0.65rem;"></div>
+    <div id="redeemCodesList" style="position:relative;z-index:2;display:grid;gap:0.8rem;"></div>
 
     <!-- Empty state -->
     <div id="redeemCodesEmpty" style="
+      position:relative;z-index:2;
       font-family:'Share Tech Mono',monospace;font-size:0.72rem;
       letter-spacing:0.14em;color:rgba(136,136,170,0.5);
       text-transform:uppercase;text-align:center;
       padding:2.5rem 0;display:none;
-    ">No redeem codes available right now.</div>
+    ">▢ No redeem codes available right now.</div>
 
     <!-- Footer note -->
-    <div style="margin-top:1.25rem;font-family:'Share Tech Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;color:rgba(255,255,255,0.25);text-transform:uppercase;text-align:right;">
-      SYNCHRONIZED · iDate Clan
+    <div style="position:relative;z-index:2;margin-top:1.4rem;padding-top:0.9rem;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:0.55rem;letter-spacing:0.14em;text-transform:uppercase;">
+      <span style="color:rgba(0,240,255,0.42);">▸ Secure Sync</span>
+      <span style="color:rgba(255,255,255,0.26);">SYNCHRONIZED · iDate Clan</span>
     </div>
   </div>
 </div>
@@ -8296,59 +8311,85 @@ async function submitApplication() {
     #redeemNavWrap { bottom: 90px !important; left: 16px !important; }
     #redeemNavBtn  { width: 50px !important; height: 54px !important; }
   }
+  @keyframes redeemBorderFlow { 0%{background-position:0% 0;} 100%{background-position:300% 0;} }
+  @keyframes rcShine { 0%{left:-60%;} 100%{left:130%;} }
+  /* ── Redeem code "ticket" cards — each cycles a different neon accent ── */
   .redeem-code-card {
-    background: linear-gradient(135deg, rgba(0,240,255,0.06), rgba(0,240,255,0.02));
-    border: 1px solid rgba(0,240,255,0.22);
-    padding: 1rem 1.1rem;
-    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
-    transition: border-color 0.2s;
-    position: relative;
-    overflow: hidden;
+    --rc:#00f0ff; --rc2:#00b3ff;
+    position:relative; overflow:hidden;
+    padding:1.05rem 1.2rem 1.1rem 1.4rem;
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--rc) 11%, transparent), rgba(7,7,22,0.35) 62%),
+      rgba(9,9,26,0.55);
+    border:1px solid color-mix(in srgb, var(--rc) 38%, transparent);
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
   }
+  .redeem-code-card:nth-child(4n+1){ --rc:#00f0ff; --rc2:#00b3ff; }
+  .redeem-code-card:nth-child(4n+2){ --rc:#ff2d78; --rc2:#ff6aa6; }
+  .redeem-code-card:nth-child(4n+3){ --rc:#ffd700; --rc2:#ffae00; }
+  .redeem-code-card:nth-child(4n+4){ --rc:#00dc82; --rc2:#16f0a3; }
   .redeem-code-card::before {
-    content:'';position:absolute;top:0;left:0;width:3px;height:100%;
-    background: linear-gradient(180deg,var(--cyan),rgba(0,240,255,0.2));
+    content:''; position:absolute; top:0; left:0; width:4px; height:100%;
+    background:linear-gradient(180deg, var(--rc), var(--rc2));
+    box-shadow:0 0 12px var(--rc);
   }
-  .redeem-code-card:hover { border-color: rgba(0,240,255,0.45); }
+  .redeem-code-card::after {
+    content:''; position:absolute; top:0; left:-60%; width:45%; height:100%;
+    background:linear-gradient(105deg, transparent, color-mix(in srgb, var(--rc) 26%, transparent), transparent);
+    transform:skewX(-18deg); opacity:0; pointer-events:none;
+  }
+  .redeem-code-card:hover {
+    transform:translateY(-2px);
+    border-color:color-mix(in srgb, var(--rc) 72%, transparent);
+    box-shadow:0 10px 28px rgba(0,0,0,0.45), 0 0 20px color-mix(in srgb, var(--rc) 28%, transparent);
+  }
+  .redeem-code-card:hover::after { opacity:1; animation:rcShine 0.85s ease; }
   .redeem-code-title {
-    font-family:'Orbitron',sans-serif;font-weight:700;font-size:0.82rem;
-    letter-spacing:0.06em;color:#fff;text-transform:uppercase;margin-bottom:0.3rem;
+    font-family:'Orbitron',sans-serif;font-weight:700;font-size:0.84rem;
+    letter-spacing:0.06em;color:#fff;text-transform:uppercase;margin-bottom:0.32rem;
+    text-shadow:0 0 10px color-mix(in srgb, var(--rc) 55%, transparent);
   }
   .redeem-code-desc {
     font-family:'Exo 2',sans-serif;font-size:0.82rem;
-    color:rgba(218,231,230,0.78);line-height:1.55;margin-bottom:0.65rem;
+    color:rgba(218,231,230,0.78);line-height:1.55;margin-bottom:0.7rem;
   }
   .redeem-code-value-wrap {
-    display:flex;align-items:center;gap:0.5rem;
+    display:flex;align-items:center;gap:0.55rem;
   }
   .redeem-code-value {
-    font-family:'Share Tech Mono',monospace;font-size:0.88rem;
-    letter-spacing:0.22em;color:var(--cyan);
-    background:rgba(0,240,255,0.07);border:1px solid rgba(0,240,255,0.25);
-    padding:7px 12px;border-radius:2px;flex:1;
-    text-transform:uppercase;word-break:break-all;
-    user-select:all;
+    font-family:'Share Tech Mono',monospace;font-size:0.92rem;
+    letter-spacing:0.22em;color:var(--rc);flex:1;
+    background:color-mix(in srgb, var(--rc) 8%, rgba(0,0,0,0.32));
+    border:1px dashed color-mix(in srgb, var(--rc) 50%, transparent);
+    padding:8px 12px;border-radius:3px;
+    text-transform:uppercase;word-break:break-all;user-select:all;
+    text-shadow:0 0 8px color-mix(in srgb, var(--rc) 45%, transparent);
   }
   .redeem-copy-btn {
-    background:rgba(0,240,255,0.08);border:1px solid rgba(0,240,255,0.3);
-    color:rgba(0,240,255,0.8);font-family:'Share Tech Mono',monospace;
-    font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;
-    padding:7px 13px;border-radius:2px;cursor:pointer;
+    background:transparent;border:1px solid var(--rc);color:var(--rc);
+    font-family:'Share Tech Mono',monospace;
+    font-size:0.66rem;letter-spacing:0.12em;text-transform:uppercase;
+    padding:8px 14px;border-radius:3px;cursor:pointer;
     transition:all 0.18s;white-space:nowrap;flex-shrink:0;
   }
-  .redeem-copy-btn:hover{background:rgba(0,240,255,0.18);border-color:var(--cyan);color:var(--cyan);}
+  .redeem-copy-btn:hover{
+    background:linear-gradient(135deg, var(--rc), var(--rc2));color:#06061a;font-weight:700;
+    box-shadow:0 0 16px color-mix(in srgb, var(--rc) 55%, transparent);
+  }
   .redeem-code-expiry {
     font-family:'Share Tech Mono',monospace;font-size:0.58rem;
-    letter-spacing:0.12em;color:rgba(0,240,255,0.45);
-    text-transform:uppercase;margin-top:0.45rem;
+    letter-spacing:0.12em;color:color-mix(in srgb, var(--rc) 60%, #8888aa);
+    text-transform:uppercase;margin-top:0.5rem;
   }
-  .redeem-code-expiry.expired { color: rgba(255,45,120,0.55); }
+  .redeem-code-expiry.expired { color: rgba(255,45,120,0.6); }
   .redeem-code-card.expired-card {
-    opacity:0.55;border-color:rgba(255,45,120,0.18);
+    opacity:0.55; --rc:#ff2d78; --rc2:#ff6aa6;
+    border-color:rgba(255,45,120,0.2);
   }
-  .redeem-code-card.expired-card::before { background:linear-gradient(180deg,rgba(255,45,120,0.5),transparent); }
-  #redeemModalCard::-webkit-scrollbar { width: 4px; }
-  #redeemModalCard::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.2); border-radius: 2px; }
+  #redeemModalCard::-webkit-scrollbar { width: 5px; }
+  #redeemModalCard::-webkit-scrollbar-thumb { background:linear-gradient(180deg,var(--cyan),var(--hot-pink)); border-radius:3px; }
+  #redeemModalCard::-webkit-scrollbar-track { background:transparent; }
 </style>
 
 <script>
