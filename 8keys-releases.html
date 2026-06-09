@@ -549,6 +549,33 @@
 
     .poster-line { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; min-width: 0; }
 
+    .poster-avatar {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      flex: none;
+      overflow: hidden;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--pink), var(--cyan));
+      box-shadow: inset 0 0 0 1.5px rgba(10, 11, 22, 0.4), 0 0 0 1px var(--border);
+      font-family: var(--font-display);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #07101a;
+      letter-spacing: 0;
+      user-select: none;
+    }
+
+    .poster-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
     .poster-name {
       display: inline-flex;
       align-items: center;
@@ -557,15 +584,6 @@
       font-size: 1rem;
       font-weight: 600;
       color: #fff;
-    }
-
-    .poster-name::before {
-      content: "";
-      width: 30px; height: 30px;
-      flex: none;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--pink), var(--cyan));
-      box-shadow: inset 0 0 0 2px rgba(10, 11, 22, 0.55);
     }
 
     .release-labels { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 8px; }
@@ -1047,6 +1065,55 @@
       return raw;
     }
 
+    // Officer avatars pulled from the clan roster on index.html.
+    // Each entry matches against the normalized poster name (letters/numbers only).
+    const OFFICER_AVATARS = [
+      { src: "lujj.png", match: ["luj"] },
+      { src: "zyx.png", match: ["zyx"] },
+      { src: "jam1.png", match: ["jxiam", "jam"] },
+      { src: "shin.png", match: ["sh1n", "shin"] },
+      { src: "kyo.png", match: ["kyo"] },
+      { src: "mari.png", match: ["minwonuna", "minwo", "mari"] },
+      { src: "errs.png", match: ["errs"] },
+      { src: "pinoo.png", match: ["pinoo"] },
+      { src: "kael.png", match: ["kael"] }
+    ];
+
+    function resolveOfficerAvatar(poster) {
+      const norm = String(poster || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (!norm) return null;
+      const officer = OFFICER_AVATARS.find(o => o.match.some(token => norm.includes(token)));
+      return officer ? officer.src : null;
+    }
+
+    function posterInitials(poster) {
+      const cleaned = String(poster || "").replace(/\[sync\]/ig, "").replace(/[^a-zA-Z0-9]/g, "");
+      return (cleaned.slice(0, 2) || "?").toUpperCase();
+    }
+
+    function createPosterAvatar(poster) {
+      const avatar = document.createElement("span");
+      avatar.className = "poster-avatar";
+      avatar.setAttribute("aria-hidden", "true");
+
+      const src = resolveOfficerAvatar(poster);
+      if (src) {
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = poster;
+        img.loading = "lazy";
+        img.addEventListener("error", () => {
+          img.remove();
+          avatar.textContent = posterInitials(poster);
+        });
+        avatar.appendChild(img);
+      } else {
+        avatar.textContent = posterInitials(poster);
+      }
+
+      return avatar;
+    }
+
     function createBadge(label) {
       const badge = document.createElement("span");
       badge.className = `badge ${badgeClass(label)}`;
@@ -1206,7 +1273,7 @@
         poster.className = "poster-name";
         poster.textContent = release.poster;
 
-        posterLine.append(poster);
+        posterLine.append(createPosterAvatar(release.poster), poster);
         meta.appendChild(posterLine);
 
         const releaseLabels = document.createElement("div");
