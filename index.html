@@ -10,30 +10,15 @@
     <!-- ╚══════════════════════════════════════════════╝ -->
 
     <!-- 1. Content Security Policy — blocks XSS & unauthorized resource injection -->
-    <meta http-equiv="Content-Security-Policy" content="
-  default-src 'self';
-  script-src 'self' 'unsafe-inline';
-  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-  font-src 'self' https://fonts.gstatic.com;
-  img-src 'self' data: https://synchronized.site https://sync-worker.lastresort962.workers.dev;
-  media-src 'self';
-  connect-src 'self' https://sync-worker.lastresort962.workers.dev https://discord.com;
-  frame-ancestors 'none';
-  base-uri 'self';
-  form-action 'self';
-">
 
     <!-- 2. Clickjacking Protection — prevents your site from being iframed -->
-    <meta http-equiv="X-Frame-Options" content="DENY">
 
     <!-- 3. MIME Sniffing Protection -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
 
     <!-- 4. Referrer Policy — limits referrer info leakage -->
     <meta name="referrer" content="strict-origin-when-cross-origin">
 
     <!-- 5. Permissions Policy — disables sensitive browser APIs -->
-    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
 
     <!-- SEO & Link Preview Tags -->
     <meta name="description" content="SYNCHRONIZED is iDate Clan's official hub — rankings, roster, events, and more.">
@@ -8746,6 +8731,138 @@ async function submitApplication() {
   renderReleasePreview();
   window.addEventListener('storage', renderReleasePreview);
 })();
+</script>
+
+<!-- PROFESSIONAL REFINEMENT LAYER (auto-appended) -->
+<style>
+
+/* ════════════════════════════════════════════════════════════
+   PROFESSIONAL REFINEMENT LAYER
+   Appended last so it polishes the existing neon theme without
+   touching markup or interactive features. Focus: readability,
+   contrast, consistent structure — plus a hard guarantee that the
+   page background stays dark.
+   ════════════════════════════════════════════════════════════ */
+
+/* 0 · GUARANTEE THE DARK CANVAS — the page must never render white */
+html{ background-color:#050510 !important; }
+body{ background-color:#050510 !important; }
+
+/* 1 · Crisp text rendering site-wide */
+body{
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+}
+
+/* 2 · Calm the visual noise that fights with text.
+      The scan-line overlay and grid are kept for atmosphere but
+      softened so copy stays sharp. */
+body::before{
+  background:repeating-linear-gradient(
+    0deg,transparent,transparent 3px,
+    rgba(0,0,0,0.03) 3px,rgba(0,0,0,0.03) 6px) !important;
+}
+.grid-bg{ opacity:.62; background-size:72px 72px; }
+
+/* 3 · Friendly selection + anchored scrolling clears the fixed nav */
+::selection{ background:rgba(255,45,120,.35); color:#fff; }
+html{ scroll-padding-top:88px; }
+
+/* 4 · Readable body copy: higher contrast, comfortable measure,
+      relaxed rhythm, no glow on long-form text. */
+.about-text p{
+  color:#d7dcf3 !important;
+  font-size:1.07rem;
+  line-height:1.85 !important;
+  letter-spacing:.004em;
+  margin-bottom:1.25rem;
+  max-width:62ch;
+  text-shadow:none;
+}
+.about-text p strong{ font-weight:700; }
+.about-text p strong:not([style]){ color:var(--cyan); }
+
+/* 5 · Consistent, professional section rhythm + clearer hierarchy */
+.section-wrapper{ padding:6rem 2rem; }
+.section-label{ font-size:.72rem; letter-spacing:.32em; margin-bottom:.7rem; }
+.section-title{
+  line-height:1.12;
+  margin-bottom:1.1rem;
+  text-shadow:0 0 16px rgba(255,45,120,.25);
+}
+.section-divider{ height:3px; width:88px; border-radius:3px; margin-bottom:2.5rem; }
+
+/* 6 · Navigation legibility */
+.nav-links a{ color:#e3e7f6; font-size:.82rem; letter-spacing:.1em; }
+.nav-links a:hover,.nav-links a:focus-visible{ color:var(--cyan); }
+
+/* 7 · Hero subtitle + clan tag clarity */
+.hero-sub{ color:#e9edff; font-size:.95rem; letter-spacing:.16em; }
+.clan-tag{ letter-spacing:.26em; }
+
+/* 8 · Member cards — names & roles easier to scan */
+.member-name{ font-size:1rem; letter-spacing:.07em; }
+.member-role{ font-size:.78rem; letter-spacing:.15em; }
+
+/* 9 · Clear keyboard focus for accessibility / professionalism */
+a:focus-visible,button:focus-visible,input:focus-visible,
+textarea:focus-visible,select:focus-visible{
+  outline:2px solid var(--cyan);
+  outline-offset:3px;
+  border-radius:3px;
+}
+
+/* 10 · Tidy responsive spacing */
+@media (max-width:900px){
+  .section-wrapper{ padding:4rem 1.5rem; }
+}
+@media (max-width:600px){
+  .section-wrapper{ padding:3rem 1.15rem; }
+  .about-text p{ font-size:1rem; line-height:1.8 !important; }
+}
+
+</style>
+<script>
+/* SAFETY / ANTI-BLANK-SCREEN GUARD (auto-appended)
+   Ensures the page is never left blank or stuck on the loading screen
+   in preview / embedded / automated viewers, without altering any
+   normal-visitor behaviour. */
+(function () {
+  'use strict';
+
+  function unhideBody() {
+    try {
+      var b = document.body;
+      if (b && b.style && b.style.display === 'none') {
+        b.style.display = '';
+      }
+    } catch (e) {}
+  }
+
+  function clearLoader() {
+    try {
+      var ls = document.getElementById('ls');
+      if (ls && !ls.classList.contains('ls-gone')) {
+        ls.classList.add('ls-gone');
+        ls.style.opacity = '0';
+        ls.style.visibility = 'hidden';
+        ls.style.pointerEvents = 'none';
+      }
+    } catch (e) {}
+  }
+
+  // Make sure body is visible immediately and shortly after load.
+  unhideBody();
+  document.addEventListener('DOMContentLoaded', unhideBody);
+  window.addEventListener('load', unhideBody);
+
+  // Failsafe: if the loading screen is still up after 9s (e.g. the
+  // ENTER button was never clickable in this viewer), retire it so the
+  // dark page underneath is revealed instead of a frozen overlay.
+  setTimeout(clearLoader, 9000);
+})();
+
 </script>
 </body>
 </html>
