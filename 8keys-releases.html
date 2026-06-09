@@ -1010,6 +1010,59 @@
       }
     }
 
+    // ── Defensive normalization ─────────────────────────────────
+    // Admin-saved releases can arrive in slightly different shapes
+    // (e.g. chart versions stored as a comma string instead of an
+    // array, or a release/song missing fields). Coerce everything
+    // into the exact shape the renderer expects so a single stray
+    // entry can never crash the whole feed and blank the page.
+    function toVersionArray(value) {
+      if (Array.isArray(value)) return value.map(v => String(v).trim()).filter(Boolean);
+      if (value === undefined || value === null) return [];
+      if (typeof value === "string") {
+        return value.split(/[,/|]/).map(v => v.trim()).filter(Boolean);
+      }
+      return [String(value).trim()].filter(Boolean);
+    }
+
+    function normalizeSong(raw) {
+      const song = (raw && typeof raw === "object") ? raw : {};
+      return {
+        ...song,
+        title: song.title != null ? String(song.title) : (typeof raw === "string" ? raw : ""),
+        artist: song.artist != null ? String(song.artist) : "",
+        difficulty: song.difficulty != null ? song.difficulty : "",
+        bpm: song.bpm != null ? String(song.bpm) : "",
+        duration: song.duration != null ? String(song.duration) : "",
+        versions: toVersionArray(
+          song.versions != null ? song.versions
+            : song.charts != null ? song.charts
+            : song.badges
+        ),
+        experimental: Boolean(song.experimental),
+        edited: Boolean(song.edited)
+      };
+    }
+
+    function normalizeRelease(raw) {
+      const release = (raw && typeof raw === "object") ? raw : {};
+      const songsSource = Array.isArray(release.songs) ? release.songs
+        : Array.isArray(release.tracks) ? release.tracks
+        : [];
+      return {
+        ...release,
+        poster: release.poster != null ? String(release.poster)
+          : (release.author != null ? String(release.author) : ""),
+        date: release.date != null ? String(release.date) : "",
+        label: release.label != null ? String(release.label) : "",
+        songs: songsSource.map(normalizeSong)
+      };
+    }
+
+    function normalizeReleases(list) {
+      return Array.isArray(list) ? list.map(normalizeRelease) : [];
+    }
+
     let releases = [];
 
     const filters = ["All", "New Songs", "Updated", "Experimental"];
@@ -1368,7 +1421,7 @@
     }
 
     async function initReleases() {
-      releases = await getReleaseData();
+      releases = normalizeReleases(await getReleaseData());
       renderTotals();
       renderFilters();
       renderFeed();
