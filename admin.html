@@ -233,6 +233,7 @@
     <button type="button" class="admin-mode-btn" id="modeRosterBtn" aria-pressed="false" onclick="switchAdminTool('roster')">Roster</button>
     <button type="button" class="admin-mode-btn" id="modeGalleryBtn" aria-pressed="false" onclick="switchAdminTool('gallery')">Photos</button>
     <button type="button" class="admin-mode-btn" id="modeRedeemBtn" aria-pressed="false" onclick="switchAdminTool('redeem')">🎁 Redeem</button>
+    <button type="button" class="admin-mode-btn" id="modeOrgBtn" aria-pressed="false" onclick="switchAdminTool('org')">👥 Organization</button>
   </div>
   <div class="admin-tool-panel" id="announcementTool">
   <div class="msg" id="postMsg"></div>
@@ -426,6 +427,8 @@
       <div id="redeemAdminList"></div>
     </div>
   </div>
+
+  <div class="release-manager admin-tool-panel" id="orgManager" hidden></div>
 
   <button class="btn-secondary" onclick="confirmLogout()">&larr; Logout</button>
   <button class="btn-secondary" onclick="window.location.href='index.html'" style="margin-top:0.4rem;">&#8962;&nbsp; Back to Main Page</button>
@@ -906,11 +909,13 @@
     var rosterTool = document.getElementById('rosterManager');
     var galleryTool = document.getElementById('galleryManager');
     var redeemTool = document.getElementById('redeemManager');
+    var orgTool = document.getElementById('orgManager');
     var announcementBtn = document.getElementById('modeAnnouncementBtn');
     var releaseBtn = document.getElementById('modeReleasesBtn');
     var rosterBtn = document.getElementById('modeRosterBtn');
     var galleryBtn = document.getElementById('modeGalleryBtn');
     var redeemBtn = document.getElementById('modeRedeemBtn');
+    var orgBtn = document.getElementById('modeOrgBtn');
     var label = document.querySelector('#adminBox .box-label');
     var title = document.querySelector('#adminBox .box-title');
     var isAnnouncement = tool === 'announcement';
@@ -918,22 +923,26 @@
     var isRoster = tool === 'roster';
     var isGallery = tool === 'gallery';
     var isRedeem = tool === 'redeem';
+    var isOrg = tool === 'org';
 
     announcementTool.hidden = !isAnnouncement;
     releaseTool.hidden = !isReleases;
     rosterTool.hidden = !isRoster;
     galleryTool.hidden = !isGallery;
     redeemTool.hidden = !isRedeem;
+    if (orgTool) orgTool.hidden = !isOrg;
     announcementBtn.classList.toggle('active', isAnnouncement);
     releaseBtn.classList.toggle('active', isReleases);
     rosterBtn.classList.toggle('active', isRoster);
     galleryBtn.classList.toggle('active', isGallery);
     redeemBtn.classList.toggle('active', isRedeem);
+    if (orgBtn) orgBtn.classList.toggle('active', isOrg);
     announcementBtn.setAttribute('aria-pressed', isAnnouncement ? 'true' : 'false');
     releaseBtn.setAttribute('aria-pressed', isReleases ? 'true' : 'false');
     rosterBtn.setAttribute('aria-pressed', isRoster ? 'true' : 'false');
     galleryBtn.setAttribute('aria-pressed', isGallery ? 'true' : 'false');
     redeemBtn.setAttribute('aria-pressed', isRedeem ? 'true' : 'false');
+    if (orgBtn) orgBtn.setAttribute('aria-pressed', isOrg ? 'true' : 'false');
 
     if (isReleases) {
       label.textContent = '8Keys Release Panel';
@@ -951,6 +960,10 @@
       label.textContent = 'Redeem Codes Panel';
       title.innerHTML = 'Manage <span>Redeem Codes</span>';
       renderRedeemAdminList();
+    } else if (isOrg) {
+      label.textContent = 'Organization Panel';
+      title.innerHTML = 'Manage <span>Organization</span>';
+      if (typeof initOrgManager === 'function') initOrgManager();
     } else {
       label.textContent = 'Announcement Panel';
       title.innerHTML = 'Post <span>Announcement</span>';
@@ -1850,6 +1863,660 @@
     document.getElementById('saveRedeemBtn').innerHTML = '&#9654;&nbsp; Save Redeem Code';
     document.getElementById('cancelRedeemEditBtn').style.display = 'none';
   }
+</script>
+
+<!-- SYNC Organization Management module -->
+<script>
+/* ============================================================================
+   SYNCHRONIZED — Organization Management (Admin)
+   Founders / Leadership / High Council / Moderators / Recruiters / Members.
+   Full CRUD, drag reorder + visual hierarchy, image upload (drag&drop + crop/
+   zoom), themes, glow, border, toggles, optional fields, animation controls,
+   mobile layout, and live preview — persisted via the existing Worker pattern.
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  var WORKER = (typeof WORKER_URL !== 'undefined') ? WORKER_URL : 'https://sync-worker.lastresort962.workers.dev';
+  var SEC = (typeof SECRET !== 'undefined') ? SECRET : 'sync123';
+  var FOUNDER_PREFIX = '__SYNC_FOUNDER__';
+  var META_PREFIX = '__SYNC_ORG_META__';
+  var LS_FOUNDERS = 'sync_founders_v1';
+  var LS_META = 'sync_org_meta_v1';
+  var FOUNDER_AUTHOR = 'SYNC-FOUNDER';
+
+  var DEPARTMENTS = ['Clan Master', 'Vice Clan Master', 'High Council', 'Leadership', 'Moderators', 'Recruiters', 'Members'];
+  var ROLES = [
+    { id: 'clan-master', label: '\u265B Clan Master', color: '#FFD700', dept: 'Clan Master' },
+    { id: 'vice', label: '\u265C Vice Clan Master', color: '#ff3333', dept: 'Vice Clan Master' },
+    { id: 'high-council', label: '\u25C8 High Council', color: '#E8B48A', dept: 'High Council' },
+    { id: 'examiner', label: '\u25CE Examiner', color: '#00BFFF', dept: 'Leadership' },
+    { id: 'mod', label: '\u2B21 Moderator', color: '#b07fff', dept: 'Leadership' },
+    { id: 'recruiter', label: '\u2726 Recruiter', color: '#00ffb4', dept: 'Recruiters' },
+    { id: 'member', label: '\u25C6 Member', color: '#FF69B4', dept: 'Members' },
+    { id: 'custom', label: '\u2726 Custom', color: '#00f0ff', dept: 'Leadership' }
+  ];
+  var THEMES = ['', 'gold', 'crimson', 'cyan', 'purple', 'pink', 'green', 'custom'];
+  var GLOWS = ['', 'low', 'medium', 'high', 'extreme'];
+  var BORDERS = ['', 'neon', 'animated', 'pulse'];
+  var ENTRANCES = [['', 'Default'], ['fade', 'Fade In'], ['slide', 'Slide Up'], ['neon', 'Neon Reveal'], ['scan', 'Cyber Scan'], ['glitch', 'Glitch Appearance']];
+  var HOVERS = [['', 'Default'], ['glow', 'Glow Expand'], ['pulse', 'Pulse'], ['rotate', 'Rotate Border'], ['ring', 'Energy Ring']];
+  var MOBILE_LAYOUTS = [['scroll', 'Vertical Scroll (default)'], ['carousel', 'Carousel'], ['expand', 'Expand / Collapse'], ['paginate', 'Pagination']];
+
+  var founders = [];     // working copy
+  var meta = { mobileLayout: 'scroll', tabletLayout: 'default', desktopLayout: 'default' };
+  var editId = null;
+  var pendingImage = '';
+  var deptFilter = 'all';
+  var initialized = false;
+
+  /* ---- shared helpers (reuse existing globals where present) -------------- */
+  function esc(s) {
+    if (typeof escHtml === 'function') return escHtml(s);
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function uid() { return 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  function roleColor(id) { for (var i = 0; i < ROLES.length; i++) if (ROLES[i].id === id) return ROLES[i].color; return '#00f0ff'; }
+  function roleDept(id) { for (var i = 0; i < ROLES.length; i++) if (ROLES[i].id === id) return ROLES[i].dept; return 'Members'; }
+  function hexRgb(hex) {
+    var h = String(hex || '').replace('#', '');
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    var n = parseInt(h, 16); if (isNaN(n)) return '0,240,255';
+    return ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255);
+  }
+  function msg(text, type) {
+    var el = document.getElementById('orgMsg'); if (!el) return;
+    el.textContent = text; el.className = 'msg ' + (type || 'success'); el.style.display = 'block';
+    setTimeout(function () { el.style.display = 'none'; }, 2600);
+  }
+
+  /* ---- persistence -------------------------------------------------------- */
+  function isFounderPost(p) { return !!(p && typeof p.content === 'string' && p.content.indexOf(FOUNDER_PREFIX) === 0); }
+  function isMetaPost(p) { return !!(p && typeof p.content === 'string' && p.content.indexOf(META_PREFIX) === 0); }
+  function founderToPost(f) { return { author: FOUNDER_AUTHOR, content: FOUNDER_PREFIX + JSON.stringify(f), images: [], timestamp: f.updatedAt || new Date().toISOString() }; }
+  function metaToPost(m) { return { author: FOUNDER_AUTHOR, content: META_PREFIX + JSON.stringify(m), images: [], timestamp: new Date().toISOString() }; }
+  function founderFromPost(p) { try { return JSON.parse(p.content.slice(FOUNDER_PREFIX.length)); } catch (e) { return null; } }
+  function metaFromPost(p) { try { return JSON.parse(p.content.slice(META_PREFIX.length)); } catch (e) { return null; } }
+
+  function getLocal() { try { var s = JSON.parse(localStorage.getItem(LS_FOUNDERS)); return Array.isArray(s) ? s : []; } catch (e) { return []; } }
+
+  function builtinDefaults() {
+    var raw = [
+      { role:'clan-master', department:'Clan Master', displayName:'[SYNC]-Luj-*CM', roleLabel:'Clan Master', image:'lujj.png', badgeText:'\u2694 Commander \u2694' },
+      { role:'vice', department:'Vice Clan Master', displayName:'[SYNC]-Zyx-', roleLabel:'Vice Clan Master', image:'zyx.png' },
+      { role:'high-council', department:'High Council', displayName:'[SYNC]-Jxiam-', roleLabel:'High Council', image:'jam1.png' },
+      { role:'high-council', department:'High Council', displayName:'[SYNC]-Sh1n-', roleLabel:'High Council', image:'shin.png' },
+      { role:'high-council', department:'High Council', displayName:'[SYNC]-KYO-', roleLabel:'High Council', image:'kyo.png' },
+      { role:'high-council', department:'High Council', displayName:'[SYNC]-Minwonuna-', roleLabel:'High Council', image:'mari.png', smallName:true },
+      { role:'examiner', department:'Leadership', displayName:'[SYNC]-Errs-', roleLabel:'Examiner', image:'errs.png', badgeText:'\u2726 Examiner \u2726' },
+      { role:'mod', department:'Leadership', displayName:'[SYNC]-pinoo*-', roleLabel:'Moderator', image:'pinoo.png', badgeText:'\u2726 Forum Moderator \u2726' },
+      { role:'recruiter', department:'Leadership', displayName:'[SYNC]-Kael-', roleLabel:'Recruiter', image:'kael.png', badgeText:'\u2726 Recruiter \u2726' }
+    ];
+    return raw.map(function (m, i) {
+      return Object.assign({ id:'seed-'+i, username:'', nickname:'', title:'', rankLevel:i+1, theme:'', customColor:'#00f0ff', glow:'', border:'', parentId:null, order:i, active:true, featured:false, showHomepage:true, showFounders:true, discord:'', facebook:'', roblox:'', joinDate:'', bio:'', achievements:'', awards:'', quote:'', entrance:'', hover:'', updatedAt:new Date().toISOString() }, m);
+    });
+  }
+  function seedDefaults() {
+    if (window.SyncFounders && typeof window.SyncFounders.defaults === 'function') return window.SyncFounders.defaults();
+    return builtinDefaults();
+  }
+
+  function fetchPosts() {
+    if (typeof fetchAllPosts === 'function') return fetchAllPosts();
+    return fetch(WORKER + '/announcements', { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('http'); return r.json(); }).then(function (p) { return Array.isArray(p) ? p : []; });
+  }
+
+  function loadOrg() {
+    return fetchPosts().then(function (posts) {
+      founders = posts.map(founderFromPost).filter(Boolean);
+      var m = null; for (var i = 0; i < posts.length; i++) { var mm = metaFromPost(posts[i]); if (mm) { m = mm; break; } }
+      if (m) meta = Object.assign(meta, m);
+      if (!founders.length) { founders = getLocal(); }
+      if (!founders.length) { founders = seedDefaults(); }
+      localStorage.setItem(LS_FOUNDERS, JSON.stringify(founders));
+      localStorage.setItem(LS_META, JSON.stringify(meta));
+    }).catch(function () {
+      founders = getLocal(); if (!founders.length) founders = seedDefaults();
+      msg('Using local data. Shared sync could not load.', 'error');
+    });
+  }
+
+  function persist() {
+    founders.forEach(function (f, i) { if (f.order == null) f.order = i; });
+    localStorage.setItem(LS_FOUNDERS, JSON.stringify(founders));
+    localStorage.setItem(LS_META, JSON.stringify(meta));
+    return fetchPosts().then(function (posts) {
+      var keep = posts.filter(function (p) { return !isFounderPost(p) && !isMetaPost(p); });
+      var payload = keep.concat(founders.map(founderToPost)).concat([metaToPost(meta)]);
+      return fetch(WORKER + '/save?secret=' + SEC, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    }).then(function (r) { if (!r || !r.ok) throw new Error('save failed'); });
+  }
+
+  /* ---- option helpers ----------------------------------------------------- */
+  function opts(list, sel) { return list.map(function (o) { var v = (o instanceof Array) ? o[0] : o; var l = (o instanceof Array) ? o[1] : (o || '\u2014 None \u2014'); return '<option value="' + esc(v) + '"' + (v === sel ? ' selected' : '') + '>' + esc(l) + '</option>'; }).join(''); }
+  function roleOpts(sel) { return ROLES.map(function (r) { return '<option value="' + r.id + '"' + (r.id === sel ? ' selected' : '') + '>' + esc(r.label) + '</option>'; }).join(''); }
+  function deptOpts(sel) { var list = DEPARTMENTS.slice(); founders.forEach(function (f) { if (f.department && list.indexOf(f.department) < 0) list.push(f.department); }); return list.map(function (d) { return '<option value="' + esc(d) + '"' + (d === sel ? ' selected' : '') + '>' + esc(d) + '</option>'; }).join(''); }
+
+  var FIELD_INPUT = 'width:100%;background:var(--dark3);border:1px solid rgba(0,240,255,0.15);color:var(--text);font-family:\'Exo 2\',sans-serif;font-size:0.93rem;padding:0.6rem 0.8rem;border-radius:2px;outline:none;';
+
+  /* ---- build the panel UI ------------------------------------------------- */
+  function buildUI() {
+    var root = document.getElementById('orgManager');
+    if (!root) return;
+    root.innerHTML =
+      '<div class="posts-label">\uD83D\uDEE1\uFE0F Organization Management</div>' +
+      '<p class="release-help">Add, edit, reorder and arrange founders &amp; staff. Changes publish to the live site instantly. No HTML required.</p>' +
+      '<div class="msg" id="orgMsg"></div>' +
+      // department filter pills
+      '<div class="toolbar" id="orgDeptFilter" style="margin-bottom:14px;"></div>' +
+      // FORM
+      '<div id="orgForm" style="border:1px solid rgba(0,240,255,0.12);padding:1rem;border-radius:3px;margin-bottom:1.4rem;">' +
+        '<div class="posts-label" id="orgFormTitle" style="margin-bottom:0.8rem;">Add Member</div>' +
+        // image + preview row
+        '<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">' +
+          '<div style="flex:0 0 auto;">' +
+            '<label style="display:block;font-family:Rajdhani,sans-serif;font-weight:600;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.4rem;">Profile Photo</label>' +
+            '<div id="orgDrop" style="width:120px;height:120px;border:2px dashed rgba(0,240,255,0.3);border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:var(--dark3);text-align:center;position:relative;">' +
+              '<span id="orgDropHint" style="font-size:0.62rem;color:rgba(0,240,255,0.6);font-family:Share Tech Mono,monospace;padding:6px;line-height:1.5;">Drag &amp; drop<br>or click<br>PNG/JPG/WEBP</span>' +
+              '<img id="orgImgThumb" style="display:none;width:100%;height:100%;object-fit:cover;">' +
+            '</div>' +
+            '<input type="file" id="orgFile" accept="image/png,image/jpeg,image/webp" style="display:none;">' +
+            '<div style="display:flex;gap:5px;margin-top:6px;">' +
+              '<button type="button" class="tool-btn" id="orgEditImg" style="display:none;">Crop/Zoom</button>' +
+              '<button type="button" class="tool-btn" id="orgRemoveImg" style="display:none;">Remove</button>' +
+            '</div>' +
+          '</div>' +
+          // LIVE PREVIEW
+          '<div style="flex:1 1 200px;min-width:200px;">' +
+            '<label style="display:block;font-family:Rajdhani,sans-serif;font-weight:600;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.4rem;">Live Preview</label>' +
+            '<div id="orgPreview" style="display:flex;align-items:center;justify-content:center;min-height:120px;background:radial-gradient(circle at 50% 30%,rgba(0,240,255,0.05),transparent);border:1px solid rgba(0,240,255,0.08);border-radius:4px;padding:10px;"></div>' +
+          '</div>' +
+        '</div>' +
+        // basic info grid
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;">' +
+          fieldText('orgDisplayName', 'Display Name *', 'e.g. [SYNC]-Luj-*CM') +
+          fieldText('orgUsername', 'Username', 'e.g. lujj') +
+          fieldText('orgNickname', 'Nickname', 'e.g. Luj') +
+          fieldText('orgTitle', 'Title', 'e.g. Founder') +
+          fieldSelect('orgRole', 'Role (card style)', roleOpts('high-council')) +
+          fieldText('orgRoleLabel', 'Card Label', 'e.g. Clan Master') +
+          fieldSelect('orgDept', 'Department', deptOpts('High Council')) +
+          fieldText('orgRank', 'Rank Level', '1', 'number') +
+          fieldText('orgBadge', 'Custom Badge Text', 'e.g. \u2694 Commander \u2694') +
+          fieldText('orgNewDept', 'New Department (optional)', 'e.g. Event Team') +
+        '</div>' +
+        // visual customization
+        '<div class="posts-label" style="margin:1rem 0 0.6rem;">Visual Customization</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.7rem;">' +
+          fieldSelect('orgTheme', 'Card Theme', opts(THEMES.map(function (t) { return [t, t ? t.charAt(0).toUpperCase() + t.slice(1) : 'Role Default']; }), '')) +
+          fieldSelect('orgGlow', 'Glow Strength', opts(GLOWS.map(function (g) { return [g, g ? g.charAt(0).toUpperCase() + g.slice(1) : 'Default']; }), '')) +
+          fieldSelect('orgBorder', 'Border Style', opts(BORDERS.map(function (b) { return [b, b ? b.charAt(0).toUpperCase() + b.slice(1) : 'Classic']; }), '')) +
+        '</div>' +
+        '<div id="orgCustomColorWrap" style="display:none;margin-top:0.6rem;">' +
+          '<label style="display:block;font-family:Rajdhani,sans-serif;font-weight:600;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.4rem;">Custom Color</label>' +
+          '<input type="color" id="orgCustomColor" value="#00f0ff" style="width:60px;height:36px;background:none;border:1px solid rgba(0,240,255,0.2);border-radius:3px;cursor:pointer;">' +
+        '</div>' +
+        // animation controls
+        '<div class="posts-label" style="margin:1rem 0 0.6rem;">Animation</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;">' +
+          fieldSelect('orgEntrance', 'Entrance Animation', opts(ENTRANCES, '')) +
+          fieldSelect('orgHover', 'Hover Animation', opts(HOVERS, '')) +
+        '</div>' +
+        // toggles
+        '<div class="posts-label" style="margin:1rem 0 0.6rem;">Card Controls</div>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;">' +
+          toggle('orgActive', 'Active', true) +
+          toggle('orgFeatured', 'Featured', false) +
+          toggle('orgHome', 'Show on Homepage', true) +
+          toggle('orgInFounders', 'Show in Founders', true) +
+        '</div>' +
+        // optional info
+        '<details style="margin-top:1rem;"><summary style="cursor:pointer;font-family:Rajdhani,sans-serif;font-weight:600;font-size:0.74rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--cyan);">Additional Information (optional)</summary>' +
+          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin-top:0.8rem;">' +
+            fieldText('orgDiscord', 'Discord Username', '') +
+            fieldText('orgFacebook', 'Facebook Profile', '') +
+            fieldText('orgRoblox', 'Roblox Username', '') +
+            fieldText('orgJoinDate', 'Join Date', '', 'date') +
+          '</div>' +
+          fieldArea('orgBio', 'Biography') +
+          fieldArea('orgAchievements', 'Achievements') +
+          fieldArea('orgAwards', 'Awards') +
+          fieldArea('orgQuote', 'Favorite Quote') +
+        '</details>' +
+        // form buttons
+        '<button class="btn-primary" id="orgSaveBtn" style="margin-top:1.2rem;">&#9654;&nbsp; Add Member</button>' +
+        '<button class="btn-secondary" id="orgCancelBtn" style="display:none;">\u2715 Cancel Edit</button>' +
+      '</div>' +
+      // MOBILE / GLOBAL LAYOUT
+      '<details style="margin-bottom:1.2rem;border:1px solid rgba(0,240,255,0.1);padding:0.8rem 1rem;border-radius:3px;"><summary style="cursor:pointer;font-family:Rajdhani,sans-serif;font-weight:600;font-size:0.74rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--cyan);">Responsive / Layout Settings</summary>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.7rem;margin-top:0.8rem;">' +
+          fieldSelect('orgMobile', 'Mobile Layout', opts(MOBILE_LAYOUTS, meta.mobileLayout)) +
+          fieldSelect('orgTablet', 'Tablet Layout', opts([['default', 'Default'], ['grid', 'Compact Grid']], meta.tabletLayout)) +
+          fieldSelect('orgDesktop', 'Desktop Layout', opts([['default', 'Default'], ['wide', 'Wide']], meta.desktopLayout)) +
+        '</div>' +
+        '<button class="btn-secondary" id="orgSaveLayout" style="margin-top:0.8rem;">Save Layout Settings</button>' +
+      '</details>' +
+      // VISUAL HIERARCHY / LIST
+      '<div class="posts-label">Visual Hierarchy &mdash; drag to reorder or move between departments</div>' +
+      '<div id="orgTree"></div>';
+
+    wireForm();
+    renderDeptFilter();
+    renderTree();
+    updatePreview();
+  }
+
+  function fieldText(id, label, ph, type) {
+    return '<div><label style="display:block;font-family:Rajdhani,sans-serif;font-weight:600;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem;">' + esc(label) + '</label>' +
+      '<input type="' + (type || 'text') + '" id="' + id + '" placeholder="' + esc(ph || '') + '" style="' + FIELD_INPUT + '"></div>';
+  }
+  function fieldArea(id, label) {
+    return '<div style="margin-top:0.7rem;"><label style="display:block;font-family:Rajdhani,sans-serif;font-weight:600;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem;">' + esc(label) + '</label>' +
+      '<textarea id="' + id + '" style="' + FIELD_INPUT + 'min-height:60px;line-height:1.5;resize:vertical;"></textarea></div>';
+  }
+  function fieldSelect(id, label, optionsHtml) {
+    return '<div><label style="display:block;font-family:Rajdhani,sans-serif;font-weight:600;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem;">' + esc(label) + '</label>' +
+      '<select id="' + id + '" style="' + FIELD_INPUT + '">' + optionsHtml + '</select></div>';
+  }
+  function toggle(id, label, on) {
+    return '<label class="check-pill" style="display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(0,240,255,0.2);padding:6px 12px;border-radius:2px;cursor:pointer;font-family:Rajdhani,sans-serif;font-size:0.78rem;color:var(--muted);"><input type="checkbox" id="' + id + '"' + (on ? ' checked' : '') + '> ' + esc(label) + '</label>';
+  }
+
+  /* ---- form wiring -------------------------------------------------------- */
+  function wireForm() {
+    var dropEl = document.getElementById('orgDrop');
+    var file = document.getElementById('orgFile');
+    bindImage(dropEl, file);
+
+    ['orgRole'].forEach(function (id) {
+      document.getElementById(id).addEventListener('change', function () {
+        var r = this.value;
+        var lbl = document.getElementById('orgRoleLabel');
+        if (!lbl.value) lbl.value = roleLabelDefault(r);
+        var dep = document.getElementById('orgDept');
+        dep.value = roleDept(r);
+        updatePreview();
+      });
+    });
+    document.getElementById('orgTheme').addEventListener('change', function () {
+      document.getElementById('orgCustomColorWrap').style.display = this.value === 'custom' ? 'block' : 'none';
+      updatePreview();
+    });
+    ['orgDisplayName', 'orgRoleLabel', 'orgBadge', 'orgGlow', 'orgBorder', 'orgEntrance', 'orgHover', 'orgCustomColor', 'orgDept'].forEach(function (id) {
+      var el = document.getElementById(id); if (el) el.addEventListener('input', updatePreview);
+      if (el) el.addEventListener('change', updatePreview);
+    });
+    document.getElementById('orgSaveBtn').addEventListener('click', saveMember);
+    document.getElementById('orgCancelBtn').addEventListener('click', resetForm);
+    document.getElementById('orgSaveLayout').addEventListener('click', saveLayout);
+  }
+
+  function bindImage(zone, file) {
+    if (!zone || !file) return;
+    zone.addEventListener('click', function () { file.click(); });
+    file.addEventListener('change', function () { if (file.files && file.files[0]) handleFile(file.files[0]); file.value = ''; });
+    ['dragenter', 'dragover'].forEach(function (ev) { zone.addEventListener(ev, function (e) { e.preventDefault(); zone.style.borderColor = 'rgba(0,240,255,0.8)'; }); });
+    ['dragleave', 'drop'].forEach(function (ev) { zone.addEventListener(ev, function (e) { e.preventDefault(); zone.style.borderColor = 'rgba(0,240,255,0.3)'; }); });
+    zone.addEventListener('drop', function (e) { var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) handleFile(f); });
+    document.getElementById('orgRemoveImg').addEventListener('click', function (e) { e.stopPropagation(); setImage(''); });
+    document.getElementById('orgEditImg').addEventListener('click', function (e) { e.stopPropagation(); if (pendingImage) openCropper(pendingImage); });
+  }
+
+  function handleFile(f) {
+    if (!/^image\/(png|jpeg|webp)$/.test(f.type)) { msg('Use PNG, JPG or WEBP.', 'error'); return; }
+    if (f.size > 4 * 1024 * 1024) { msg('Image too large (max 4MB).', 'error'); return; }
+    var reader = new FileReader();
+    reader.onload = function (e) { openCropper(e.target.result); };
+    reader.readAsDataURL(f);
+  }
+  function setImage(dataUrl) {
+    pendingImage = dataUrl || '';
+    var thumb = document.getElementById('orgImgThumb');
+    var hint = document.getElementById('orgDropHint');
+    if (pendingImage) { thumb.src = pendingImage; thumb.style.display = 'block'; hint.style.display = 'none'; document.getElementById('orgRemoveImg').style.display = ''; document.getElementById('orgEditImg').style.display = ''; }
+    else { thumb.style.display = 'none'; hint.style.display = ''; document.getElementById('orgRemoveImg').style.display = 'none'; document.getElementById('orgEditImg').style.display = 'none'; }
+    updatePreview();
+  }
+
+  function roleLabelDefault(r) { for (var i = 0; i < ROLES.length; i++) if (ROLES[i].id === r) return ROLES[i].label.replace(/^[^ ]+ /, ''); return ''; }
+
+  /* ---- crop / zoom modal -------------------------------------------------- */
+  function openCropper(src) {
+    var V = 260, OUT = 500;
+    var ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10001;display:flex;align-items:center;justify-content:center;';
+    ov.innerHTML =
+      '<div style="background:var(--dark2);border:1px solid rgba(0,240,255,0.25);padding:1.4rem;max-width:340px;width:92%;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));">' +
+        '<div class="posts-label" style="margin-bottom:0.8rem;">Crop &amp; Zoom (500\u00d7500)</div>' +
+        '<div id="cropView" style="width:' + V + 'px;height:' + V + 'px;max-width:100%;margin:0 auto;overflow:hidden;position:relative;border:1px solid rgba(0,240,255,0.3);border-radius:50%;background:#000;cursor:move;touch-action:none;">' +
+          '<img id="cropImg" style="position:absolute;left:0;top:0;transform-origin:0 0;user-select:none;pointer-events:none;">' +
+        '</div>' +
+        '<label style="display:block;font-family:Rajdhani,sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:0.9rem 0 0.3rem;">Zoom</label>' +
+        '<input type="range" id="cropZoom" min="1" max="4" step="0.01" value="1" style="width:100%;">' +
+        '<div style="display:flex;gap:8px;margin-top:1rem;">' +
+          '<button class="btn-primary" id="cropApply" style="flex:1;">Apply</button>' +
+          '<button class="btn-secondary" id="cropCancel" style="flex:1;margin-top:0;">Cancel</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(ov);
+    var img = ov.querySelector('#cropImg');
+    var zoom = ov.querySelector('#cropZoom');
+    var state = { base: 1, scale: 1, ox: 0, oy: 0, w0: 0, h0: 0 };
+    var loaded = new Image();
+    loaded.onload = function () {
+      state.w0 = loaded.naturalWidth; state.h0 = loaded.naturalHeight;
+      state.base = Math.max(V / state.w0, V / state.h0);
+      img.src = src;
+      setZoom(1); center();
+      apply();
+    };
+    loaded.src = src;
+    function center() {
+      var dw = state.w0 * state.scale, dh = state.h0 * state.scale;
+      state.ox = (V - dw) / 2; state.oy = (V - dh) / 2; clamp();
+    }
+    function setZoom(z) { state.scale = state.base * z; }
+    function clamp() {
+      var dw = state.w0 * state.scale, dh = state.h0 * state.scale;
+      state.ox = Math.min(0, Math.max(V - dw, state.ox));
+      state.oy = Math.min(0, Math.max(V - dh, state.oy));
+    }
+    function apply() { clamp(); img.style.transform = 'translate(' + state.ox + 'px,' + state.oy + 'px) scale(' + state.scale + ')'; }
+    zoom.addEventListener('input', function () { var cx = V / 2, cy = V / 2; var px = (cx - state.ox) / state.scale, py = (cy - state.oy) / state.scale; setZoom(parseFloat(this.value)); state.ox = cx - px * state.scale; state.oy = cy - py * state.scale; apply(); });
+    var dragging = false, lx = 0, ly = 0;
+    var view = ov.querySelector('#cropView');
+    view.addEventListener('pointerdown', function (e) { dragging = true; lx = e.clientX; ly = e.clientY; view.setPointerCapture(e.pointerId); });
+    view.addEventListener('pointermove', function (e) { if (!dragging) return; state.ox += e.clientX - lx; state.oy += e.clientY - ly; lx = e.clientX; ly = e.clientY; apply(); });
+    view.addEventListener('pointerup', function () { dragging = false; });
+    ov.querySelector('#cropCancel').addEventListener('click', function () { document.body.removeChild(ov); });
+    ov.querySelector('#cropApply').addEventListener('click', function () {
+      var srcSize = V / state.scale;
+      var srcLeft = -state.ox / state.scale, srcTop = -state.oy / state.scale;
+      var canvas = document.createElement('canvas'); canvas.width = OUT; canvas.height = OUT;
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(loaded, srcLeft, srcTop, srcSize, srcSize, 0, 0, OUT, OUT);
+      setImage(canvas.toDataURL('image/jpeg', 0.85));
+      document.body.removeChild(ov);
+    });
+  }
+
+  /* ---- live preview ------------------------------------------------------- */
+  function formToMember() {
+    var role = val('orgRole');
+    var newDept = val('orgNewDept').trim();
+    var dept = newDept || val('orgDept');
+    var m = {
+      id: editId || uid(),
+      displayName: val('orgDisplayName').trim(),
+      username: val('orgUsername').trim(),
+      nickname: val('orgNickname').trim(),
+      title: val('orgTitle').trim(),
+      role: role,
+      roleLabel: val('orgRoleLabel').trim() || roleLabelDefault(role),
+      department: dept,
+      rankLevel: parseInt(val('orgRank'), 10) || 0,
+      badgeText: val('orgBadge').trim(),
+      image: pendingImage,
+      theme: val('orgTheme'),
+      customColor: val('orgCustomColor'),
+      glow: val('orgGlow'),
+      border: val('orgBorder'),
+      entrance: val('orgEntrance'),
+      hover: val('orgHover'),
+      active: chk('orgActive'),
+      featured: chk('orgFeatured'),
+      showHomepage: chk('orgHome'),
+      showFounders: chk('orgInFounders'),
+      discord: val('orgDiscord').trim(),
+      facebook: val('orgFacebook').trim(),
+      roblox: val('orgRoblox').trim(),
+      joinDate: val('orgJoinDate'),
+      bio: val('orgBio').trim(),
+      achievements: val('orgAchievements').trim(),
+      awards: val('orgAwards').trim(),
+      quote: val('orgQuote').trim(),
+      updatedAt: new Date().toISOString()
+    };
+    return m;
+  }
+  function val(id) { var e = document.getElementById(id); return e ? e.value : ''; }
+  function chk(id) { var e = document.getElementById(id); return e ? e.checked : false; }
+
+  function updatePreview() {
+    var box = document.getElementById('orgPreview'); if (!box) return;
+    var m = formToMember();
+    if (window.SyncFounders && typeof window.SyncFounders.renderCard === 'function') {
+      // Use the real renderer when its CSS is available; otherwise fallback chip.
+      box.innerHTML = miniCard(m);
+    } else {
+      box.innerHTML = miniCard(m);
+    }
+  }
+  function miniCard(m) {
+    var col = m.theme === 'custom' ? (m.customColor || '#00f0ff') : (m.theme ? ({ gold: '#FFD700', crimson: '#ff3333', cyan: '#00f0ff', purple: '#b07fff', pink: '#ff2d78', green: '#00ffb4' }[m.theme]) : roleColor(m.role));
+    var rgb = hexRgb(col);
+    var glowMap = { low: 8, medium: 16, high: 28, extreme: 40 };
+    var blur = glowMap[m.glow] || 16;
+    var av = m.image ? '<img src="' + esc(m.image) + '" style="width:78px;height:78px;border-radius:50%;object-fit:cover;border:2px solid ' + col + ';box-shadow:0 0 ' + blur + 'px rgba(' + rgb + ',0.8);">' :
+      '<div style="width:78px;height:78px;border-radius:50%;border:2px solid ' + col + ';display:flex;align-items:center;justify-content:center;font-family:Orbitron,sans-serif;color:#fff;box-shadow:0 0 ' + blur + 'px rgba(' + rgb + ',0.8);">' + esc((m.displayName || '?').charAt(0)) + '</div>';
+    return '<div style="text-align:center;">' +
+      (m.badgeText ? '<div style="font-family:Share Tech Mono,monospace;font-size:0.55rem;letter-spacing:0.15em;color:' + col + ';margin-bottom:6px;text-transform:uppercase;">' + esc(m.badgeText) + '</div>' : '') +
+      av +
+      '<div style="font-family:Orbitron,sans-serif;font-size:0.8rem;color:#fff;margin-top:8px;">' + esc(m.displayName || 'Display Name') + '</div>' +
+      '<div style="font-family:Rajdhani,sans-serif;font-size:0.72rem;letter-spacing:0.1em;color:' + col + ';text-shadow:0 0 8px rgba(' + rgb + ',0.7);text-transform:uppercase;">' + esc(m.roleLabel || 'Role') + '</div>' +
+      (m.featured ? '<div style="font-size:0.55rem;color:var(--gold);margin-top:4px;">\u2605 Featured</div>' : '') +
+    '</div>';
+  }
+
+  /* ---- save / edit / delete ---------------------------------------------- */
+  function saveMember() {
+    var m = formToMember();
+    if (!m.displayName) { msg('Display name is required.', 'error'); return; }
+    var btn = document.getElementById('orgSaveBtn');
+    btn.disabled = true; var oldHtml = btn.innerHTML; btn.innerHTML = 'Saving...';
+    if (editId) {
+      var idx = indexOf(editId); if (idx >= 0) { m.order = founders[idx].order; founders[idx] = m; }
+    } else {
+      var same = founders.filter(function (f) { return f.department === m.department; });
+      m.order = same.length ? Math.max.apply(null, same.map(function (f) { return f.order || 0; })) + 1 : 0;
+      founders.push(m);
+    }
+    persist().then(function () {
+      msg(editId ? 'Member updated & published.' : 'Member added & published.', 'success');
+      resetForm(); renderTree();
+    }).catch(function () { msg('Saved locally, but live publish failed.', 'error'); renderTree(); })
+      .then(function () { btn.disabled = false; btn.innerHTML = oldHtml; });
+  }
+  function indexOf(id) { for (var i = 0; i < founders.length; i++) if (founders[i].id === id) return i; return -1; }
+
+  function editMember(id) {
+    var m = founders[indexOf(id)]; if (!m) return;
+    editId = id;
+    set('orgDisplayName', m.displayName); set('orgUsername', m.username); set('orgNickname', m.nickname);
+    set('orgTitle', m.title); set('orgRole', m.role); set('orgRoleLabel', m.roleLabel);
+    set('orgDept', m.department); set('orgRank', m.rankLevel); set('orgBadge', m.badgeText);
+    set('orgNewDept', ''); set('orgTheme', m.theme || ''); set('orgGlow', m.glow || ''); set('orgBorder', m.border || '');
+    set('orgEntrance', m.entrance || ''); set('orgHover', m.hover || '');
+    if (m.customColor) set('orgCustomColor', m.customColor);
+    document.getElementById('orgCustomColorWrap').style.display = m.theme === 'custom' ? 'block' : 'none';
+    setChk('orgActive', m.active !== false); setChk('orgFeatured', !!m.featured);
+    setChk('orgHome', m.showHomepage !== false); setChk('orgInFounders', m.showFounders !== false);
+    set('orgDiscord', m.discord); set('orgFacebook', m.facebook); set('orgRoblox', m.roblox);
+    set('orgJoinDate', m.joinDate); set('orgBio', m.bio); set('orgAchievements', m.achievements);
+    set('orgAwards', m.awards); set('orgQuote', m.quote);
+    setImage(m.image || '');
+    document.getElementById('orgFormTitle').textContent = 'Edit Member';
+    document.getElementById('orgSaveBtn').innerHTML = '&#9654;&nbsp; Update Member';
+    document.getElementById('orgCancelBtn').style.display = '';
+    updatePreview();
+    document.getElementById('orgForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function set(id, v) { var e = document.getElementById(id); if (e) e.value = (v == null ? '' : v); }
+  function setChk(id, v) { var e = document.getElementById(id); if (e) e.checked = !!v; }
+
+  function resetForm() {
+    editId = null; pendingImage = '';
+    ['orgDisplayName', 'orgUsername', 'orgNickname', 'orgTitle', 'orgRoleLabel', 'orgBadge', 'orgNewDept', 'orgDiscord', 'orgFacebook', 'orgRoblox', 'orgJoinDate', 'orgBio', 'orgAchievements', 'orgAwards', 'orgQuote'].forEach(function (id) { set(id, ''); });
+    set('orgRole', 'high-council'); set('orgDept', 'High Council'); set('orgRank', '');
+    set('orgTheme', ''); set('orgGlow', ''); set('orgBorder', ''); set('orgEntrance', ''); set('orgHover', '');
+    document.getElementById('orgCustomColorWrap').style.display = 'none';
+    setChk('orgActive', true); setChk('orgFeatured', false); setChk('orgHome', true); setChk('orgInFounders', true);
+    setImage('');
+    document.getElementById('orgFormTitle').textContent = 'Add Member';
+    document.getElementById('orgSaveBtn').innerHTML = '&#9654;&nbsp; Add Member';
+    document.getElementById('orgCancelBtn').style.display = 'none';
+    updatePreview();
+  }
+
+  function deleteMember(id) {
+    var go = (typeof showConfirm === 'function') ? showConfirm('Remove member?', 'This removes the member from the organization.', '\uD83D\uDDD1\uFE0F') : Promise.resolve(window.confirm('Remove member?'));
+    go.then(function (ok) {
+      if (!ok) return;
+      var i = indexOf(id); if (i >= 0) founders.splice(i, 1);
+      persist().then(function () { msg('Member removed.', 'success'); renderTree(); }).catch(function () { renderTree(); });
+      if (editId === id) resetForm();
+    });
+  }
+
+  function toggleActive(id) {
+    var i = indexOf(id); if (i < 0) return;
+    founders[i].active = founders[i].active === false ? true : false;
+    persist().then(function () { renderTree(); }).catch(function () { renderTree(); });
+  }
+
+  /* ---- reorder (buttons + drag) ------------------------------------------ */
+  function move(id, dir) {
+    var i = indexOf(id); if (i < 0) return;
+    var dept = founders[i].department;
+    var group = founders.filter(function (f) { return f.department === dept; }).sort(byOrder);
+    var gi = group.indexOf(founders[i]);
+    var tj = gi + dir; if (tj < 0 || tj >= group.length) return;
+    var a = group[gi], b = group[tj];
+    var ao = a.order; a.order = b.order; b.order = ao;
+    persist().then(function () { renderTree(); }).catch(function () { renderTree(); });
+  }
+  function byOrder(a, b) { var oa = a.order != null ? a.order : 999, ob = b.order != null ? b.order : 999; return oa - ob; }
+
+  /* ---- department filter pills ------------------------------------------- */
+  function renderDeptFilter() {
+    var bar = document.getElementById('orgDeptFilter'); if (!bar) return;
+    var present = {}; founders.forEach(function (f) { present[f.department || 'Members'] = true; });
+    var list = ['all'].concat(DEPARTMENTS.filter(function (d) { return present[d]; }));
+    Object.keys(present).forEach(function (d) { if (list.indexOf(d) < 0) list.push(d); });
+    bar.innerHTML = list.map(function (d) {
+      var lbl = d === 'all' ? 'All' : d;
+      return '<button type="button" class="tool-btn' + (deptFilter === d ? ' active' : '') + '" data-dept="' + esc(d) + '">' + esc(lbl) + '</button>';
+    }).join('');
+    Array.prototype.forEach.call(bar.querySelectorAll('button'), function (b) {
+      b.addEventListener('click', function () { deptFilter = b.getAttribute('data-dept'); renderDeptFilter(); renderTree(); });
+    });
+  }
+
+  /* ---- visual hierarchy / list ------------------------------------------- */
+  function renderTree() {
+    var tree = document.getElementById('orgTree'); if (!tree) return;
+    renderDeptFilter();
+    var groups = {}, order = [];
+    founders.forEach(function (f) { var d = f.department || 'Members'; if (!groups[d]) { groups[d] = []; order.push(d); } groups[d].push(f); });
+    order.sort(function (a, b) { var ia = DEPARTMENTS.indexOf(a), ib = DEPARTMENTS.indexOf(b); ia = ia < 0 ? 99 : ia; ib = ib < 0 ? 99 : ib; return ia - ib; });
+    var html = '';
+    order.forEach(function (d) {
+      if (deptFilter !== 'all' && deptFilter !== d) return;
+      var items = groups[d].slice().sort(byOrder);
+      html += '<div class="org-dept" data-dept="' + esc(d) + '" style="margin-bottom:1rem;border-left:2px solid rgba(0,240,255,0.3);padding-left:0.8rem;">' +
+        '<div style="font-family:Orbitron,sans-serif;font-size:0.78rem;letter-spacing:0.1em;color:var(--cyan);margin-bottom:0.5rem;">\u25C8 ' + esc(d) + ' <span style="color:rgba(136,136,170,0.6);font-size:0.66rem;">(' + items.length + ')</span></div>' +
+        '<div class="org-droplist" data-dept="' + esc(d) + '">' +
+        items.map(rowHtml).join('') +
+        '</div></div>';
+    });
+    tree.innerHTML = html || '<div class="posts-empty" style="color:rgba(136,136,170,0.6);">No members yet.</div>';
+    wireRows(tree);
+  }
+
+  function rowHtml(f) {
+    var col = roleColor(f.role);
+    var av = f.image ? '<img src="' + esc(f.image) + '" style="width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid ' + col + ';">' :
+      '<span style="width:30px;height:30px;border-radius:50%;border:1px solid ' + col + ';display:inline-flex;align-items:center;justify-content:center;font-size:0.7rem;color:#fff;">' + esc((f.displayName || '?').charAt(0)) + '</span>';
+    var dim = f.active === false ? 'opacity:0.45;' : '';
+    return '<div class="org-row" draggable="true" data-id="' + esc(f.id) + '" style="display:flex;align-items:center;gap:10px;background:var(--dark3);border:1px solid rgba(0,240,255,0.1);border-radius:2px;padding:6px 10px;margin-bottom:6px;cursor:grab;' + dim + '">' +
+      '<span style="color:rgba(0,240,255,0.4);font-size:0.9rem;">\u2630</span>' + av +
+      '<div style="flex:1;min-width:0;"><div style="font-family:Rajdhani,sans-serif;font-weight:600;font-size:0.84rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(f.displayName) + (f.featured ? ' <span style="color:var(--gold);font-size:0.7rem;">\u2605</span>' : '') + '</div>' +
+      '<div style="font-size:0.62rem;color:' + col + ';text-transform:uppercase;letter-spacing:0.08em;">' + esc(f.roleLabel || f.role) + '</div></div>' +
+      '<button type="button" class="release-mini-btn" data-act="up" title="Move up">\u2191</button>' +
+      '<button type="button" class="release-mini-btn" data-act="down" title="Move down">\u2193</button>' +
+      '<button type="button" class="release-mini-btn" data-act="toggle" title="Enable/disable">' + (f.active === false ? 'Off' : 'On') + '</button>' +
+      '<button type="button" class="release-mini-btn" data-act="edit">Edit</button>' +
+      '<button type="button" class="release-mini-btn delete" data-act="del">Del</button>' +
+      '</div>';
+  }
+
+  var dragId = null;
+  function wireRows(tree) {
+    Array.prototype.forEach.call(tree.querySelectorAll('.org-row'), function (row) {
+      var id = row.getAttribute('data-id');
+      Array.prototype.forEach.call(row.querySelectorAll('button'), function (b) {
+        b.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var act = b.getAttribute('data-act');
+          if (act === 'edit') editMember(id);
+          else if (act === 'del') deleteMember(id);
+          else if (act === 'up') move(id, -1);
+          else if (act === 'down') move(id, 1);
+          else if (act === 'toggle') toggleActive(id);
+        });
+      });
+      row.addEventListener('dragstart', function () { dragId = id; row.style.opacity = '0.4'; });
+      row.addEventListener('dragend', function () { row.style.opacity = ''; dragId = null; });
+      row.addEventListener('dragover', function (e) { e.preventDefault(); });
+      row.addEventListener('drop', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        if (!dragId || dragId === id) return;
+        dropOn(dragId, id);
+      });
+    });
+    Array.prototype.forEach.call(tree.querySelectorAll('.org-droplist'), function (list) {
+      list.addEventListener('dragover', function (e) { e.preventDefault(); });
+      list.addEventListener('drop', function (e) {
+        e.preventDefault();
+        if (!dragId) return;
+        if (e.target.closest && e.target.closest('.org-row')) return; // handled by row drop
+        var dept = list.getAttribute('data-dept');
+        var di = indexOf(dragId); if (di < 0) return;
+        founders[di].department = dept;
+        var same = founders.filter(function (f) { return f.department === dept; });
+        founders[di].order = same.length ? Math.max.apply(null, same.map(function (f) { return f.order || 0; })) + 1 : 0;
+        persist().then(function () { renderTree(); }).catch(function () { renderTree(); });
+      });
+    });
+  }
+  function dropOn(srcId, targetId) {
+    var si = indexOf(srcId), ti = indexOf(targetId); if (si < 0 || ti < 0) return;
+    var src = founders[si], tgt = founders[ti];
+    src.department = tgt.department; // move into target's department
+    // rebuild orders within department placing src before target
+    var group = founders.filter(function (f) { return f.department === tgt.department && f.id !== src.id; }).sort(byOrder);
+    var out = [], placed = false;
+    group.forEach(function (f) { if (f.id === tgt.id && !placed) { out.push(src); placed = true; } out.push(f); });
+    if (!placed) out.push(src);
+    out.forEach(function (f, i) { f.order = i; });
+    persist().then(function () { renderTree(); }).catch(function () { renderTree(); });
+  }
+
+  /* ---- layout settings ---------------------------------------------------- */
+  function saveLayout() {
+    meta.mobileLayout = val('orgMobile'); meta.tabletLayout = val('orgTablet'); meta.desktopLayout = val('orgDesktop');
+    persist().then(function () { msg('Layout settings saved.', 'success'); }).catch(function () { msg('Saved locally.', 'error'); });
+  }
+
+  /* ---- init --------------------------------------------------------------- */
+  window.initOrgManager = function () {
+    if (initialized) { renderTree(); return; }
+    initialized = true;
+    buildUI();
+    loadOrg().then(function () { buildUI(); });
+  };
+})();
+
 </script>
 </body>
 </html>
