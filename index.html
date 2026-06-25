@@ -10,15 +10,30 @@
     <!-- ╚══════════════════════════════════════════════╝ -->
 
     <!-- 1. Content Security Policy — blocks XSS & unauthorized resource injection -->
+    <meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline';
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src 'self' https://fonts.gstatic.com;
+  img-src 'self' data: https://synchronized.site https://sync-worker.lastresort962.workers.dev https://cdn.discordapp.com https://media.discordapp.net;
+  media-src 'self';
+  connect-src 'self' https://sync-worker.lastresort962.workers.dev https://discord.com;
+  frame-ancestors 'none';
+  base-uri 'self';
+  form-action 'self';
+">
 
     <!-- 2. Clickjacking Protection — prevents your site from being iframed -->
+    <meta http-equiv="X-Frame-Options" content="DENY">
 
     <!-- 3. MIME Sniffing Protection -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
 
     <!-- 4. Referrer Policy — limits referrer info leakage -->
     <meta name="referrer" content="strict-origin-when-cross-origin">
 
     <!-- 5. Permissions Policy — disables sensitive browser APIs -->
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=()">
 
     <!-- SEO & Link Preview Tags -->
     <meta name="description" content="SYNCHRONIZED is iDate Clan's official hub — rankings, roster, events, and more.">
@@ -1982,7 +1997,7 @@
     mix-blend-mode: screen;
   }
 
-  /* ═══════════════════════════════════  ══════════
+  /* ══════════════════════════════════════════════
      LOADING SCREEN
   ══════════════════   ══   ════════════════════════ */
   #ls {
@@ -2818,216 +2833,7 @@
     <h2 class="section-title">The <span class="cyan">Founders</span></h2>
     <div class="section-divider"></div>
 
-    <div class="hierarchy-tree">
-
-      <!-- ── TIER 1: CLAN MASTER ── -->
-      <div class="hierarchy-tier">
-        <div class="tier-label tier-label--master">
-          <span class="tier-icon">♛</span> Clan Master
-        </div>
-        <div class="tier-connector"></div>
-        <div class="tier-cards tier-cards--center">
-          <div class="member-card hcard--master">
-            <!-- Gold dust particles -->
-            <div class="master-dust">
-              <span></span><span></span><span></span><span></span>
-              <span></span><span></span><span></span><span></span>
-            </div>
-
-            <!-- Animated crown -->
-            <span class="master-crown">👑</span>
-
-            <!-- Avatar with dual spinning rings -->
-            <div class="master-avatar-wrap">
-              <div class="master-avatar-ring-2"></div>
-              <div class="master-avatar-ring"></div>
-              <div class="member-avatar" style="background:none;padding:0;overflow:hidden;width:100px;height:100px;border:3px solid #FFD700;position:relative;z-index:2;">
-                <img src="lujj.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
-              </div>
-            </div>
-
-            <!-- Shimmer name -->
-            <div class="master-name">[SYNC]-Luj-*CM</div>
-
-            <!-- Role -->
-            <div class="member-role clan-master" style="margin-top:0.3rem;">Clan Master</div>
-
-            <!-- Commander badge -->
-            <div class="master-badge">⚔ Commander ⚔</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="tier-branch-line"></div>
-
-      <!-- ── TIER 1.5: VICE CLAN MASTER ── -->
-      <div class="hierarchy-tier">
-        <div class="tier-label tier-label--vice">
-          <span class="tier-icon">♜</span> Vice Clan Master
-        </div>
-        <div class="tier-connector"></div>
-        <div class="tier-cards tier-cards--center">
-          
-          <div class="member-card hcard--vice hcard--vice-special">
-            <div class="member-card-corner" style="border-top-color:rgba(255,51,51,0.7);"></div>
-            <div class="vice-sparks">
-              <span></span><span></span><span></span><span></span><span></span>
-            </div>
-            <div class="member-avatar" style="background:none;padding:0;overflow:hidden;border:2px solid #ff3333;box-shadow:0 0 22px rgba(255,51,51,0.7), 0 0 50px rgba(255,51,51,0.3);">
-              <img src="zyx.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
-            </div>
-            <div class="member-name" style="text-shadow:0 0 14px rgba(255,51,51,0.8);">[SYNC]-Zyx-</div>
-            <div class="member-role vice-clan-master">Vice Clan Master</div>
-          </div>
-
-        </div>
-      </div>
-
-      <div class="tier-branch-line"></div>
-
-      <!-- ── TIER 2: HIGH COUNCIL ── -->
-      <div class="hierarchy-tier">
-        <div class="tier-label tier-label--council">
-          <span class="tier-icon">◈</span> High Council
-        </div>
-        <div class="tier-connector"></div>
-        <div class="tier-cards">
-          <div class="member-card hcard--council">
-            <div class="member-card-corner"></div>
-            <div class="member-avatar" style="background:none;padding:0;overflow:hidden;border:2px solid #E8B48A;box-shadow:0 0 14px rgba(232,180,138,0.4);">
-              <img src="jam1.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
-            </div>
-            <div class="member-name">[SYNC]-Jxiam-</div>
-            <div class="member-role high-council">High Council</div>
-          </div>
-          <div class="member-card hcard--council">
-            <div class="member-card-corner"></div>
-            <div class="member-avatar" style="background:none;padding:0;overflow:hidden;border:2px solid #E8B48A;box-shadow:0 0 14px rgba(232,180,138,0.4);">
-              <img src="shin.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
-            </div>
-            <div class="member-name">[SYNC]-Sh1n-</div>
-            <div class="member-role high-council">High Council</div>
-          </div>
-          <div class="member-card hcard--council">
-            <div class="member-card-corner"></div>
-            <div class="member-avatar" style="background:none;padding:0;overflow:hidden;border:2px solid #E8B48A;box-shadow:0 0 14px rgba(232,180,138,0.4);">
-              <img src="kyo.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
-            </div>
-            <div class="member-name">[SYNC]-KYO-</div>
-            <div class="member-role high-council">High Council</div>
-          </div>
-          <div class="member-card hcard--council">
-            <div class="member-card-corner"></div>
-            <div class="member-avatar" style="background:none;padding:0;overflow:hidden;border:2px solid #E8B48A;box-shadow:0 0 14px rgba(232,180,138,0.4);">
-              <img src="mari.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
-            </div>
-            <div class="member-name" style="font-size:0.82rem;letter-spacing:0.06em;">[SYNC]-Minwonuna-</div>
-            <div class="member-role high-council">High Council</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="tier-branch-line"></div>
-
-      <!-- ── TIER 3: MOD + EXAMINER + RECRUITER (triangle layout) ── -->
-      <div class="hierarchy-tier">
-        <div class="tier-label-row-triangle">
-          <div class="tier-label tier-label--recruiter" style="animation: examinerLabelPulse 2.5s ease-in-out infinite;">
-            <span class="tier-icon">◎</span> Examiner
-          </div>
-          <div class="tier-label tier-label--mod" style="animation: modLabelPulse 2s ease-in-out infinite;">
-            <span class="tier-icon">⬡</span> Moderator
-          </div>
-          <div class="tier-label tier-label--recruiter-new" style="animation: recruiterLabelPulse 2.2s ease-in-out infinite;">
-            <span class="tier-icon">✦</span> Recruiter
-          </div>
-        </div>
-        <div class="tier-connector" style="background:linear-gradient(180deg,rgba(176,127,255,0.8),rgba(255,45,120,0.5));"></div>
-
-        <!-- Triangle layout: examiner left, mod center (higher), recruiter right -->
-        <div class="triangle-tier-cards">
-
-          <!-- LEFT: EXAMINER -->
-          <div class="triangle-side triangle-left">
-            <div class="member-card hcard--recruiter hcard--examiner-special">
-              <div class="member-card-corner" style="border-top-color:rgba(0,191,255,0.9);"></div>
-              <div class="examiner-sparks">
-                <span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span>
-              </div>
-              <div class="examiner-corner-bl"></div>
-              <div class="examiner-badge">✦ Examiner ✦</div>
-              <div class="examiner-avatar-wrap">
-                <div class="examiner-avatar-halo"></div>
-                <div class="member-avatar examiner-avatar-inner" style="background:none;padding:0;overflow:hidden;width:90px;height:90px;border:2px solid #00BFFF;box-shadow:0 0 25px rgba(0,191,255,0.9), 0 0 50px rgba(0,191,255,0.4), 0 0 80px rgba(0,240,255,0.2);">
-                  <img src="errs.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;filter:saturate(1.3) brightness(1.1);" onerror="this.parentElement.innerHTML='?'">
-                </div>
-              </div>
-              <div class="examiner-ring examiner-ring-1"></div>
-              <div class="examiner-ring examiner-ring-2"></div>
-              <div class="member-name examiner-name">[SYNC]-Errs-</div>
-              <div class="member-role recruiter" style="font-size:0.8rem;letter-spacing:0.2em;">Examiner</div>
-            </div>
-          </div>
-
-          <!-- CENTER: MODERATOR (elevated) -->
-          <div class="triangle-center">
-            <div class="member-card hcard--mod hcard--mod-special" id="mod-pinoo">
-              <div class="mod-ring mod-ring-1"></div>
-              <div class="mod-ring mod-ring-2"></div>
-              <div class="mod-sparks">
-                <span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span>
-              </div>
-              <div class="member-card-corner" style="border-top-color:rgba(176,127,255,0.9);"></div>
-              <div class="mod-corner-bl"></div>
-              <div class="mod-badge">✦ Forum Moderator ✦</div>
-              <div class="mod-avatar-wrap">
-                <div class="mod-avatar-halo"></div>
-                <div class="member-avatar mod-avatar-inner" style="background:none;padding:0;overflow:hidden;width:96px;height:96px;border:3px solid #b07fff;box-shadow:0 0 30px rgba(176,127,255,1), 0 0 60px rgba(176,127,255,0.5), 0 0 90px rgba(255,45,120,0.3);">
-                  <img src="pinoo.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;filter:saturate(1.4) brightness(1.1);">
-                </div>
-              </div>
-              <div class="member-name mod-name">[SYNC]-pinoo*-</div>
-              <div class="member-role mod" style="font-size:0.8rem;letter-spacing:0.2em;">Moderator</div>
-              <div class="mod-code-tag">&lt;dev /&gt;</div>
-            </div>
-          </div>
-
-          <!-- RIGHT: RECRUITER -->
-          <div class="triangle-side triangle-right">
-            <div class="member-card hcard--recruiter-new" id="card-recruiter">
-              <!-- Neon scan line sweep -->
-              <div class="recruiter-scan"></div>
-              <!-- Corner accents -->
-              <div class="member-card-corner" style="border-top-color:rgba(0,255,180,0.9);"></div>
-              <div class="recruiter-corner-bl"></div>
-              <!-- Orbiting dots -->
-              <div class="recruiter-orbit">
-                <span class="ro ro-1"></span>
-                <span class="ro ro-2"></span>
-                <span class="ro ro-3"></span>
-              </div>
-              <!-- Badge -->
-              <div class="recruiter-badge">✦ Recruiter ✦</div>
-              <!-- Avatar -->
-              <div class="recruiter-avatar-wrap">
-                <div class="recruiter-avatar-ring-1"></div>
-                <div class="recruiter-avatar-ring-2"></div>
-                <div class="member-avatar recruiter-avatar-inner" style="background:none;padding:0;overflow:hidden;width:90px;height:90px;border:2px solid #00ffb4;box-shadow:0 0 25px rgba(0,255,180,0.9), 0 0 50px rgba(0,255,180,0.4), 0 0 80px rgba(0,240,255,0.2);">
-                  <img src="kael.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;filter:saturate(1.3) brightness(1.1);" onerror="this.parentElement.style.background='linear-gradient(135deg,#00ffb4,#00BFFF)';this.parentElement.innerHTML='<span style=\'font-family:Orbitron,sans-serif;font-size:1.8rem;color:#fff;\'>R</span>'">
-                </div>
-              </div>
-              <div class="member-name recruiter-name-text">[SYNC]-Kael-</div>
-              <div class="member-role" style="color:#00ffb4;text-shadow:0 0 8px rgba(0,255,180,0.8);font-size:0.8rem;letter-spacing:0.2em;">Recruiter</div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-
-    </div><!-- /hierarchy-tree -->
+    <div class="hierarchy-tree" id="foundersTree"></div><!-- /hierarchy-tree -->
   </div>
 </section>
 
@@ -3825,7 +3631,7 @@
           .map(a => {
             const url = typeof a === 'string' ? a : a.url;
             const safeUrl = url ? escHtmlInline(url) : null;
-            return safeUrl ? `<div class="ann-popup-img"><img src="${safeUrl}" alt="image" loading="lazy" referrerpolicy="no-referrer" style="min-height: 100px; background: rgba(0,240,255,0.05);"></div>` : '';
+            return safeUrl ? `<div class="ann-popup-img"><img src="${safeUrl}" alt="image" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" style="min-height: 100px; background: rgba(0,240,255,0.05);"></div>` : '';
           })
           .join('');
         card.innerHTML = `
@@ -8430,7 +8236,7 @@ async function submitApplication() {
 <script>
 // ══════════════════════════════════════════════════════
 //  REDEEM CODES — index.html (read-only view)
-// ══════════════════════════════════════════════════════
+// ═══════════════════════��══════════════════════════════
 (function() {
   const STORAGE_KEY = 'sync_redeem_codes';
 
@@ -8733,134 +8539,482 @@ async function submitApplication() {
 })();
 </script>
 
-<!-- PROFESSIONAL REFINEMENT LAYER (auto-appended) -->
-<style>
-
-/* ════════════════════════════════════════════════════════════
-   PROFESSIONAL REFINEMENT LAYER
-   Appended last so it polishes the existing neon theme without
-   touching markup or interactive features. Focus: readability,
-   contrast, consistent structure — plus a hard guarantee that the
-   page background stays dark.
-   ════════════════════════════════════════════════════════════ */
-
-/* 0 · GUARANTEE THE DARK CANVAS — the page must never render white */
-html{ background-color:#050510 !important; }
-body{ background-color:#050510 !important; }
-
-/* 1 · Crisp text rendering site-wide */
-body{
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  text-rendering:optimizeLegibility;
-}
-
-/* 2 · Calm the visual noise that fights with text.
-      The scan-line overlay and grid are kept for atmosphere but
-      softened so copy stays sharp. */
-body::before{
-  background:repeating-linear-gradient(
-    0deg,transparent,transparent 3px,
-    rgba(0,0,0,0.03) 3px,rgba(0,0,0,0.03) 6px) !important;
-}
-.grid-bg{ opacity:.62; background-size:72px 72px; }
-
-/* 3 · Friendly selection + anchored scrolling clears the fixed nav */
-::selection{ background:rgba(255,45,120,.35); color:#fff; }
-html{ scroll-padding-top:88px; }
-
-/* 4 · Readable body copy: higher contrast, comfortable measure,
-      relaxed rhythm, no glow on long-form text. */
-.about-text p{
-  color:#d7dcf3 !important;
-  font-size:1.07rem;
-  line-height:1.85 !important;
-  letter-spacing:.004em;
-  margin-bottom:1.25rem;
-  max-width:62ch;
-  text-shadow:none;
-}
-.about-text p strong{ font-weight:700; }
-.about-text p strong:not([style]){ color:var(--cyan); }
-
-/* 5 · Consistent, professional section rhythm + clearer hierarchy */
-.section-wrapper{ padding:6rem 2rem; }
-.section-label{ font-size:.72rem; letter-spacing:.32em; margin-bottom:.7rem; }
-.section-title{
-  line-height:1.12;
-  margin-bottom:1.1rem;
-  text-shadow:0 0 16px rgba(255,45,120,.25);
-}
-.section-divider{ height:3px; width:88px; border-radius:3px; margin-bottom:2.5rem; }
-
-/* 6 · Navigation legibility */
-.nav-links a{ color:#e3e7f6; font-size:.82rem; letter-spacing:.1em; }
-.nav-links a:hover,.nav-links a:focus-visible{ color:var(--cyan); }
-
-/* 7 · Hero subtitle + clan tag clarity */
-.hero-sub{ color:#e9edff; font-size:.95rem; letter-spacing:.16em; }
-.clan-tag{ letter-spacing:.26em; }
-
-/* 8 · Member cards — names & roles easier to scan */
-.member-name{ font-size:1rem; letter-spacing:.07em; }
-.member-role{ font-size:.78rem; letter-spacing:.15em; }
-
-/* 9 · Clear keyboard focus for accessibility / professionalism */
-a:focus-visible,button:focus-visible,input:focus-visible,
-textarea:focus-visible,select:focus-visible{
-  outline:2px solid var(--cyan);
-  outline-offset:3px;
-  border-radius:3px;
-}
-
-/* 10 · Tidy responsive spacing */
-@media (max-width:900px){
-  .section-wrapper{ padding:4rem 1.5rem; }
-}
-@media (max-width:600px){
-  .section-wrapper{ padding:3rem 1.15rem; }
-  .about-text p{ font-size:1rem; line-height:1.8 !important; }
-}
-
-</style>
+<!-- SYNC Founders dynamic renderer -->
 <script>
-/* SAFETY / ANTI-BLANK-SCREEN GUARD (auto-appended)
-   Ensures the page is never left blank or stuck on the loading screen
-   in preview / embedded / automated viewers, without altering any
-   normal-visitor behaviour. */
+/* ============================================================================
+   SYNCHRONIZED — Founders / Organization dynamic renderer (frontend)
+   Replaces the hardcoded Founders hierarchy with a data-driven system.
+   Reuses the EXACT existing CSS classes + card templates so the design is
+   pixel-identical out of the box. Theme / glow / border / animation / mobile
+   are optional additive layers controlled from the Admin panel.
+   ========================================================================== */
 (function () {
   'use strict';
 
-  function unhideBody() {
-    try {
-      var b = document.body;
-      if (b && b.style && b.style.display === 'none') {
-        b.style.display = '';
-      }
-    } catch (e) {}
+  var WORKER_URL = 'https://sync-worker.lastresort962.workers.dev';
+  var FOUNDER_PREFIX = '__SYNC_FOUNDER__';
+  var META_PREFIX = '__SYNC_ORG_META__';
+  var LS_FOUNDERS = 'sync_founders_v1';
+  var LS_META = 'sync_org_meta_v1';
+
+  /* ---- Tier / department configuration ------------------------------------ */
+  // Order + visual config for the known departments. Custom departments fall
+  // back to a generic neon label and a centered grid arrangement.
+  var TIER_DEFS = [
+    { key: 'Clan Master',      icon: '\u265B', labelClass: 'tier-label--master',   arrange: 'center'   },
+    { key: 'Vice Clan Master', icon: '\u265C', labelClass: 'tier-label--vice',     arrange: 'center'   },
+    { key: 'High Council',     icon: '\u25C8', labelClass: 'tier-label--council',  arrange: 'grid'     },
+    { key: 'Leadership',       icon: '\u2726', labelClass: 'tier-label--mod',      arrange: 'triangle' },
+    { key: 'Moderators',       icon: '\u2B21', labelClass: 'tier-label--mod',      arrange: 'grid'     },
+    { key: 'Recruiters',       icon: '\u2726', labelClass: 'tier-label--recruiter',arrange: 'grid'     },
+    { key: 'Members',          icon: '\u25C6', labelClass: 'tier-label--member',   arrange: 'grid'     }
+  ];
+
+  // Per-role visual descriptor used for custom departments + role labels/icons.
+  var ROLE_META = {
+    'clan-master':      { label: 'Clan Master',      icon: '\u265B', color: '#FFD700', labelClass: 'tier-label--master' },
+    'vice':             { label: 'Vice Clan Master', icon: '\u265C', color: '#ff3333', labelClass: 'tier-label--vice' },
+    'high-council':     { label: 'High Council',     icon: '\u25C8', color: '#E8B48A', labelClass: 'tier-label--council' },
+    'examiner':         { label: 'Examiner',         icon: '\u25CE', color: '#00BFFF', labelClass: 'tier-label--recruiter' },
+    'mod':              { label: 'Moderator',        icon: '\u2B21', color: '#b07fff', labelClass: 'tier-label--mod' },
+    'recruiter':        { label: 'Recruiter',        icon: '\u2726', color: '#00ffb4', labelClass: 'tier-label--recruiter' },
+    'member':           { label: 'Member',           icon: '\u25C6', color: '#FF69B4', labelClass: 'tier-label--member' },
+    'custom':           { label: 'Staff',            icon: '\u2726', color: '#00f0ff', labelClass: 'tier-label--council' }
+  };
+
+  var THEME_COLORS = {
+    gold:    '#FFD700',
+    crimson: '#ff3333',
+    cyan:    '#00f0ff',
+    purple:  '#b07fff',
+    pink:    '#ff2d78',
+    green:   '#00ffb4'
+  };
+
+  /* ---- Defaults: the current 9 members (keeps the page identical) --------- */
+  function defaultFounders() {
+    var d = [
+      { role: 'clan-master', department: 'Clan Master', displayName: '[SYNC]-Luj-*CM', roleLabel: 'Clan Master', image: 'lujj.png', badgeText: '\u2694 Commander \u2694' },
+      { role: 'vice', department: 'Vice Clan Master', displayName: '[SYNC]-Zyx-', roleLabel: 'Vice Clan Master', image: 'zyx.png' },
+      { role: 'high-council', department: 'High Council', displayName: '[SYNC]-Jxiam-', roleLabel: 'High Council', image: 'jam1.png' },
+      { role: 'high-council', department: 'High Council', displayName: '[SYNC]-Sh1n-', roleLabel: 'High Council', image: 'shin.png' },
+      { role: 'high-council', department: 'High Council', displayName: '[SYNC]-KYO-', roleLabel: 'High Council', image: 'kyo.png' },
+      { role: 'high-council', department: 'High Council', displayName: '[SYNC]-Minwonuna-', roleLabel: 'High Council', image: 'mari.png', smallName: true },
+      { role: 'examiner', department: 'Leadership', displayName: '[SYNC]-Errs-', roleLabel: 'Examiner', image: 'errs.png', badgeText: '\u2726 Examiner \u2726' },
+      { role: 'mod', department: 'Leadership', displayName: '[SYNC]-pinoo*-', roleLabel: 'Moderator', image: 'pinoo.png', badgeText: '\u2726 Forum Moderator \u2726' },
+      { role: 'recruiter', department: 'Leadership', displayName: '[SYNC]-Kael-', roleLabel: 'Recruiter', image: 'kael.png', badgeText: '\u2726 Recruiter \u2726' }
+    ];
+    return d.map(function (m, i) {
+      return Object.assign({
+        id: 'seed-' + i,
+        username: '', nickname: '', title: '', rankLevel: i + 1,
+        theme: '', glow: '', border: '', parentId: null, order: i,
+        active: true, featured: false, showHomepage: true, showFounders: true,
+        discord: '', facebook: '', roblox: '', joinDate: '', bio: '',
+        achievements: '', awards: '', quote: '', entrance: '', hover: ''
+      }, m);
+    });
   }
 
-  function clearLoader() {
-    try {
-      var ls = document.getElementById('ls');
-      if (ls && !ls.classList.contains('ls-gone')) {
-        ls.classList.add('ls-gone');
-        ls.style.opacity = '0';
-        ls.style.visibility = 'hidden';
-        ls.style.pointerEvents = 'none';
-      }
-    } catch (e) {}
+  function defaultMeta() {
+    return { mobileLayout: 'scroll', tabletLayout: 'default', desktopLayout: 'default' };
   }
 
-  // Make sure body is visible immediately and shortly after load.
-  unhideBody();
-  document.addEventListener('DOMContentLoaded', unhideBody);
-  window.addEventListener('load', unhideBody);
+  /* ---- Data loading ------------------------------------------------------- */
+  function readLocal(key, fallback) {
+    try {
+      var raw = localStorage.getItem(key);
+      if (!raw) return fallback;
+      var p = JSON.parse(raw);
+      return p == null ? fallback : p;
+    } catch (e) { return fallback; }
+  }
 
-  // Failsafe: if the loading screen is still up after 9s (e.g. the
-  // ENTER button was never clickable in this viewer), retire it so the
-  // dark page underneath is revealed instead of a frozen overlay.
-  setTimeout(clearLoader, 9000);
+  function founderFromPost(post) {
+    try {
+      if (!post || typeof post.content !== 'string') return null;
+      if (post.content.indexOf(FOUNDER_PREFIX) !== 0) return null;
+      return JSON.parse(post.content.slice(FOUNDER_PREFIX.length));
+    } catch (e) { return null; }
+  }
+  function metaFromPost(post) {
+    try {
+      if (!post || typeof post.content !== 'string') return null;
+      if (post.content.indexOf(META_PREFIX) !== 0) return null;
+      return JSON.parse(post.content.slice(META_PREFIX.length));
+    } catch (e) { return null; }
+  }
+
+  function loadData() {
+    return fetch(WORKER_URL + '/announcements', { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('http'); return r.json(); })
+      .then(function (posts) {
+        posts = Array.isArray(posts) ? posts : [];
+        var founders = posts.map(founderFromPost).filter(Boolean);
+        var meta = null;
+        for (var i = 0; i < posts.length; i++) { var m = metaFromPost(posts[i]); if (m) { meta = m; break; } }
+        if (founders.length) {
+          localStorage.setItem(LS_FOUNDERS, JSON.stringify(founders));
+          if (meta) localStorage.setItem(LS_META, JSON.stringify(meta));
+          return { founders: founders, meta: meta || readLocal(LS_META, defaultMeta()) };
+        }
+        throw new Error('empty');
+      })
+      .catch(function () {
+        var founders = readLocal(LS_FOUNDERS, null);
+        if (!Array.isArray(founders) || !founders.length) founders = defaultFounders();
+        return { founders: founders, meta: readLocal(LS_META, defaultMeta()) };
+      });
+  }
+
+  /* ---- Helpers ------------------------------------------------------------ */
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function hexToRgb(hex) {
+    var h = String(hex || '').replace('#', '');
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    var n = parseInt(h, 16);
+    if (isNaN(n)) return '0,240,255';
+    return ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255);
+  }
+  function themeColor(m) {
+    if (m.theme === 'custom' && m.customColor) return m.customColor;
+    return THEME_COLORS[m.theme] || (ROLE_META[m.role] || ROLE_META.custom).color;
+  }
+  function avatarImg(m, style, onerr) {
+    if (m.image) {
+      return '<img src="' + esc(m.image) + '" style="' + style + '"' + (onerr ? ' onerror="' + onerr + '"' : '') + '>';
+    }
+    var initial = esc((m.displayName || '?').replace(/[^A-Za-z0-9]/g, '').charAt(0).toUpperCase() || '?');
+    return '<span style="font-family:Orbitron,sans-serif;font-size:1.8rem;color:#fff;">' + initial + '</span>';
+  }
+
+  // Extra classes / attributes for the optional theme/glow/border/animation layers.
+  function fxClasses(m) {
+    var c = [];
+    if (m.glow) c.push('fdr-glow-' + m.glow);
+    if (m.border) c.push('fdr-border-' + m.border);
+    if (m.hover) c.push('fdr-hover-' + m.hover);
+    if (m.entrance) c.push('fdr-anim-' + m.entrance);
+    if (m.theme) c.push('fdr-themed');
+    return c.length ? ' ' + c.join(' ') : '';
+  }
+  function fxStyle(m) {
+    if (!m.theme) return '';
+    var col = themeColor(m);
+    return ' style="--fdr-accent:' + esc(col) + ';--fdr-accent-rgb:' + hexToRgb(col) + ';"';
+  }
+
+  /* ---- Card templates (exact reproductions of the original markup) -------- */
+  function cardMaster(m) {
+    return '<div class="member-card hcard--master' + fxClasses(m) + '"' + fxStyle(m) + '>' +
+      '<div class="master-dust"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>' +
+      '<span class="master-crown">\uD83D\uDC51</span>' +
+      '<div class="master-avatar-wrap">' +
+        '<div class="master-avatar-ring-2"></div><div class="master-avatar-ring"></div>' +
+        '<div class="member-avatar" style="background:none;padding:0;overflow:hidden;width:100px;height:100px;border:3px solid #FFD700;position:relative;z-index:2;">' +
+          avatarImg(m, 'width:100%;height:100%;object-fit:cover;border-radius:50%;') +
+        '</div>' +
+      '</div>' +
+      '<div class="master-name">' + esc(m.displayName) + '</div>' +
+      '<div class="member-role clan-master" style="margin-top:0.3rem;">' + esc(m.roleLabel || 'Clan Master') + '</div>' +
+      (m.badgeText ? '<div class="master-badge">' + esc(m.badgeText) + '</div>' : '') +
+    '</div>';
+  }
+  function cardVice(m) {
+    return '<div class="member-card hcard--vice hcard--vice-special' + fxClasses(m) + '"' + fxStyle(m) + '>' +
+      '<div class="member-card-corner" style="border-top-color:rgba(255,51,51,0.7);"></div>' +
+      '<div class="vice-sparks"><span></span><span></span><span></span><span></span><span></span></div>' +
+      '<div class="member-avatar" style="background:none;padding:0;overflow:hidden;border:2px solid #ff3333;box-shadow:0 0 22px rgba(255,51,51,0.7), 0 0 50px rgba(255,51,51,0.3);">' +
+        avatarImg(m, 'width:100%;height:100%;object-fit:cover;border-radius:50%;') +
+      '</div>' +
+      '<div class="member-name" style="text-shadow:0 0 14px rgba(255,51,51,0.8);">' + esc(m.displayName) + '</div>' +
+      '<div class="member-role vice-clan-master">' + esc(m.roleLabel || 'Vice Clan Master') + '</div>' +
+    '</div>';
+  }
+  function cardCouncil(m) {
+    var nameStyle = m.smallName ? ' style="font-size:0.82rem;letter-spacing:0.06em;"' : '';
+    return '<div class="member-card hcard--council' + fxClasses(m) + '"' + fxStyle(m) + '>' +
+      '<div class="member-card-corner"></div>' +
+      '<div class="member-avatar" style="background:none;padding:0;overflow:hidden;border:2px solid #E8B48A;box-shadow:0 0 14px rgba(232,180,138,0.4);">' +
+        avatarImg(m, 'width:100%;height:100%;object-fit:cover;border-radius:50%;') +
+      '</div>' +
+      '<div class="member-name"' + nameStyle + '>' + esc(m.displayName) + '</div>' +
+      '<div class="member-role high-council">' + esc(m.roleLabel || 'High Council') + '</div>' +
+    '</div>';
+  }
+  function cardExaminer(m) {
+    return '<div class="member-card hcard--recruiter hcard--examiner-special' + fxClasses(m) + '"' + fxStyle(m) + '>' +
+      '<div class="member-card-corner" style="border-top-color:rgba(0,191,255,0.9);"></div>' +
+      '<div class="examiner-sparks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>' +
+      '<div class="examiner-corner-bl"></div>' +
+      (m.badgeText ? '<div class="examiner-badge">' + esc(m.badgeText) + '</div>' : '') +
+      '<div class="examiner-avatar-wrap">' +
+        '<div class="examiner-avatar-halo"></div>' +
+        '<div class="member-avatar examiner-avatar-inner" style="background:none;padding:0;overflow:hidden;width:90px;height:90px;border:2px solid #00BFFF;box-shadow:0 0 25px rgba(0,191,255,0.9), 0 0 50px rgba(0,191,255,0.4), 0 0 80px rgba(0,240,255,0.2);">' +
+          avatarImg(m, 'width:100%;height:100%;object-fit:cover;border-radius:50%;filter:saturate(1.3) brightness(1.1);', "this.parentElement.innerHTML='?'") +
+        '</div>' +
+      '</div>' +
+      '<div class="examiner-ring examiner-ring-1"></div><div class="examiner-ring examiner-ring-2"></div>' +
+      '<div class="member-name examiner-name">' + esc(m.displayName) + '</div>' +
+      '<div class="member-role recruiter" style="font-size:0.8rem;letter-spacing:0.2em;">' + esc(m.roleLabel || 'Examiner') + '</div>' +
+    '</div>';
+  }
+  function cardMod(m) {
+    return '<div class="member-card hcard--mod hcard--mod-special' + fxClasses(m) + '"' + fxStyle(m) + '>' +
+      '<div class="mod-ring mod-ring-1"></div><div class="mod-ring mod-ring-2"></div>' +
+      '<div class="mod-sparks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>' +
+      '<div class="member-card-corner" style="border-top-color:rgba(176,127,255,0.9);"></div>' +
+      '<div class="mod-corner-bl"></div>' +
+      (m.badgeText ? '<div class="mod-badge">' + esc(m.badgeText) + '</div>' : '') +
+      '<div class="mod-avatar-wrap">' +
+        '<div class="mod-avatar-halo"></div>' +
+        '<div class="member-avatar mod-avatar-inner" style="background:none;padding:0;overflow:hidden;width:96px;height:96px;border:3px solid #b07fff;box-shadow:0 0 30px rgba(176,127,255,1), 0 0 60px rgba(176,127,255,0.5), 0 0 90px rgba(255,45,120,0.3);">' +
+          avatarImg(m, 'width:100%;height:100%;object-fit:cover;border-radius:50%;filter:saturate(1.4) brightness(1.1);') +
+        '</div>' +
+      '</div>' +
+      '<div class="member-name mod-name">' + esc(m.displayName) + '</div>' +
+      '<div class="member-role mod" style="font-size:0.8rem;letter-spacing:0.2em;">' + esc(m.roleLabel || 'Moderator') + '</div>' +
+      '<div class="mod-code-tag">&lt;dev /&gt;</div>' +
+    '</div>';
+  }
+  function cardRecruiter(m) {
+    return '<div class="member-card hcard--recruiter-new' + fxClasses(m) + '"' + fxStyle(m) + '>' +
+      '<div class="recruiter-scan"></div>' +
+      '<div class="member-card-corner" style="border-top-color:rgba(0,255,180,0.9);"></div>' +
+      '<div class="recruiter-corner-bl"></div>' +
+      '<div class="recruiter-orbit"><span class="ro ro-1"></span><span class="ro ro-2"></span><span class="ro ro-3"></span></div>' +
+      (m.badgeText ? '<div class="recruiter-badge">' + esc(m.badgeText) + '</div>' : '') +
+      '<div class="recruiter-avatar-wrap">' +
+        '<div class="recruiter-avatar-ring-1"></div><div class="recruiter-avatar-ring-2"></div>' +
+        '<div class="member-avatar recruiter-avatar-inner" style="background:none;padding:0;overflow:hidden;width:90px;height:90px;border:2px solid #00ffb4;box-shadow:0 0 25px rgba(0,255,180,0.9), 0 0 50px rgba(0,255,180,0.4), 0 0 80px rgba(0,240,255,0.2);">' +
+          avatarImg(m, 'width:100%;height:100%;object-fit:cover;border-radius:50%;filter:saturate(1.3) brightness(1.1);') +
+        '</div>' +
+      '</div>' +
+      '<div class="member-name recruiter-name-text">' + esc(m.displayName) + '</div>' +
+      '<div class="member-role" style="color:#00ffb4;text-shadow:0 0 8px rgba(0,255,180,0.8);font-size:0.8rem;letter-spacing:0.2em;">' + esc(m.roleLabel || 'Recruiter') + '</div>' +
+    '</div>';
+  }
+  // Generic neon card for custom roles/departments (theme-colored), scales infinitely.
+  function cardGeneric(m) {
+    var col = themeColor(m);
+    var rgb = hexToRgb(col);
+    return '<div class="member-card hcard--council fdr-generic' + fxClasses(m) + '" style="--fdr-accent:' + esc(col) + ';--fdr-accent-rgb:' + rgb + ';">' +
+      '<div class="member-card-corner" style="border-top-color:rgba(' + rgb + ',0.8);"></div>' +
+      '<div class="member-avatar" style="background:none;padding:0;overflow:hidden;border:2px solid ' + esc(col) + ';box-shadow:0 0 14px rgba(' + rgb + ',0.5);">' +
+        avatarImg(m, 'width:100%;height:100%;object-fit:cover;border-radius:50%;') +
+      '</div>' +
+      '<div class="member-name">' + esc(m.displayName) + '</div>' +
+      '<div class="member-role" style="color:' + esc(col) + ';text-shadow:0 0 8px rgba(' + rgb + ',0.7);">' + esc(m.roleLabel || (ROLE_META[m.role] || ROLE_META.custom).label) + '</div>' +
+    '</div>';
+  }
+
+  function renderCard(m) {
+    switch (m.role) {
+      case 'clan-master':  return cardMaster(m);
+      case 'vice':         return cardVice(m);
+      case 'high-council': return cardCouncil(m);
+      case 'examiner':     return cardExaminer(m);
+      case 'mod':          return cardMod(m);
+      case 'recruiter':    return cardRecruiter(m);
+      default:             return cardGeneric(m);
+    }
+  }
+
+  /* ---- Tier assembly ------------------------------------------------------ */
+  function tierDef(name) {
+    for (var i = 0; i < TIER_DEFS.length; i++) if (TIER_DEFS[i].key === name) return TIER_DEFS[i];
+    return null;
+  }
+  function tierOrderIndex(name) {
+    for (var i = 0; i < TIER_DEFS.length; i++) if (TIER_DEFS[i].key === name) return i;
+    return TIER_DEFS.length; // custom departments go last, in insertion order
+  }
+
+  function renderTierLabel(def, members) {
+    if (def && def.arrange === 'triangle') {
+      // One label per distinct role present, ordered examiner -> mod -> recruiter.
+      var order = ['examiner', 'mod', 'recruiter'];
+      var seen = {}, labels = [];
+      members.forEach(function (m) { seen[m.role] = true; });
+      order.forEach(function (r) { if (seen[r]) { labels.push(r); delete seen[r]; } });
+      Object.keys(seen).forEach(function (r) { labels.push(r); });
+      var anim = { examiner: 'examinerLabelPulse 2.5s', mod: 'modLabelPulse 2s', recruiter: 'recruiterLabelPulse 2.2s' };
+      var html = '<div class="tier-label-row-triangle">';
+      labels.forEach(function (r) {
+        var meta = ROLE_META[r] || ROLE_META.custom;
+        var cls = r === 'recruiter' ? 'tier-label--recruiter-new' : meta.labelClass;
+        var a = anim[r] ? ' style="animation:' + anim[r] + ' ease-in-out infinite;"' : '';
+        html += '<div class="tier-label ' + cls + '"' + a + '><span class="tier-icon">' + meta.icon + '</span> ' + esc(meta.label) + '</div>';
+      });
+      html += '</div>';
+      return html;
+    }
+    var icon = def ? def.icon : '\u2726';
+    var labelClass = def ? def.labelClass : 'tier-label--council';
+    return '<div class="tier-label ' + labelClass + '"><span class="tier-icon">' + icon + '</span> ' + esc(arguments[2]) + '</div>';
+  }
+
+  function renderTier(name, members, isFirst) {
+    var def = tierDef(name);
+    var arrange = def ? def.arrange : 'grid';
+    var html = '';
+    if (!isFirst) html += '<div class="tier-branch-line"></div>';
+    html += '<div class="hierarchy-tier">';
+    html += renderTierLabel(def, members, name);
+    if (arrange === 'triangle') {
+      html += '<div class="tier-connector" style="background:linear-gradient(180deg,rgba(176,127,255,0.8),rgba(255,45,120,0.5));"></div>';
+      html += '<div class="triangle-tier-cards">';
+      var left = [], center = [], right = [];
+      members.forEach(function (m) {
+        if (m.role === 'mod') center.push(m);
+        else if (m.role === 'recruiter') right.push(m);
+        else left.push(m);
+      });
+      html += '<div class="triangle-side triangle-left">' + left.map(renderCard).join('') + '</div>';
+      html += '<div class="triangle-center">' + center.map(renderCard).join('') + '</div>';
+      html += '<div class="triangle-side triangle-right">' + right.map(renderCard).join('') + '</div>';
+      html += '</div>';
+    } else {
+      html += '<div class="tier-connector"></div>';
+      var cardsClass = arrange === 'center' ? 'tier-cards tier-cards--center' : 'tier-cards';
+      html += '<div class="' + cardsClass + '">' + members.map(renderCard).join('') + '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  /* ---- Main render -------------------------------------------------------- */
+  function render(state) {
+    var root = document.getElementById('foundersTree');
+    if (!root) return;
+    var meta = state.meta || defaultMeta();
+    var founders = (state.founders || []).filter(function (m) {
+      return m && m.active !== false && m.showFounders !== false;
+    });
+    // Group by department, preserving first-seen order for custom departments.
+    var groups = {}, deptOrder = [];
+    founders.forEach(function (m) {
+      var d = m.department || (ROLE_META[m.role] || ROLE_META.custom).label;
+      if (!groups[d]) { groups[d] = []; deptOrder.push(d); }
+      groups[d].push(m);
+    });
+    // Sort departments: known tiers by config order, custom appended in insertion order.
+    deptOrder.sort(function (a, b) {
+      var ia = tierOrderIndex(a), ib = tierOrderIndex(b);
+      if (ia !== ib) return ia - ib;
+      return deptOrder.indexOf(a) - deptOrder.indexOf(b);
+    });
+    // Sort members within a department by order then rankLevel.
+    Object.keys(groups).forEach(function (d) {
+      groups[d].sort(function (a, b) {
+        var oa = a.order != null ? a.order : 999, ob = b.order != null ? b.order : 999;
+        if (oa !== ob) return oa - ob;
+        return (a.rankLevel || 0) - (b.rankLevel || 0);
+      });
+    });
+    var html = '';
+    deptOrder.forEach(function (d, i) {
+      if (!groups[d].length) return;
+      html += renderTier(d, groups[d], i === 0);
+    });
+    root.innerHTML = html || '<div style="text-align:center;color:#888;font-family:Rajdhani,sans-serif;padding:2rem;">No members to display.</div>';
+    // Apply mobile layout behaviors.
+    root.setAttribute('data-mobile', meta.mobileLayout || 'scroll');
+    applyMobile(root, meta);
+  }
+
+  /* ---- Mobile behaviors --------------------------------------------------- */
+  function applyMobile(root, meta) {
+    var mode = meta.mobileLayout || 'scroll';
+    root.classList.remove('mob-scroll', 'mob-carousel', 'mob-expand', 'mob-paginate');
+    root.classList.add('mob-' + mode);
+    if (!window.matchMedia('(max-width: 640px)').matches) return;
+    if (mode === 'expand') {
+      var tiers = root.querySelectorAll('.hierarchy-tier');
+      tiers.forEach(function (t, idx) {
+        if (idx === 0) return; // keep top tier open
+        t.classList.add('fdr-collapsed');
+        var lbl = t.querySelector('.tier-label, .tier-label-row-triangle');
+        if (lbl) {
+          lbl.style.cursor = 'pointer';
+          lbl.addEventListener('click', function () { t.classList.toggle('fdr-collapsed'); });
+        }
+      });
+    }
+  }
+
+  /* ---- Inject runtime CSS (theme/glow/border/animations/mobile) ----------- */
+  function injectStyles() {
+    if (document.getElementById('fdr-runtime-css')) return;
+    var css = [
+      /* SAFETY: never let the site scroll-reveal (or anything) hide injected founders */
+      '#foundersTree .reveal{opacity:1!important;transform:none!important;}',
+      '#foundersTree .hierarchy-tier,#foundersTree .tier-cards,#foundersTree .triangle-tier-cards,#foundersTree .member-card{opacity:1!important;}',
+      /* themed accent overrides border + glow using --fdr-accent */
+      '.member-card.fdr-themed .member-avatar{border-color:var(--fdr-accent)!important;box-shadow:0 0 16px rgba(var(--fdr-accent-rgb),0.55)!important;}',
+      '.member-card.fdr-themed .member-card-corner{border-top-color:rgba(var(--fdr-accent-rgb),0.8)!important;}',
+      /* glow strengths */
+      '.fdr-glow-low .member-avatar{box-shadow:0 0 8px rgba(var(--fdr-accent-rgb,0,240,255),0.35)!important;}',
+      '.fdr-glow-medium .member-avatar{box-shadow:0 0 16px rgba(var(--fdr-accent-rgb,0,240,255),0.55)!important;}',
+      '.fdr-glow-high .member-avatar{box-shadow:0 0 26px rgba(var(--fdr-accent-rgb,0,240,255),0.8),0 0 50px rgba(var(--fdr-accent-rgb,0,240,255),0.4)!important;}',
+      '.fdr-glow-extreme .member-avatar{box-shadow:0 0 34px rgba(var(--fdr-accent-rgb,0,240,255),1),0 0 70px rgba(var(--fdr-accent-rgb,0,240,255),0.6),0 0 110px rgba(var(--fdr-accent-rgb,0,240,255),0.3)!important;}',
+      /* border styles */
+      '.fdr-border-neon .member-avatar{border-width:2px!important;border-style:solid!important;}',
+      '.fdr-border-animated .member-avatar{animation:fdrBorderHue 4s linear infinite;}',
+      '@keyframes fdrBorderHue{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}',
+      '.fdr-border-pulse .member-avatar{animation:fdrBorderPulse 1.8s ease-in-out infinite;}',
+      '@keyframes fdrBorderPulse{0%,100%{box-shadow:0 0 10px rgba(var(--fdr-accent-rgb,0,240,255),0.5)}50%{box-shadow:0 0 26px rgba(var(--fdr-accent-rgb,0,240,255),0.95)}}',
+      /* entrance animations */
+      '@keyframes fdrFadeIn{from{opacity:0}to{opacity:1}}',
+      '@keyframes fdrSlideUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}',
+      '@keyframes fdrNeonReveal{0%{opacity:0;filter:brightness(3) blur(6px)}100%{opacity:1;filter:brightness(1) blur(0)}}',
+      '@keyframes fdrCyberScan{0%{opacity:0;clip-path:inset(0 0 100% 0)}100%{opacity:1;clip-path:inset(0 0 0 0)}}',
+      '@keyframes fdrGlitch{0%{opacity:0;transform:translate(-4px,2px)}20%{opacity:1;transform:translate(4px,-2px)}40%{transform:translate(-3px,1px)}60%{transform:translate(3px,-1px)}100%{opacity:1;transform:translate(0,0)}}',
+      '.fdr-anim-fade{animation:fdrFadeIn 0.7s ease both;}',
+      '.fdr-anim-slide{animation:fdrSlideUp 0.7s cubic-bezier(0.2,0.8,0.2,1) both;}',
+      '.fdr-anim-neon{animation:fdrNeonReveal 0.8s ease both;}',
+      '.fdr-anim-scan{animation:fdrCyberScan 0.8s ease both;}',
+      '.fdr-anim-glitch{animation:fdrGlitch 0.6s steps(2) both;}',
+      /* hover animations */
+      '.fdr-hover-glow:hover .member-avatar{box-shadow:0 0 30px rgba(var(--fdr-accent-rgb,0,240,255),1),0 0 60px rgba(var(--fdr-accent-rgb,0,240,255),0.5)!important;transition:box-shadow 0.3s;}',
+      '.fdr-hover-pulse:hover{animation:fdrBorderPulse 1s ease-in-out infinite;}',
+      '.fdr-hover-rotate:hover .member-avatar{animation:fdrRotate 3s linear infinite;}',
+      '@keyframes fdrRotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}',
+      '.fdr-hover-ring:hover .member-avatar{outline:2px solid rgba(var(--fdr-accent-rgb,0,240,255),0.7);outline-offset:6px;transition:outline-offset 0.3s;}',
+      /* mobile: expand/collapse */
+      '@media(max-width:640px){',
+      '.hierarchy-tier.fdr-collapsed .tier-cards,.hierarchy-tier.fdr-collapsed .triangle-tier-cards,.hierarchy-tier.fdr-collapsed .tier-connector{display:none!important;}',
+      '.hierarchy-tree.mob-carousel .tier-cards{flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:8px;justify-content:flex-start;}',
+      '.hierarchy-tree.mob-carousel .tier-cards>.member-card{scroll-snap-align:center;flex:0 0 auto;}',
+      '}'
+    ].join('\n');
+    var s = document.createElement('style');
+    s.id = 'fdr-runtime-css';
+    s.textContent = css;
+    document.head.appendChild(s);
+  }
+
+  /* ---- Boot --------------------------------------------------------------- */
+  function boot() {
+    if (!document.getElementById('foundersTree')) return;
+    injectStyles();
+    // Render immediately from local/seed for instant paint, then refresh from worker.
+    var local = readLocal(LS_FOUNDERS, null);
+    render({ founders: (Array.isArray(local) && local.length) ? local : defaultFounders(), meta: readLocal(LS_META, defaultMeta()) });
+    loadData().then(render).catch(function () {});
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+  // Robustness: re-run if the first paint was missed/raced or fired before #foundersTree existed.
+  window.addEventListener('load', function () { var r = document.getElementById('foundersTree'); if (r && !r.innerHTML) { try { boot(); } catch (e) {} } });
+  setTimeout(function () { var r = document.getElementById('foundersTree'); if (r && !r.innerHTML) { try { boot(); } catch (e) {} } }, 800);
+
+  // Expose for the admin live-preview iframe / cross-page use if needed.
+  window.SyncFounders = { render: render, renderCard: renderCard, defaults: defaultFounders, ROLE_META: ROLE_META, THEME_COLORS: THEME_COLORS };
 })();
 
 </script>
