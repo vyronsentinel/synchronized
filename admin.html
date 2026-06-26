@@ -436,8 +436,22 @@
 
 <script>
   const WORKER_URL = 'https://sync-worker.lastresort962.workers.dev';
-  const SECRET     = 'sync123';
-  const PASSWORD   = 'adminsync26';
+    let SECRET = '';
+  let PASSWORD = '';
+  // Encrypted admin credentials — decrypted in-memory only after the correct password is entered.
+  var __ADM = { salt: 'iESSm4POdL8AHHpED5Nwxg==', iv: 'YBmOLcSQ5dLcOSHD', data: 'taZQPfmB7XbSoQHS5xnd2EcVPDX/GOr/cSfdOEjXpg==', iter: 250000 };
+  function __b64b(s){ return Uint8Array.from(atob(s), function(c){ return c.charCodeAt(0); }); }
+  async function __admUnlock(pw){
+    try {
+      if (!(window.crypto && window.crypto.subtle)) { alert('Admin login requires a secure context (https:// or localhost).'); return false; }
+      var km = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveKey']);
+      var key = await crypto.subtle.deriveKey({ name:'PBKDF2', salt:__b64b(__ADM.salt), iterations:__ADM.iter, hash:'SHA-256' }, km, { name:'AES-GCM', length:256 }, false, ['decrypt']);
+      var buf = await crypto.subtle.decrypt({ name:'AES-GCM', iv:__b64b(__ADM.iv) }, key, __b64b(__ADM.data));
+      var c = JSON.parse(new TextDecoder().decode(buf));
+      SECRET = c.s; PASSWORD = pw; window.__SYNC_SECRET = c.s;
+      return true;
+    } catch (e) { return false; }
+  }
 
   let pendingImages = [];
   let pendingGalleryImage = '';
@@ -506,10 +520,10 @@
   }
 
   // ── LOGIN ──
-  function doLogin() {
+  async function doLogin() {
     var val = document.getElementById('passwordInput').value;
     var msg = document.getElementById('loginMsg');
-    if (val === PASSWORD) {
+    if (await __admUnlock(val)) {
       msg.className = 'msg';
       showAdmin();
     } else {
@@ -642,7 +656,7 @@
     btn.disabled = true; btn.innerHTML = '&#9654;&nbsp; Posting...'; msg.className = 'msg'; msg.textContent = '';
 
     try {
-      var res = await fetch(WORKER_URL + '/post?secret=' + SECRET, {
+      var res = await fetch(WORKER_URL + '/post?secret=' + (window.__SYNC_SECRET || ''), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: content, author: author, images: images })
@@ -818,7 +832,7 @@
       posts[index].content = newText;
       posts[index].edited  = new Date().toISOString();
 
-      var saveRes = await fetch(WORKER_URL + '/save?secret=' + SECRET, {
+      var saveRes = await fetch(WORKER_URL + '/save?secret=' + (window.__SYNC_SECRET || ''), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(posts)
@@ -851,7 +865,7 @@
 
       posts.splice(index, 1);
 
-      var saveRes = await fetch(WORKER_URL + '/save?secret=' + SECRET, {
+      var saveRes = await fetch(WORKER_URL + '/save?secret=' + (window.__SYNC_SECRET || ''), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(posts)
@@ -1024,7 +1038,7 @@
     var posts = await fetchAllPosts();
     var visiblePosts = posts.filter(function(post) { return !isReleasePost(post); });
     var releasePosts = items.map(releaseToPost);
-    var saveRes = await fetch(WORKER_URL + '/save?secret=' + SECRET, {
+    var saveRes = await fetch(WORKER_URL + '/save?secret=' + (window.__SYNC_SECRET || ''), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(visiblePosts.concat(releasePosts))
@@ -1343,7 +1357,7 @@
     var posts = await fetchAllPosts();
     var visiblePosts = posts.filter(function(post) { return !isRosterPost(post); });
     var rosterPosts = rosterCache.map(rosterToPost);
-    var saveRes = await fetch(WORKER_URL + '/save?secret=' + SECRET, {
+    var saveRes = await fetch(WORKER_URL + '/save?secret=' + (window.__SYNC_SECRET || ''), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(visiblePosts.concat(rosterPosts))
@@ -1494,7 +1508,7 @@
     var posts = await fetchAllPosts();
     var visiblePosts = posts.filter(function(post) { return !isGalleryPost(post); });
     var galleryPosts = items.map(galleryToPost);
-    var saveRes = await fetch(WORKER_URL + '/save?secret=' + SECRET, {
+    var saveRes = await fetch(WORKER_URL + '/save?secret=' + (window.__SYNC_SECRET || ''), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(visiblePosts.concat(galleryPosts))
@@ -1878,7 +1892,7 @@
   'use strict';
 
   var WORKER = (typeof WORKER_URL !== 'undefined') ? WORKER_URL : 'https://sync-worker.lastresort962.workers.dev';
-  var SEC = (typeof SECRET !== 'undefined') ? SECRET : 'sync123';
+  var SEC = (typeof SECRET !== 'undefined') ? SECRET : '';
   var FOUNDER_PREFIX = '__SYNC_FOUNDER__';
   var META_PREFIX = '__SYNC_ORG_META__';
   var LS_FOUNDERS = 'sync_founders_v1';
@@ -1988,7 +2002,7 @@
     return fetchPosts().then(function (posts) {
       var keep = posts.filter(function (p) { return !isFounderPost(p) && !isMetaPost(p); });
       var payload = keep.concat(founders.map(founderToPost)).concat([metaToPost(meta)]);
-      return fetch(WORKER + '/save?secret=' + SEC, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      return fetch(WORKER + '/save?secret=' + (window.__SYNC_SECRET || ''), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
     }).then(function (r) { if (!r || !r.ok) throw new Error('save failed'); });
   }
 
