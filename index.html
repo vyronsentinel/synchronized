@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Always revalidate the page so returning visitors don't get a stale cached copy -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>SYNCHRONIZED | iDate</title>
 
     <!-- ╔══════════════════════════════════════════════╗ -->
@@ -4245,6 +4249,16 @@
     width: 100%;
     padding: 0 1rem;
     position: relative;
+  }
+
+  /* Each side can hold multiple members; spread them left-to-right */
+  .triangle-side {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 1.2rem;
   }
 
   /* Sides sit lower, center sits higher */
@@ -8867,17 +8881,25 @@ async function submitApplication() {
     html += renderTierLabel(def, members, name);
     if (arrange === 'triangle') {
       html += '<div class="tier-connector" style="background:linear-gradient(180deg,rgba(176,127,255,0.8),rgba(255,45,120,0.5));"></div>';
-      html += '<div class="triangle-tier-cards">';
       var left = [], center = [], right = [];
       members.forEach(function (m) {
         if (m.role === 'mod') center.push(m);
         else if (m.role === 'recruiter') right.push(m);
         else left.push(m);
       });
-      html += '<div class="triangle-side triangle-left">' + left.map(renderCard).join('') + '</div>';
-      html += '<div class="triangle-center">' + center.map(renderCard).join('') + '</div>';
-      html += '<div class="triangle-side triangle-right">' + right.map(renderCard).join('') + '</div>';
-      html += '</div>';
+      var groupsPresent = (left.length ? 1 : 0) + (center.length ? 1 : 0) + (right.length ? 1 : 0);
+      if (groupsPresent <= 1) {
+        // Only one role group present (e.g. all examiners): lay them out in a
+        // horizontal grid row, identical to the High Council tier.
+        var only = left.length ? left : (center.length ? center : right);
+        html += '<div class="tier-cards">' + only.map(renderCard).join('') + '</div>';
+      } else {
+        html += '<div class="triangle-tier-cards">';
+        html += '<div class="triangle-side triangle-left">' + left.map(renderCard).join('') + '</div>';
+        html += '<div class="triangle-center">' + center.map(renderCard).join('') + '</div>';
+        html += '<div class="triangle-side triangle-right">' + right.map(renderCard).join('') + '</div>';
+        html += '</div>';
+      }
     } else {
       html += '<div class="tier-connector"></div>';
       var cardsClass = arrange === 'center' ? 'tier-cards tier-cards--center' : 'tier-cards';
