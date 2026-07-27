@@ -4577,8 +4577,15 @@
     border-left:2px solid rgba(0,191,255,0.7);
     pointer-events:none;
   }
-  /* Badge */
+  /* Badge — absolutely positioned so it floats in the card's reserved top
+     padding instead of pushing the avatar down when present. This keeps the
+     avatar row aligned across cards whether or not a given member has a
+     badgeText set. */
   .examiner-badge {
+    position:absolute;
+    top:0.85rem;
+    left:50%;
+    transform:translateX(-50%);
     font-family:'Share Tech Mono',monospace;
     font-size:0.52rem;
     letter-spacing:0.22em;
@@ -4587,9 +4594,9 @@
     border:1px solid rgba(0,191,255,0.35);
     padding:3px 10px;
     text-transform:uppercase;
-    margin-bottom:0.9rem;
     animation:examinerBadgeGlow 3s ease-in-out infinite;
     white-space:nowrap;
+    z-index:5;
   }
   @keyframes examinerBadgeGlow {
     0%,100% { box-shadow:none; color:#00bfff; }
@@ -8765,7 +8772,7 @@ async function submitApplication() {
       '<div class="member-card-corner" style="border-top-color:rgba(0,191,255,0.9);"></div>' +
       '<div class="examiner-sparks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>' +
       '<div class="examiner-corner-bl"></div>' +
-      (m.badgeText ? '<div class="examiner-badge">' + esc(m.badgeText) + '</div>' : '') +
+      '<div class="examiner-badge">' + esc(m.badgeText || '\u2726 EXAMINER \u2726') + '</div>' +
       '<div class="examiner-avatar-wrap">' +
         '<div class="examiner-avatar-halo"></div>' +
         '<div class="member-avatar examiner-avatar-inner" style="background:none;padding:0;overflow:hidden;width:90px;height:90px;border:2px solid #00BFFF;box-shadow:0 0 25px rgba(0,191,255,0.9), 0 0 50px rgba(0,191,255,0.4), 0 0 80px rgba(0,240,255,0.2);">' +
@@ -8826,8 +8833,27 @@ async function submitApplication() {
     '</div>';
   }
 
+  // Resolves the role actually used to pick a card template. Falls back to
+  // scanning the human-readable Role Label when `role` is missing/unknown
+  // (e.g. custom/blank) so a mismatched admin entry (dropdown left on
+  // "Custom" but labelled "Examiner") still renders with the correct card
+  // instead of silently falling back to the plain generic card.
+  var KNOWN_ROLES = ['clan-master', 'vice', 'high-council', 'examiner', 'mod', 'recruiter'];
+  function effectiveRole(m) {
+    var r = String(m.role || '').toLowerCase().trim();
+    if (KNOWN_ROLES.indexOf(r) !== -1) return r;
+    var label = String(m.roleLabel || '').toLowerCase();
+    if (label.indexOf('examiner') !== -1) return 'examiner';
+    if (label.indexOf('moderator') !== -1) return 'mod';
+    if (label.indexOf('recruiter') !== -1) return 'recruiter';
+    if (label.indexOf('high council') !== -1) return 'high-council';
+    if (label.indexOf('vice') !== -1) return 'vice';
+    if (label.indexOf('clan master') !== -1) return 'clan-master';
+    return r;
+  }
+
   function renderCard(m) {
-    switch (m.role) {
+    switch (effectiveRole(m)) {
       case 'clan-master':  return cardMaster(m);
       case 'vice':         return cardVice(m);
       case 'high-council': return cardCouncil(m);
@@ -8853,7 +8879,7 @@ async function submitApplication() {
       // One label per distinct role present, ordered examiner -> mod -> recruiter.
       var order = ['examiner', 'mod', 'recruiter'];
       var seen = {}, labels = [];
-      members.forEach(function (m) { seen[m.role] = true; });
+      members.forEach(function (m) { seen[effectiveRole(m)] = true; });
       order.forEach(function (r) { if (seen[r]) { labels.push(r); delete seen[r]; } });
       Object.keys(seen).forEach(function (r) { labels.push(r); });
       var anim = { examiner: 'examinerLabelPulse 2.5s', mod: 'modLabelPulse 2s', recruiter: 'recruiterLabelPulse 2.2s' };
@@ -8883,8 +8909,9 @@ async function submitApplication() {
       html += '<div class="tier-connector" style="background:linear-gradient(180deg,rgba(176,127,255,0.8),rgba(255,45,120,0.5));"></div>';
       var left = [], center = [], right = [];
       members.forEach(function (m) {
-        if (m.role === 'mod') center.push(m);
-        else if (m.role === 'recruiter') right.push(m);
+        var r = effectiveRole(m);
+        if (r === 'mod') center.push(m);
+        else if (r === 'recruiter') right.push(m);
         else left.push(m);
       });
       var groupsPresent = (left.length ? 1 : 0) + (center.length ? 1 : 0) + (right.length ? 1 : 0);
