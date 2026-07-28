@@ -3704,7 +3704,7 @@
     <div class="section-divider" style="margin:0 auto 2rem;background:linear-gradient(90deg,transparent,var(--hot-pink),transparent);width:120px;"></div>
 
     <p style="color:#aaaacc;font-size:1.05rem;line-height:1.8;max-width:540px;margin:0 auto 2.5rem;">
-      View the complete lineup of all <strong style="color:#fff;">25 active members</strong> — names, ranks, and roles — on the full roster page.
+      View the complete lineup of all <strong style="color:#fff;"><span id="active-member-count">25</span> active members</strong> — names, ranks, and roles — on the full roster page.
     </p>
 
     <!-- Quick role legend -->
@@ -9066,6 +9066,50 @@ async function submitApplication() {
   window.SyncFounders = { render: render, renderCard: renderCard, defaults: defaultFounders, ROLE_META: ROLE_META, THEME_COLORS: THEME_COLORS };
 })();
 
+</script>
+
+<!-- ===================== DYNAMIC ACTIVE MEMBER COUNT ===================== -->
+<script>
+(function () {
+  // The real full-roster data lives in the roster modal's table body (#rm-tbody),
+  // populated from the live worker feed — this is every member, not just the
+  // curated homepage leadership showcase (#foundersTree only holds a subset).
+  var MEMBERS_CONTAINER_ID = 'rm-tbody';
+  var CARD_SELECTOR = '.rm-row';
+  var COUNT_TARGET_ID = 'active-member-count';
+
+  function countMemberCards() {
+    var container = document.getElementById(MEMBERS_CONTAINER_ID);
+    if (!container) return null;
+    return container.querySelectorAll(CARD_SELECTOR).length;
+  }
+
+  function updateActiveMemberCount() {
+    var target = document.getElementById(COUNT_TARGET_ID);
+    var count = countMemberCards();
+    // Only overwrite the static fallback once the real roster has actually
+    // loaded, so we never flash "0" while the data is still in flight.
+    if (target && count) target.textContent = count;
+  }
+
+  function init() {
+    updateActiveMemberCount();
+
+    var container = document.getElementById(MEMBERS_CONTAINER_ID);
+    if (!container || !window.MutationObserver) return;
+
+    // Whenever roster rows are added or removed — including the async
+    // roster refresh — recount automatically. No manual edits needed.
+    var observer = new MutationObserver(updateActiveMemberCount);
+    observer.observe(container, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
 </script>
 </body>
 </html>
