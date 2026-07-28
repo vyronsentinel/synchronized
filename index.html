@@ -3704,7 +3704,7 @@
     <div class="section-divider" style="margin:0 auto 2rem;background:linear-gradient(90deg,transparent,var(--hot-pink),transparent);width:120px;"></div>
 
     <p style="color:#aaaacc;font-size:1.05rem;line-height:1.8;max-width:540px;margin:0 auto 2.5rem;">
-      View the complete lineup of all <strong style="color:#fff;">25 active members</strong> — names, ranks, and roles — on the full roster page.
+      View the complete lineup of all <strong style="color:#fff;"><span id="active-member-count">25</span> active members</strong> — names, ranks, and roles — on the full roster page.
     </p>
 
     <!-- Quick role legend -->
@@ -5239,14 +5239,14 @@ async function submitApplication() {
     });
 
     if (res.ok) {
-      status.style.display = 'block';
-      status.style.background = 'rgba(0,240,255,0.06)';
-      status.style.border = '1px solid rgba(0,240,255,0.35)';
-      status.style.color = 'var(--cyan)';
-      status.textContent = '✔ Application sent! We\'ll reach out soon.';
+      status.style.display = 'none';
+      status.textContent = '';
       // Reset form
       ['f-name','f-ign','f-discord','f-level','f-oldfam','f-reason','f-birthday','f-age','f-fbemail','f-examiner','f-r1','f-r2','f-r3'].forEach(id => document.getElementById(id).value = '');
-      btn.textContent = 'Sent ✔';
+      btn.textContent = 'Send Application to Discord';
+      btn.disabled = false;
+      // Full-screen cyberpunk success confirmation
+      openApplicationSuccess();
     } else {
       throw new Error('Discord returned ' + res.status);
     }
@@ -5260,6 +5260,289 @@ async function submitApplication() {
     btn.textContent = 'Send Application to Discord';
   }
 }
+</script>
+
+<!-- ===================== APPLICATION SUCCESS MODAL ===================== -->
+<div id="applySuccessModal" class="success-modal" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+  <div class="success-card" id="successCard">
+    <div class="sc-corner sc-corner-tl"></div>
+    <div class="sc-corner sc-corner-tr"></div>
+    <div class="sc-corner sc-corner-bl"></div>
+    <div class="sc-corner sc-corner-br"></div>
+
+    <div class="success-scanlines" aria-hidden="true"></div>
+
+    <div class="success-icon-wrap">
+      <svg class="success-check" viewBox="0 0 100 100" width="86" height="86">
+        <defs>
+          <linearGradient id="successIconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff2d78"/>
+            <stop offset="100%" stop-color="#00f0ff"/>
+          </linearGradient>
+        </defs>
+        <circle class="success-check-ring" cx="50" cy="50" r="43" fill="none" stroke="url(#successIconGradient)" stroke-width="3"/>
+        <path class="success-check-mark" d="M27 51 L43 66 L75 32" fill="none" stroke="url(#successIconGradient)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <div class="section-label" style="text-align:center;">Application Received</div>
+    <h2 class="success-heading" id="successTitle">THANK YOU!</h2>
+    <p class="success-body">Your application was sent to us!</p>
+
+    <div class="success-btn-row">
+      <button type="button" class="btn-secondary" onclick="closeApplicationSuccess(false)">Return Home</button>
+      <button type="button" class="btn-primary" onclick="closeApplicationSuccess(true)">Dismiss</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  body.success-modal-open { overflow: hidden; }
+
+  #applySuccessModal.success-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10500;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(0.75rem, 2.5vw, 2rem);
+    background: rgba(3,3,10,0.86);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+  #applySuccessModal.success-modal.is-open { display: flex; }
+
+  #applySuccessModal .success-card {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    padding: 2.75rem 2.25rem 2.25rem;
+    text-align: center;
+    background:
+      linear-gradient(rgba(10,10,30,0.94), rgba(10,10,30,0.94)) padding-box,
+      linear-gradient(135deg, var(--hot-pink), var(--cyan)) border-box;
+    border: 1.5px solid transparent;
+    border-radius: 4px;
+    clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 26px 100%, 0 calc(100% - 26px));
+    box-shadow: 0 0 40px rgba(0,240,255,0.25), 0 0 70px rgba(255,45,120,0.15), 0 20px 60px rgba(0,0,0,0.6);
+    opacity: 0;
+    transform: scale(0.82);
+    overflow: hidden;
+  }
+  #applySuccessModal.success-modal.is-open .success-card {
+    animation: successEntry 0.55s cubic-bezier(.2,.9,.25,1.15) forwards;
+  }
+  #applySuccessModal.success-modal.is-closing .success-card {
+    animation: successExit 0.28s ease-in forwards;
+  }
+
+  @keyframes successEntry {
+    0%   { opacity: 0; transform: scale(0.78) translateX(0); filter: brightness(1); }
+    35%  { opacity: 1; transform: scale(1.04) translateX(-6px); filter: brightness(1.6); }
+    45%  { transform: scale(1.02) translateX(5px); }
+    55%  { transform: scale(1.0) translateX(-3px); }
+    70%  { transform: scale(1.01) translateX(0); filter: brightness(1.1); }
+    100% { opacity: 1; transform: scale(1) translateX(0); filter: brightness(1); }
+  }
+  @keyframes successExit {
+    0%   { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.9); }
+  }
+
+  #applySuccessModal.success-modal.is-open .success-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    animation: successGlowPulse 2.4s ease-in-out 0.55s infinite;
+  }
+  @keyframes successGlowPulse {
+    0%, 100% { box-shadow: inset 0 0 30px rgba(0,240,255,0.06); }
+    50%      { box-shadow: inset 0 0 46px rgba(255,45,120,0.1); }
+  }
+
+  .success-scanlines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.05;
+    background: repeating-linear-gradient(
+      0deg,
+      #fff 0px,
+      transparent 1px,
+      transparent 3px
+    );
+    mix-blend-mode: overlay;
+  }
+
+  .success-icon-wrap {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.4rem;
+  }
+  .success-check-ring {
+    stroke-dasharray: 270;
+    stroke-dashoffset: 270;
+    filter: drop-shadow(0 0 6px rgba(0,240,255,0.7));
+  }
+  .success-check-mark {
+    stroke-dasharray: 70;
+    stroke-dashoffset: 70;
+    filter: drop-shadow(0 0 6px rgba(255,45,120,0.8));
+  }
+  #applySuccessModal.success-modal.is-open .success-check-ring {
+    animation: successRingDraw 0.6s ease-out 0.15s forwards;
+  }
+  #applySuccessModal.success-modal.is-open .success-check-mark {
+    animation: successMarkDraw 0.4s ease-out 0.62s forwards, successMarkPulse 2s ease-in-out 1.1s infinite;
+  }
+  @keyframes successRingDraw {
+    to { stroke-dashoffset: 0; }
+  }
+  @keyframes successMarkDraw {
+    to { stroke-dashoffset: 0; }
+  }
+  @keyframes successMarkPulse {
+    0%, 100% { filter: drop-shadow(0 0 6px rgba(255,45,120,0.8)); }
+    50%      { filter: drop-shadow(0 0 14px rgba(0,240,255,0.9)); }
+  }
+
+  .success-heading {
+    position: relative;
+    z-index: 1;
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.6rem, 5vw, 2.1rem);
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    margin: 0.2rem 0 0.9rem;
+    background: linear-gradient(90deg, var(--hot-pink), var(--cyan));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    text-shadow: 0 0 22px rgba(0,240,255,0.35), 0 0 30px rgba(255,45,120,0.25);
+    opacity: 0;
+  }
+  #applySuccessModal.success-modal.is-open .success-heading {
+    animation: successTextIn 0.4s ease-out 0.4s forwards, successGlitch 0.4s steps(2) 0.85s;
+  }
+  @keyframes successTextIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes successGlitch {
+    0%   { transform: translate(0,0); }
+    20%  { transform: translate(-2px,1px); }
+    40%  { transform: translate(2px,-1px); }
+    60%  { transform: translate(-1px,0); }
+    80%  { transform: translate(1px,1px); }
+    100% { transform: translate(0,0); }
+  }
+
+  .success-body {
+    position: relative;
+    z-index: 1;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.02rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--text);
+    margin: 0 0 1.9rem;
+    opacity: 0;
+  }
+  #applySuccessModal.success-modal.is-open .success-body {
+    animation: successTextIn 0.4s ease-out 0.55s forwards;
+  }
+
+  .success-btn-row {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    opacity: 0;
+  }
+  #applySuccessModal.success-modal.is-open .success-btn-row {
+    animation: successTextIn 0.4s ease-out 0.7s forwards;
+  }
+  .success-btn-row .btn-primary,
+  .success-btn-row .btn-secondary {
+    font-size: 0.78rem;
+    padding: 12px 22px;
+  }
+
+  .sc-corner {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    z-index: 2;
+  }
+  .sc-corner-tl { top: 8px; left: 8px; border-top: 2px solid var(--cyan); border-left: 2px solid var(--cyan); }
+  .sc-corner-tr { top: 8px; right: 8px; border-top: 2px solid var(--hot-pink); border-right: 2px solid var(--hot-pink); }
+  .sc-corner-bl { bottom: 8px; left: 8px; border-bottom: 2px solid var(--hot-pink); border-left: 2px solid var(--hot-pink); }
+  .sc-corner-br { bottom: 8px; right: 8px; border-bottom: 2px solid var(--cyan); border-right: 2px solid var(--cyan); }
+
+  @media (max-width: 480px) {
+    #applySuccessModal .success-card { padding: 2.2rem 1.4rem 1.8rem; }
+    .success-btn-row { flex-direction: column; }
+    .success-btn-row .btn-primary,
+    .success-btn-row .btn-secondary { width: 100%; }
+  }
+</style>
+
+<script>
+function openApplicationSuccess() {
+  const modal = document.getElementById('applySuccessModal');
+  if (!modal) return;
+  modal.classList.remove('is-closing');
+  modal.hidden = false;
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('success-modal-open');
+  // restart animations even if opened again
+  void modal.offsetWidth;
+  requestAnimationFrame(() => modal.classList.add('is-open'));
+  clearTimeout(window._applySuccessAutoClose);
+  window._applySuccessAutoClose = setTimeout(() => closeApplicationSuccess(true), 9000);
+}
+
+function closeApplicationSuccess(keepApplyOpen) {
+  const modal = document.getElementById('applySuccessModal');
+  if (!modal) return;
+  clearTimeout(window._applySuccessAutoClose);
+  modal.classList.remove('is-open');
+  modal.classList.add('is-closing');
+  modal.setAttribute('aria-hidden', 'true');
+  setTimeout(() => {
+    modal.hidden = true;
+    modal.classList.remove('is-closing');
+    document.body.classList.remove('success-modal-open');
+  }, 300);
+
+  // "Return Home" also closes the application form modal underneath;
+  // "Dismiss" leaves the (now reset) application form visible.
+  if (!keepApplyOpen) {
+    closeApplicationModal();
+  }
+}
+
+document.addEventListener('click', function(event) {
+  const modal = document.getElementById('applySuccessModal');
+  if (modal && modal.classList.contains('is-open') && event.target === modal) {
+    closeApplicationSuccess(true);
+  }
+});
+
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    const modal = document.getElementById('applySuccessModal');
+    if (modal && modal.classList.contains('is-open')) closeApplicationSuccess(true);
+  }
+});
 </script>
 
 <!-- FOOTER -->
@@ -9066,6 +9349,50 @@ async function submitApplication() {
   window.SyncFounders = { render: render, renderCard: renderCard, defaults: defaultFounders, ROLE_META: ROLE_META, THEME_COLORS: THEME_COLORS };
 })();
 
+</script>
+
+<!-- ===================== DYNAMIC ACTIVE MEMBER COUNT ===================== -->
+<script>
+(function () {
+  // The real full-roster data lives in the roster modal's table body (#rm-tbody),
+  // populated from the live worker feed — this is every member, not just the
+  // curated homepage leadership showcase (#foundersTree only holds a subset).
+  var MEMBERS_CONTAINER_ID = 'rm-tbody';
+  var CARD_SELECTOR = '.rm-row';
+  var COUNT_TARGET_ID = 'active-member-count';
+
+  function countMemberCards() {
+    var container = document.getElementById(MEMBERS_CONTAINER_ID);
+    if (!container) return null;
+    return container.querySelectorAll(CARD_SELECTOR).length;
+  }
+
+  function updateActiveMemberCount() {
+    var target = document.getElementById(COUNT_TARGET_ID);
+    var count = countMemberCards();
+    // Only overwrite the static fallback once the real roster has actually
+    // loaded, so we never flash "0" while the data is still in flight.
+    if (target && count) target.textContent = count;
+  }
+
+  function init() {
+    updateActiveMemberCount();
+
+    var container = document.getElementById(MEMBERS_CONTAINER_ID);
+    if (!container || !window.MutationObserver) return;
+
+    // Whenever roster rows are added or removed — including the async
+    // roster refresh — recount automatically. No manual edits needed.
+    var observer = new MutationObserver(updateActiveMemberCount);
+    observer.observe(container, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
 </script>
 </body>
 </html>
