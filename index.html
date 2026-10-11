@@ -88,6 +88,7 @@ h3{font:900 clamp(1.6rem,4.2vw,3.3rem)/1.05 var(--d);text-transform:uppercase;le
 .rk p,.rk small{display:block;margin:12px 0 0;color:var(--text-secondary);font-size:.85rem;max-width:none}
 .ent{display:flex;gap:10px;margin:14px 0}
 .ent input{flex:1;min-width:0;min-height:44px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:rgba(8,5,22,.65);color:var(--text-primary);font:inherit}
+.ent-status{flex-basis:100%;margin:0;color:var(--text-secondary);font-size:.9rem}
 @property --p{syntax:'<number>';inherits:false;initial-value:0}
 #check{text-align:center;max-width:820px;margin:auto}
 #check p{color:var(--text-secondary);margin:0 auto 1.6rem;max-width:44ch}
@@ -474,7 +475,7 @@ footer img{height:54px;margin-bottom:12px}
     <div class="rbar" id="scRuler"></div>
     <p id="scAvg"></p>
    </div>
-   <form class="ent" id="scEnt" hidden><input id="scName" maxlength="16" autocomplete="nickname" placeholder="Your name" aria-label="Your name"><button class="btn" type="submit"><span>Add to ranking</span></button></form>
+   <form class="ent" id="scEnt" hidden><input id="scName" maxlength="16" autocomplete="nickname" placeholder="Your name" aria-label="Your name"><button class="btn" type="submit"><span>Add to ranking</span></button><p class="ent-status" id="scEntMsg" aria-live="polite"></p></form>
    <div class="acts"><button class="btn ghost" id="scAgain" type="button"><span>Try again</span></button><a class="btn" href="#apply"><span>Open application</span></a></div>
   </div>
   <div class="rk" id="scRk" hidden><h4>The ranking</h4><ol id="scList"></ol><p id="scRkMsg" aria-live="polite"></p><small>One place per person, counted by a scrambled version of your IP address. We never store the address itself.</small></div>
@@ -783,17 +784,26 @@ snd.onclick=()=>{AU.setOn(!AU.on);paintSnd();if(AU.on&&AU.init())AU.free(2)};
 paintSnd();
 /* ---------- ranking: needs the Worker in worker.js. Replace this with your deployed Worker URL to enable the leaderboard ---------- */
 const LB='https://sync-ranking.alcastro-batucan.workers.dev'; /* paste your Worker URL here, no trailing slash */
-const rk=$('#scRk'),ent=$('#scEnt'),nm=$('#scName'),lst=$('#scList'),rkm=$('#scRkMsg');let lastP=0;
+const rk=$('#scRk'),ent=$('#scEnt'),nm=$('#scName'),lst=$('#scList'),rkm=$('#scRkMsg'),entMsg=$('#scEntMsg');let lastP=0,personalBest=null,offerId=0;
 function paintRank(d){rk.hidden=false;lst.textContent='';
  d.top.forEach((e,i)=>{const li=document.createElement('li'),a=document.createElement('b'),n=document.createElement('span'),sc=document.createElement('b');
   if(e.me)li.className='me';a.textContent=i+1;n.textContent=e.name;sc.textContent=e.score+'%';li.append(a,n,sc);lst.append(li)});
+ personalBest=d.you?d.you.score:null;
  rkm.textContent=!d.top.length?'No scores yet. Be the first.':d.you?'You are number '+d.you.rank+' of '+d.total+' with '+d.you.score+'%.':''}
-async function loadRank(){if(!LB)return;try{const r=await fetch(LB+'/top',{cache:'no-store'});if(!r.ok)throw 0;paintRank(await r.json())}catch(e){rk.hidden=false;rkm.textContent='The ranking is offline right now.'}}
-function offer(p){if(!LB)return;lastP=p;try{nm.value=localStorage.getItem('sync-name')||''}catch(e){}ent.hidden=false;ent.querySelector('button').disabled=false}
+async function refreshRank(){const r=await fetch(LB+'/top',{cache:'no-store'});if(!r.ok)throw new Error('Ranking request failed');const d=await r.json();paintRank(d);return d}
+async function loadRank(){if(!LB)return;try{await refreshRank()}catch(e){rk.hidden=false;rkm.textContent='The ranking is offline right now.'}}
+function updateOffer(){const b=ent.querySelector('button');
+ if(personalBest!==null&&lastP<=personalBest){b.disabled=true;entMsg.textContent='You cannot submit '+lastP+'% because your current high score is '+personalBest+'%. Beat '+personalBest+'% to update your ranking.'}
+ else{b.disabled=false;entMsg.textContent=personalBest===null?'No score submitted yet. You can add '+lastP+'% to the ranking.':'New high score! You can submit '+lastP+'% to replace your current best of '+personalBest+'%.'}}
+async function offer(p){if(!LB)return;lastP=p;const requestId=++offerId;
+ try{nm.value=localStorage.getItem('sync-name')||''}catch(e){}ent.hidden=false;ent.querySelector('button').disabled=true;entMsg.textContent='Checking your current high score...';
+ try{await refreshRank();if(requestId===offerId)updateOffer()}
+ catch(e){if(requestId===offerId){entMsg.textContent='Could not check your current high score. The ranking will validate your submission.';ent.querySelector('button').disabled=false}}}
 ent.addEventListener('submit',async e=>{e.preventDefault();const b=ent.querySelector('button');b.disabled=true;
+ if(personalBest!==null&&lastP<=personalBest){updateOffer();return}
  try{const r=await fetch(LB+'/score',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:nm.value.trim(),score:lastP})}),d=await r.json();
   if(!r.ok)throw d;try{localStorage.setItem('sync-name',nm.value.trim())}catch(x){}paintRank(d);rkm.textContent='High score submitted to the ranking.';ent.hidden=true;rk.scrollIntoView({block:'nearest',behavior:'smooth'})}
- catch(x){rkm.textContent=(x&&x.error)||'Could not send. Try again.';rk.hidden=false;b.disabled=false}});
+ catch(x){if(x&&Number.isInteger(x.currentBest)){personalBest=x.currentBest;updateOffer()}else{entMsg.textContent=(x&&x.error)||'Could not send. Try again.';b.disabled=false}rkm.textContent=(x&&x.error)||'Could not send. Try again.';rk.hidden=false}});
 loadRank();
 size();addEventListener('resize',size);
 })();
