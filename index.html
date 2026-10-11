@@ -704,7 +704,7 @@ function paintSnd(){snd.classList.toggle('off',!AU.on);snd.lastChild.textContent
 snd.onclick=()=>{AU.setOn(!AU.on);paintSnd();if(AU.on&&AU.init())AU.free(2)};
 paintSnd();
 /* ---------- ranking: needs the Worker in worker.js. Replace this with your deployed Worker URL to enable the leaderboard ---------- */
-const LB='https://sync-ranking.<your-account>.workers.dev'; /* paste your Worker URL here, no trailing slash */
+const LB='https://sync-ranking.alcastro-batucan.workers.dev'; /* paste your Worker URL here, no trailing slash */
 const rk=$('#scRk'),ent=$('#scEnt'),nm=$('#scName'),lst=$('#scList'),rkm=$('#scRkMsg');let lastP=0;
 function paintRank(d){rk.hidden=false;lst.textContent='';
  d.top.forEach((e,i)=>{const li=document.createElement('li'),a=document.createElement('b'),n=document.createElement('span'),sc=document.createElement('b');
