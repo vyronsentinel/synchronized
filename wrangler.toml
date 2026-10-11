@@ -3,7 +3,7 @@ main = "worker.js"
 compatibility_date = "2024-09-01"
 
 [vars]
-ORIGIN = "https://your-site.example.com"   # exactly where index.html is hosted, no trailing slash
+ORIGIN = "https://synchronized.site/"   # exactly where index.html is hosted, no trailing slash
 
 [[kv_namespaces]]
 binding = "LB"
