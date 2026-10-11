@@ -46,13 +46,16 @@ export default {
       if (!Number.isInteger(score) || score < 0 || score > 100) return send({ error: 'Bad score' }, 400);
       if (!name) return send({ error: 'Add a name first.' }, 400);
 
+      const i = board.findIndex(e => e.h === me);
+      if (i >= 0 && score <= board[i].score) {
+        return send({ error: 'Your score must beat your personal best to update the ranking.' }, 409);
+      }
+
       if (await env.LB.get('rl:' + me)) return send({ error: 'Slow down. Try again in a minute.' }, 429);
       await env.LB.put('rl:' + me, '1', { expirationTtl: 60 });
 
-      const i = board.findIndex(e => e.h === me);
       if (i < 0) board.push({ h: me, name, score, t: Date.now() });
-      else if (score > board[i].score) board[i] = { h: me, name, score, t: Date.now() };
-      else board[i].name = name; // one place per IP: keep the best score, allow a rename
+      else board[i] = { h: me, name, score, t: Date.now() };
       board.sort((a, c) => c.score - a.score || a.t - c.t);
       await env.LB.put('board', JSON.stringify(board.slice(0, KEEP)));
       return send(view());
