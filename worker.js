@@ -48,7 +48,11 @@ export default {
 
       const i = board.findIndex(e => e.h === me);
       if (i >= 0 && score <= board[i].score) {
-        return send({ error: 'Your score must beat your personal best to update the ranking.' }, 409);
+        return send({
+          error: `You cannot submit ${score}% because your current high score is ${board[i].score}%. Beat ${board[i].score}% to update your ranking.`,
+          currentBest: board[i].score,
+          submittedScore: score
+        }, 409);
       }
 
       if (await env.LB.get('rl:' + me)) return send({ error: 'Slow down. Try again in a minute.' }, 429);
