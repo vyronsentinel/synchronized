@@ -1,0 +1,10 @@
+name = "sync-ranking"
+main = "worker.js"
+compatibility_date = "2024-09-01"
+
+[vars]
+ORIGIN = "https://your-site.example.com"   # exactly where index.html is hosted, no trailing slash
+
+[[kv_namespaces]]
+binding = "LB"
+id = "baf9c61b0ef14b2b9fc043435eb0a489"
