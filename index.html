@@ -86,9 +86,10 @@ h3{font:900 clamp(1.6rem,4.2vw,3.3rem)/1.05 var(--d);text-transform:uppercase;le
 .rk li.me{outline:1.5px solid var(--accent)}
 .rk li b{font:900 1rem var(--d);font-variant-numeric:tabular-nums}
 .rk p,.rk small{display:block;margin:12px 0 0;color:var(--text-secondary);font-size:.85rem;max-width:none}
-.ent{display:flex;gap:10px;margin:14px 0}
-.ent input{flex:1;min-width:0;min-height:44px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:rgba(8,5,22,.65);color:var(--text-primary);font:inherit}
-.ent-status{flex-basis:100%;margin:0;color:var(--text-secondary);font-size:.9rem}
+.ent{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;margin:14px 0}
+.ent input{width:100%;min-width:0;min-height:44px;padding:0 12px;border-radius:8px;border:1px solid var(--line);background:rgba(8,5,22,.65);color:var(--text-primary);font:inherit}
+.ent .btn{white-space:nowrap}
+.ent-status{grid-column:1/-1;margin:0;color:var(--text-secondary);font-size:.9rem}
 @property --p{syntax:'<number>';inherits:false;initial-value:0}
 #check{text-align:center;max-width:820px;margin:auto}
 #check p{color:var(--text-secondary);margin:0 auto 1.6rem;max-width:44ch}
@@ -368,7 +369,7 @@ footer img{height:54px;margin-bottom:12px}
  .dots li{width:10px;height:10px}
  .tools{gap:12px}
  .rc{gap:18px}
- .ent{flex-direction:column}
+ .ent{grid-template-columns:1fr}
  .ent .btn{width:100%}
  .acts{gap:10px}
  .acts .btn{flex:1 1 135px;text-align:center;padding:14px 16px}
