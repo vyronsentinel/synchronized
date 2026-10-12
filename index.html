@@ -61,8 +61,9 @@ a{color:inherit}
 .site-player:hover .site-music,.site-player:focus-within .site-music,.site-player.open .site-music{transform:rotate(-360deg) scale(1.04)}
 @media(max-width:420px){.site-player-controls{--pw:min(238px,calc(100vw - 132px))}}
 .sp-track{display:flex;align-items:center;gap:12px;min-width:0}
-.sp-art{flex:none;width:44px;height:44px;border-radius:6px;background:linear-gradient(135deg,#450af5,#c4efd9);display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,.5)}
-.sp-art img{width:26px;height:26px;object-fit:contain}
+.sp-art{position:relative;overflow:hidden;flex:none;width:56px;height:56px;border-radius:6px;background:linear-gradient(135deg,#450af5,#c4efd9);display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,.5)}
+.sp-art img{width:30px;height:30px;object-fit:contain}
+.sp-art .sp-cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .sp-meta{display:grid;min-width:0}
 .sp-meta b{font:700 .95rem var(--b);color:#fff;overflow:hidden;text-overflow:ellipsis}
 .sp-meta span{font:400 .78rem var(--b);color:#b3b3b3}
@@ -76,7 +77,8 @@ a{color:inherit}
 .sp-play.playing .i-play{display:none}.sp-play.playing .i-pause{display:block}
 .sp-vol{flex:1;display:flex;align-items:center;gap:8px;color:#b3b3b3}
 .sp-vol svg{flex:none;width:18px;height:18px;fill:currentColor}
-.sp-vol input,.sp-progress input{--p:0%;flex:1;width:100%;min-width:0;height:12px;margin:0;background:transparent;-webkit-appearance:none;appearance:none;cursor:pointer}
+.sp-vol input,.sp-progress input{--p:0%;flex:1;width:100%;min-width:0;height:12px;margin:0;padding:0;border:0;border-radius:0;box-shadow:none;background:transparent;-webkit-appearance:none;appearance:none;cursor:pointer}
+.sp-vol input:focus,.sp-progress input:focus{border:0;box-shadow:none}
 .sp-vol input::-webkit-slider-runnable-track,.sp-progress input::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(to right,#fff var(--p),#4d4d4d var(--p))}
 .sp-vol input::-moz-range-track,.sp-progress input::-moz-range-track{height:4px;border-radius:2px;background:#4d4d4d}
 .sp-vol input::-moz-range-progress,.sp-progress input::-moz-range-progress{height:4px;border-radius:2px;background:#fff}
@@ -554,7 +556,7 @@ select:focus{outline:0;border-color:var(--cy);box-shadow:0 0 0 3px rgba(56,216,2
 <div class="site-player" id="site-player">
  <button class="site-music" id="site-music" type="button" aria-label="Show music controls" aria-controls="site-player-controls" aria-expanded="false"><img src="assets/spotifylogo.png" alt=""></button>
  <div class="site-player-controls" id="site-player-controls">
-  <div class="sp-track"><div class="sp-art"><img src="assets/spotifylogo.png" alt=""></div><div class="sp-meta"><b>DDU-DU DDU-DU</b><span>BLACKPINK</span></div></div>
+  <div class="sp-track"><div class="sp-art"><img src="assets/spotifylogo.png" alt=""><img class="sp-cover" src="assets/album-cover.jpg" alt="Album cover" onerror="this.remove()"></div><div class="sp-meta"><b>DDU-DU DDU-DU</b><span>BLACKPINK</span></div></div>
   <div class="sp-progress"><time id="site-track-position">0:00</time><input id="site-seek" type="range" min="0" max="100" step="0.1" value="0" aria-label="Seek"><time id="site-track-duration">-:--</time></div>
   <div class="sp-row">
    <button class="sp-play" id="site-track-toggle" type="button" aria-label="Pause background music"><svg class="i-play" viewBox="0 0 16 16"><path d="M3 1.7v12.6a.7.7 0 0 0 1.05.6l10.5-6.3a.7.7 0 0 0 0-1.2L4.05 1.1A.7.7 0 0 0 3 1.7z"/></svg><svg class="i-pause" viewBox="0 0 16 16"><path d="M2.7 1h3.6v14H2.7zM9.7 1h3.6v14H9.7z"/></svg></button>
