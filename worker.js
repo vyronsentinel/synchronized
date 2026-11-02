@@ -1,6 +1,8 @@
 // Cloudflare Worker: the SYNC CHECK ranking.
 // Bindings: KV namespace LB, secret SALT, variable ORIGIN (your site, e.g. https://example.com).
 // The visitor's IP is read here on the server, scrambled with SALT, and only the scramble is stored.
+import { handleAttendance } from './attendance-worker.mjs';
+
 const KEEP = 100, enc = new TextEncoder();
 
 async function scramble(ip, salt) {
@@ -11,8 +13,10 @@ const cleanName = n => String(n || '').replace(/[\u0000-\u001f<>&"'`]/g, '').tri
 
 export default {
   async fetch(req, env) {
+    const attendance = await handleAttendance(req, env);
+    if (attendance) return attendance;
     const cors = {
-      'Access-Control-Allow-Origin': env.ORIGIN,
+      'Access-Control-Allow-Origin': new URL(env.ORIGIN).origin,
       'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
       'Vary': 'Origin'
@@ -40,7 +44,7 @@ export default {
     if (req.method === 'GET' && path === '/top') return send(view());
 
     if (req.method === 'POST' && path === '/score') {
-      if (req.headers.get('Origin') !== env.ORIGIN) return send({ error: 'Not allowed' }, 403);
+      if (req.headers.get('Origin') !== new URL(env.ORIGIN).origin) return send({ error: 'Not allowed' }, 403);
       let b; try { b = await req.json(); } catch { return send({ error: 'Bad request' }, 400); }
       const score = Number(b.score), name = cleanName(b.name);
       if (!Number.isInteger(score) || score < 0 || score > 100) return send({ error: 'Bad score' }, 400);
