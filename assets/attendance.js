@@ -11,12 +11,17 @@
   async function request(path, options = {}) {
     const response = await fetch(path, { ...options, credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json', ...options.headers } });
     let data;
-    try { data = await response.json(); } catch { throw new Error('Attendance is not connected yet. Ask a clan admin to finish the website setup.'); }
-    if (!response.ok) {
-      const error = new Error(data.error || 'Attendance could not be loaded. Please try again.');
+    const setupError = 'Attendance is not connected yet. Ask a clan admin to finish the website setup.';
+    try { data = await response.json(); } catch { throw new Error(setupError); }
+    if (!response.ok || data?.error) {
+      const detail = [data?.error, data?.error?.message, data?.message].find(value => typeof value === 'string' && value.trim());
+      const error = new Error(detail || (response.status === 404 ? setupError : `Attendance could not be loaded (HTTP ${response.status}). Please try again.`));
       error.status = response.status;
       throw error;
     }
+    if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error(setupError);
+    if (['/api/attendance/session', '/api/attendance/checkin'].includes(path) &&
+        (!/^\d{4}-\d{2}-\d{2}$/.test(data.today || '') || typeof data.timeZone !== 'string' || !Object.hasOwn(data, 'user'))) throw new Error(setupError);
     return data;
   }
   function paintHistory(data) {
