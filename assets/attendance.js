@@ -5,6 +5,31 @@
   const get = id => document.getElementById(id);
   const status = get('att-status'), connect = get('att-connect'), checkin = get('att-checkin');
   let state = null, adminData = null, loading = false, actionPending = false, adminRequest = 0, sessionVersion = 0;
+  function openAttendance() {
+    if (!root.open) { root.showModal(); root.scrollTop = 0; }
+    return refresh();
+  }
+  document.querySelectorAll('[data-open-attendance], a[href="#attendance"]').forEach(trigger => {
+    trigger.addEventListener('click', event => { event.preventDefault(); openAttendance(); });
+  });
+  get('att-close').addEventListener('click', () => root.close());
+  root.addEventListener('close', () => {
+    if (location.hash === '#attendance') {
+      const url = new URL(location.href); url.hash = '';
+      window.history.replaceState(null, '', url);
+    }
+  });
+  const outsideDialog = event => {
+    const bounds = root.getBoundingClientRect();
+    return event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom;
+  };
+  let backdropPressed = false;
+  root.addEventListener('pointerdown', event => { backdropPressed = event.target === root && outsideDialog(event); });
+  root.addEventListener('click', event => {
+    if (backdropPressed && event.target === root && outsideDialog(event)) root.close();
+    backdropPressed = false;
+  });
+  window.addEventListener('hashchange', () => { if (location.hash === '#attendance') openAttendance(); });
   const dateLabel = (day, options = {}) => new Date(`${day}T12:00:00Z`).toLocaleDateString(undefined, { timeZone: 'UTC', month: 'short', day: 'numeric', ...options });
   const timeLabel = (time, zone) => new Date(time).toLocaleTimeString(undefined, { timeZone: zone, hour: '2-digit', minute: '2-digit' });
   function message(text, error = false) { status.textContent = text; status.classList.toggle('error', error); }
@@ -46,6 +71,8 @@
     get('att-timezone').textContent = `Daily reset · ${data.timeZone}`;
     get('att-guest').hidden = Boolean(data.user);
     get('att-member').hidden = !data.user;
+    get('att-history-card').hidden = !data.user;
+    root.classList.toggle('att-signed-in', Boolean(data.user));
     get('att-admin').hidden = !data.user?.isAdmin;
     connect.removeAttribute('aria-disabled'); connect.tabIndex = 0;
     paintHistory(data);
@@ -162,14 +189,16 @@
   get('att-retry').addEventListener('click', refresh);
   connect.addEventListener('click', event => { if (connect.getAttribute('aria-disabled') === 'true') event.preventDefault(); });
   // Refresh server date/session after a background tab returns or a clan day rolls over.
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
-  setInterval(() => { if (!document.hidden) refresh(); }, 60000);
+  document.addEventListener('visibilitychange', () => { if (root.open && !document.hidden) refresh(); });
+  setInterval(() => { if (root.open && !document.hidden) refresh(); }, 60000);
   const query = new URL(location.href);
   const authError = query.searchParams.get('attendance_error');
   if (authError) {
     query.searchParams.delete('attendance_error'); window.history.replaceState(null, '', query);
   }
-  refresh().then(() => {
-    if (authError) message(({ cancelled: 'Discord sign-in was cancelled. You can try again whenever you’re ready.', membership: 'Sign in with an approved member account from the clan Discord server.', failed: 'Discord sign-in did not finish. Please try again.' })[authError] || 'Discord sign-in did not finish. Please try again.', true);
-  });
+  if (location.hash === '#attendance' || authError) {
+    openAttendance().then(() => {
+      if (authError) message(({ cancelled: 'Discord sign-in was cancelled. You can try again whenever you’re ready.', membership: 'Sign in with an approved member account from the clan Discord server.', failed: 'Discord sign-in did not finish. Please try again.' })[authError] || 'Discord sign-in did not finish. Please try again.', true);
+    });
+  }
 })();
