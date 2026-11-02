@@ -1,0 +1,58 @@
+/* Daily attendance follows the existing SYNCHRONIZED palette and typography. */
+.attendance-nav{display:flex;align-items:center;gap:22px}
+.attendance-nav>a:first-child{font:500 .95rem var(--b);color:var(--text-primary);text-decoration:none}
+.attendance-nav>a:first-child:hover{color:var(--cy)}
+#attendance{scroll-margin-top:90px;position:relative;padding:100px max(24px,7vw);border-top:1px solid var(--line);background:radial-gradient(ellipse at 90% 10%,rgba(155,92,255,.13),transparent 60%)}
+#attendance [hidden]{display:none!important}
+.att-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:36px}
+#attendance h3{margin:14px 0 16px;max-width:18ch}
+.att-heading p{color:var(--text-secondary);max-width:48ch}
+.att-day{flex:none;border:1px solid var(--line);border-radius:8px;padding:16px 20px;font:400 .75rem/1.8 var(--m);color:var(--text-secondary)}
+.att-day strong{display:block;color:var(--text-primary);font-weight:400;font-size:.95rem}
+.att-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:22px}
+.att-card{padding:30px;border:1px solid var(--line);border-radius:12px;background:rgba(23,16,52,.88);min-width:0}
+.att-kicker{font:400 .7rem var(--m);letter-spacing:.1em;text-transform:uppercase;color:var(--cy);margin-bottom:20px}
+#attendance h4{font:700 clamp(1.15rem,2vw,1.5rem)/1.4 var(--d);margin:0 0 12px;color:var(--text-primary)}
+.att-card p{color:var(--text-secondary);line-height:1.6}
+.att-signin{margin-top:24px;display:inline-block}
+.att-note{font-size:.86rem;margin-top:18px}
+.att-person{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.att-avatar{width:54px;height:54px;border-radius:50%;background:var(--canvas);border:1px solid var(--line);display:grid;place-items:center;flex:none;overflow:hidden;font:700 1.2rem var(--d);color:var(--cy)}
+.att-avatar img{height:100%;width:100%;object-fit:cover}
+.att-person strong{display:block;font-size:1.15rem;overflow-wrap:anywhere}
+.att-person small{color:var(--text-secondary);overflow-wrap:anywhere}
+.att-person .att-link{margin-left:auto;flex:none}
+.att-link{border:0;background:transparent;color:var(--cy);text-decoration:underline;text-underline-offset:4px;cursor:pointer;font:500 .9rem var(--b);padding:8px 0;min-height:44px}
+.att-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}
+.att-stats div{padding:16px;border:1px solid var(--line);border-radius:6px}
+.att-stats strong{display:block;font:700 1.7rem var(--d);color:var(--text-primary)}
+.att-stats span{font-size:.86rem;color:var(--text-secondary)}
+#att-checkin:disabled,#attendance button:disabled,#attendance a[aria-disabled=true]{opacity:.55;cursor:default;pointer-events:none}
+#att-checkin.done{background:var(--cy);opacity:1}
+.att-history{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin:22px 0}
+.att-history-day{display:grid;place-items:center;gap:5px;min-height:62px;border:1px solid var(--line);border-radius:6px;background:var(--canvas);font:400 .7rem var(--m);color:var(--text-secondary)}
+.att-history-day b{font:500 1rem var(--b);color:var(--text-primary)}
+.att-history-day.present{border-color:var(--cy);background:rgba(56,216,255,.1)}
+.att-history-day.present b{color:var(--cy)}
+.att-history-day.today{outline:1px dashed var(--text-secondary);outline-offset:2px}
+.att-legend{display:flex;gap:18px;flex-wrap:wrap;font-size:.85rem;color:var(--text-secondary)}
+.att-legend span:first-child{color:var(--cy)}
+.att-status{min-height:26px;margin-top:20px;font-size:.95rem;color:var(--text-secondary)}
+.att-status.error{color:#ffb4cc}
+.att-admin{margin-top:24px}
+.att-admin-head{display:flex;align-items:end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.att-admin-actions{display:flex;align-items:end;gap:16px;flex-wrap:wrap}
+.att-admin label{display:grid;gap:6px;font-size:.9rem;color:var(--text-secondary)}
+.att-admin input{background:var(--canvas);color:var(--text-primary);color-scheme:dark;border:1px solid var(--line);padding:10px;border-radius:4px;width:auto;min-height:44px;font:400 .9rem var(--b)}
+.att-table-wrap{overflow-x:auto;margin-top:20px}
+.att-table{border-collapse:collapse;width:100%;text-align:left;font-size:.95rem}
+.att-table th{font:400 .72rem var(--m);color:var(--text-secondary);padding:12px 10px;border-bottom:1px solid var(--line)}
+.att-table td{padding:14px 10px;border-bottom:1px solid rgba(90,77,150,.45)}
+.att-table td:first-child{overflow-wrap:anywhere}
+.att-table small{display:block;color:var(--text-secondary)}
+.att-table .present{color:var(--cy)}
+.att-table caption{text-align:left;color:var(--text-secondary);font-size:.85rem;padding-bottom:14px}
+#attendance :is(a,button,input):focus-visible{outline:2px solid var(--cy);outline-offset:5px}
+@media(max-width:720px){.att-layout{grid-template-columns:1fr}.att-heading{align-items:start;flex-direction:column}.att-card{padding:22px}.att-day{width:100%}#attendance{padding:70px max(18px,5vw)}.attendance-nav{gap:14px}.attendance-nav>a:first-child{font-size:.85rem}}
+@media(max-width:640px){nav>a>img{max-width:36vw}}
+@media(max-width:380px){.attendance-nav{gap:10px}.att-card{padding:18px}.att-history{gap:5px}.att-person{flex-wrap:wrap}}
